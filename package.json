@@ -1,0 +1,43 @@
+{
+  "name": "lucerna",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "bun@1.3.14",
+  "author": "Anthony Tropeano",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "content:build": "bun scripts/build-content.ts",
+    "icons:build": "bun scripts/build-icons.ts",
+    "dev": "bunx --bun vite",
+    "dev:tls": "bash scripts/dev-tls.sh",
+    "build": "bun run content:build && tsc -b && bunx --bun vite build && bun scripts/build-pwa.ts",
+    "lint": "oxlint",
+    "test": "bun test",
+    "serve:dist": "bun scripts/serve-dist.ts",
+    "pretest:e2e": "bun run build",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "preview": "bunx --bun vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "bun-types": "1.3.14",
+    "oxlint": "^1.71.0",
+    "oxlint-tsgolint": "^0.24.0",
+    "prettier": "^3.9.4",
+    "tailwindcss": "^4.3.2",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  }
+}

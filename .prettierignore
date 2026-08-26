@@ -1,0 +1,7 @@
+bun.lock
+node_modules
+dist
+public
+src/assets
+*.svg
+*.png

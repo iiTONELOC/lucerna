@@ -1,0 +1,350 @@
+@import 'tailwindcss';
+
+@custom-variant spread (@media (orientation: landscape) and (min-height: 40rem));
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('./assets/fonts/eb-garamond-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('./assets/fonts/eb-garamond-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('./assets/fonts/eb-garamond-italic-latin-ext.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'EB Garamond';
+  font-style: italic;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('./assets/fonts/eb-garamond-italic-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme inline {
+  --color-background: var(--theme-background);
+  --color-surface: var(--theme-surface);
+  --color-surface-raised: var(--theme-surface-raised);
+  --color-hairline: var(--theme-hairline);
+  --color-border: var(--theme-border);
+  --color-foreground: var(--theme-foreground);
+  --color-secondary: var(--theme-secondary);
+  --color-muted: var(--theme-muted);
+  --color-accent: var(--theme-accent);
+  --color-edge-light: var(--theme-edge-light);
+  --color-accent-current: var(--theme-accent-current);
+  --color-accent-strong: var(--theme-accent-strong);
+  --color-accent-foreground: var(--theme-accent-foreground);
+  --color-on-art-scrim: var(--theme-on-art-scrim);
+  --color-on-art-foreground: var(--theme-on-art-foreground);
+  --color-on-art-secondary: var(--theme-on-art-secondary);
+  --color-on-art-muted: var(--theme-on-art-muted);
+  --color-on-art-accent: var(--theme-on-art-accent);
+  --color-on-art-accent-foreground: var(--theme-on-art-accent-foreground);
+  --text-mark: clamp(4.5rem, calc(12 * var(--type-scale-unit)), 10rem);
+  --leading-mark: 1;
+  --tracking-mark: 0.1em;
+  --text-title: clamp(1.75rem, calc(4 * var(--type-scale-unit)), 3rem);
+  --leading-title: 1.1;
+  --tracking-title: -0.008em;
+  --text-nav: clamp(1.125rem, calc(1.25 * var(--type-scale-unit)), 1.375rem);
+  --leading-nav: 1.3;
+  --tracking-nav: 0em;
+  --text-body: clamp(1rem, calc(1.1 * var(--type-scale-unit)), 1.25rem);
+  --leading-body: 1.6;
+  --text-subtitle: clamp(0.875rem, var(--type-scale-unit), 1.125rem);
+  --leading-subtitle: 1.3;
+  --tracking-subtitle: 0.09em;
+  --text-scripture: clamp(1.0625rem, calc(1.5 * var(--type-scale-unit)), 1.75rem);
+  --leading-scripture: 1.72;
+  --text-citation: clamp(0.8125rem, calc(0.9 * var(--type-scale-unit)), 1.125rem);
+  --leading-citation: 1.4;
+  --text-legal: clamp(0.6875rem, calc(0.72 * var(--type-scale-unit)), 0.8125rem);
+  --leading-legal: 1.4;
+  --tracking-legal: 0.04em;
+  --font-lucerna: 'EB Garamond', Georgia, serif;
+  --font-display: var(--font-lucerna);
+  --font-mark: var(--font-lucerna);
+  --font-reading: var(--font-lucerna);
+  --spacing-safe-top: env(safe-area-inset-top);
+  --spacing-safe-right: env(safe-area-inset-right);
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+  --spacing-safe-left: env(safe-area-inset-left);
+}
+
+@utility small-caps {
+  font-variant-caps: small-caps;
+}
+
+@utility art-ambient {
+  scale: 1.2;
+  filter: blur(2.5rem) saturate(0.8);
+  opacity: 0.45;
+
+  @media (forced-colors: active) {
+    display: none;
+  }
+}
+
+@utility art-scrim {
+  background:
+    radial-gradient(ellipse at center, transparent 25%, var(--theme-background) 85%),
+    color-mix(in srgb, var(--theme-background) 60%, transparent);
+
+  @media (forced-colors: active) {
+    background: Canvas;
+  }
+}
+
+@utility drape-relief {
+  filter: drop-shadow(0 1px 1px var(--theme-on-art-scrim))
+    drop-shadow(0 3px 7px var(--theme-on-art-scrim))
+    drop-shadow(0 0 14px color-mix(in srgb, var(--theme-on-art-scrim) 78%, transparent));
+
+  @media (forced-colors: active) {
+    filter: none;
+  }
+}
+
+@utility surface-chrome {
+  background: color-mix(in srgb, var(--theme-surface-raised) 70%, transparent);
+  backdrop-filter: blur(1.5rem) saturate(1.1);
+  box-shadow: inset 0 1px 0 var(--theme-edge-light);
+
+  @media (forced-colors: active) {
+    background: Canvas;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: 1px solid ButtonText;
+  }
+}
+
+@utility scroll-region {
+  scrollbar-color: var(--theme-border) transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--theme-border);
+    border: 0.125rem solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--theme-accent);
+  }
+
+  @media (forced-colors: active) {
+    scrollbar-color: auto;
+    scrollbar-width: auto;
+
+    &::-webkit-scrollbar {
+      width: auto;
+    }
+
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-thumb:hover {
+      background: initial;
+      border: initial;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --type-scale-unit: 1vmin;
+    --theme-background: #0a0806;
+    --theme-surface: #14100b;
+    --theme-surface-raised: #1d1811;
+    --theme-hairline: #3a3126;
+    --theme-border: #6b5c46;
+    --theme-foreground: #f4efe3;
+    --theme-secondary: #cfc5b2;
+    --theme-muted: #a89b86;
+    --theme-accent: #d5b86f;
+    --theme-accent-current: #f2db91;
+    --theme-accent-strong: #fffdf5;
+    --theme-accent-foreground: #0a0806;
+    --theme-edge-light: rgb(242 219 145 / 0.1);
+    --theme-on-art-scrim: #0a0806;
+    --theme-on-art-foreground: #f4efe3;
+    --theme-on-art-secondary: #cfc5b2;
+    --theme-on-art-muted: #a89b86;
+    --theme-on-art-accent: #f2db91;
+    --theme-on-art-accent-foreground: #0a0806;
+    --bead-active-core: #fffdf5;
+    --bead-active-mid: #f2db91;
+    --bead-active-edge: #d5b86f;
+    --bead-active-glow: #f2db91;
+    --chain-shadow: #211e1a;
+    --chain-fill: #7b766e;
+    --chain-light: #c7c2b9;
+    --drape-shadow: color-mix(in srgb, var(--theme-background) 92%, transparent);
+    --rule-lit-width: 2px;
+    --rule-lit-inset: 0.5rem;
+    background-color: var(--theme-background);
+    color: var(--theme-foreground);
+    font-family: var(--font-lucerna);
+    font-optical-sizing: auto;
+    font-variant-numeric: oldstyle-nums;
+  }
+
+  [data-text-scale='88'] {
+    font-size: 88%;
+  }
+
+  [data-text-scale='113'] {
+    font-size: 113%;
+  }
+
+  [data-text-scale='125'] {
+    font-size: 125%;
+  }
+
+  [data-text-scale='138'] {
+    font-size: 138%;
+  }
+
+  [data-text-scale='150'] {
+    font-size: 150%;
+  }
+
+  [data-theme='light'] {
+    color-scheme: light;
+    --theme-background: #f2ece0;
+    --theme-surface: #faf6ec;
+    --theme-surface-raised: #fffcf4;
+    --theme-hairline: #d8cdb8;
+    --theme-border: #8a7a5f;
+    --theme-foreground: #191714;
+    --theme-secondary: #403b34;
+    --theme-muted: #71685b;
+    --theme-accent: #8a6408;
+    --theme-accent-current: #7f5600;
+    --theme-accent-strong: #5a3a00;
+    --theme-accent-foreground: #fffcf4;
+    --theme-edge-light: rgb(255 255 255 / 0.9);
+    --bead-active-core: #fffdf5;
+    --bead-active-mid: #f2db91;
+    --bead-active-edge: #d5b86f;
+    --bead-active-glow: #7d5f18;
+    --drape-shadow: color-mix(in srgb, var(--theme-foreground) 42%, transparent);
+  }
+
+  [data-bead-material='wood'] {
+    --bead-fill: #6b4a2e;
+    --bead-light: #9a7350;
+    --bead-dark: #3f2a18;
+    --bead-chain: #7a6248;
+    --bead-specular: #ffffff;
+    --bead-specular-opacity: 0.4;
+  }
+
+  [data-bead-material='pearl'] {
+    --bead-fill: #e8e2d6;
+    --bead-light: #ffffff;
+    --bead-dark: #b8ae9c;
+    --bead-chain: #cbc3b2;
+    --bead-specular: #ffffff;
+    --bead-specular-opacity: 0.85;
+  }
+
+  [data-bead-material='obsidian'] {
+    --bead-fill: #1f1b18;
+    --bead-light: #4a423b;
+    --bead-dark: #0c0a09;
+    --bead-chain: #5a5048;
+    --bead-specular: #ffffff;
+    --bead-specular-opacity: 0.8;
+  }
+
+  [data-bead-material='rose'] {
+    --bead-fill: #a8536a;
+    --bead-light: #c87d90;
+    --bead-dark: #6e3344;
+    --bead-chain: #9a7a82;
+    --bead-specular: #ffffff;
+    --bead-specular-opacity: 0.6;
+  }
+
+  @media (forced-colors: active) {
+    [data-bead-material] {
+      --bead-fill: Canvas;
+      --bead-light: Canvas;
+      --bead-dark: CanvasText;
+      --bead-chain: CanvasText;
+      --bead-specular: Highlight;
+      --bead-specular-opacity: 1;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :root {
+      color-scheme: light dark;
+      --theme-background: Canvas;
+      --theme-surface: Canvas;
+      --theme-surface-raised: Canvas;
+      --theme-hairline: GrayText;
+      --theme-border: ButtonText;
+      --theme-foreground: CanvasText;
+      --theme-secondary: CanvasText;
+      --theme-muted: GrayText;
+      --theme-accent: LinkText;
+      --theme-accent-current: Highlight;
+      --theme-accent-strong: HighlightText;
+      --theme-accent-foreground: Canvas;
+      --theme-edge-light: ButtonText;
+      --theme-on-art-scrim: Canvas;
+      --theme-on-art-foreground: CanvasText;
+      --theme-on-art-secondary: CanvasText;
+      --theme-on-art-muted: GrayText;
+      --theme-on-art-accent: LinkText;
+      --theme-on-art-accent-foreground: Canvas;
+      --bead-active-core: HighlightText;
+      --bead-active-mid: Highlight;
+      --bead-active-edge: Highlight;
+      --bead-active-glow: Highlight;
+      --chain-shadow: CanvasText;
+      --chain-fill: CanvasText;
+      --chain-light: Highlight;
+      --drape-shadow: transparent;
+    }
+  }
+}

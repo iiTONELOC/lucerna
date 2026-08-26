@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Lucerna French Quarter lantern</title>
+  <desc id="desc">A dancing flame contained inside a tapered French Quarter lantern.</desc>
+  <defs>
+    <linearGradient id="brass" x1="118" y1="48" x2="390" y2="472" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff3d6"/>
+      <stop offset=".28" stop-color="#dec58a"/>
+      <stop offset=".65" stop-color="#ad8845"/>
+      <stop offset="1" stop-color="#695022"/>
+    </linearGradient>
+    <linearGradient id="glassLeft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".13"/>
+      <stop offset=".55" stop-color="#a9c8d4" stop-opacity=".035"/>
+      <stop offset="1" stop-color="#d9b665" stop-opacity=".1"/>
+    </linearGradient>
+    <linearGradient id="glassRight" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9b665" stop-opacity=".12"/>
+      <stop offset=".5" stop-color="#a9c8d4" stop-opacity=".025"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".08"/>
+    </linearGradient>
+    <radialGradient id="light" cx="50%" cy="62%" r="47%">
+      <stop offset="0" stop-color="#fffdf7" stop-opacity=".94"/>
+      <stop offset=".2" stop-color="#f8e8b7" stop-opacity=".62"/>
+      <stop offset=".56" stop-color="#d5b86f" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#d5b86f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#cba653"/>
+      <stop offset=".48" stop-color="#f2db91"/>
+      <stop offset="1" stop-color="#fffdf5"/>
+    </linearGradient>
+    <filter id="softGlow" x="-110%" y="-110%" width="320%" height="320%">
+      <feGaussianBlur stdDeviation="13"/>
+    </filter>
+    <filter id="flameGlow" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .aura { animation: aura 5.2s ease-in-out -1.7s infinite alternate; transform-box: fill-box; transform-origin: center; }
+      .flame-drift { animation: flame-drift 6.4s cubic-bezier(.42, 0, .58, 1) -3.1s infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+      .flame-shell { animation: flame-shell 3.1s ease-in-out -1s infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+      .flame-core { animation: flame-core 2.4s ease-in-out -.5s infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+      @keyframes aura {
+        0% { opacity: .72; transform: translate(-2px, 1px) scale(.96, 1.02); }
+        17% { opacity: .91; transform: translate(4px, -2px) scale(1.05, .97); }
+        39% { opacity: .78; transform: translate(-3px, 2px) scale(.98, 1.04); }
+        64% { opacity: .95; transform: translate(2px, -1px) scale(1.03, .99); }
+        83% { opacity: .74; transform: translate(-1px, 1px) scale(.97, 1.03); }
+        100% { opacity: .88; transform: translate(3px, -2px) scale(1.02, .98); }
+      }
+      @keyframes flame-drift {
+        0% { transform: translateX(-3px) rotate(-1.2deg); }
+        23% { transform: translateX(4px) rotate(1.8deg); }
+        41% { transform: translateX(-2px) rotate(-.7deg); }
+        68% { transform: translateX(3px) rotate(1.1deg); }
+        86% { transform: translateX(-4px) rotate(-1.5deg); }
+        100% { transform: translateX(1px) rotate(.4deg); }
+      }
+      @keyframes flame-shell {
+        0% { transform: skewX(-2deg) scale(1.03, .96); }
+        13% { transform: skewX(4deg) scale(.92, 1.12); }
+        31% { transform: skewX(-3deg) scale(1.06, .94); }
+        52% { transform: skewX(2deg) scale(.96, 1.08); }
+        73% { transform: skewX(-1deg) scale(1.02, .98); }
+        89% { transform: skewX(3deg) scale(.94, 1.1); }
+        100% { transform: skewX(-2deg) scale(1.04, .95); }
+      }
+      @keyframes flame-core {
+        0% { opacity: .86; transform: translateX(-1px) scale(1.04, .94); }
+        19% { opacity: 1; transform: translateX(3px) scale(.84, 1.14); }
+        37% { opacity: .9; transform: translateX(-2px) scale(1.08, .92); }
+        58% { opacity: .98; transform: translateX(2px) scale(.9, 1.1); }
+        76% { opacity: .84; transform: translateX(-3px) scale(1.06, .95); }
+        91% { opacity: 1; transform: translateX(1px) scale(.88, 1.12); }
+        100% { opacity: .89; transform: translateX(-1px) scale(1.03, .96); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .aura, .flame-drift, .flame-shell, .flame-core { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <ellipse class="aura" cx="256" cy="298" rx="180" ry="148" fill="url(#light)" filter="url(#softGlow)"/>
+
+  <rect x="235" y="332" width="42" height="60" rx="5" fill="#584523"/>
+  <g class="flame-drift" filter="url(#flameGlow)">
+    <path class="flame-shell" d="M256 347 C219 312 233 257 265 202 C273 248 306 270 291 309 C284 332 269 344 256 347 C243 339 233 328 256 321 Z" fill="url(#flame)"/>
+    <path class="flame-core" d="M256 334 C243 314 248 283 265 241 C272 275 282 291 275 311 C270 324 262 331 256 334 Z" fill="#fff"/>
+  </g>
+
+  <path d="M228 51 C228 28 284 28 284 51" fill="none" stroke="url(#brass)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M220 57 H292 L302 72 H210 Z" fill="none" stroke="url(#brass)" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M186 80 H326 C328 111 344 140 373 157 L354 174 H158 L139 157 C168 140 184 111 186 80 Z" fill="url(#glassRight)" stroke="url(#brass)" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M205 93 H307 C310 118 323 139 344 157 H168 C189 139 202 118 205 93 Z" fill="#584523" fill-opacity=".72" stroke="#ead7a0" stroke-opacity=".25" stroke-width="2"/>
+  <path d="M132 181 H380" fill="none" stroke="url(#brass)" stroke-width="9" stroke-linecap="round"/>
+
+  <path d="M140 191 L178 392 H256 V191 Z" fill="url(#glassLeft)"/>
+  <path d="M256 191 V392 H334 L372 191 Z" fill="url(#glassRight)"/>
+  <g fill="none" stroke="url(#brass)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M140 191 L178 392 H334 L372 191 Z" stroke-width="8.5"/>
+    <path d="M140 191 H372 M178 392 H334" stroke-width="8"/>
+    <path d="M199 199 L216 382 M313 199 L296 382" stroke-width="3.5" opacity=".7"/>
+  </g>
+  <path d="M178 392 H334 C326 412 307 422 285 426 L256 468 L227 426 C205 422 186 412 178 392 Z" fill="none" stroke="url(#brass)" stroke-width="7.5" stroke-linejoin="round"/>
+  <path d="M235 428 L256 468 L277 428" fill="none" stroke="url(#brass)" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <path d="M165 205 L190 374" stroke="#fff" stroke-opacity=".14" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M348 205 L321 374" stroke="#d7b76c" stroke-opacity=".1" stroke-width="2" stroke-linecap="round"/>
+</svg>

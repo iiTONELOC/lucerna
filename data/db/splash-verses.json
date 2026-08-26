@@ -1,0 +1,198 @@
+{
+  "openingSplashVerses": [
+    {
+      "reference": "2 Samuel 22:29",
+      "chapter": 22,
+      "verseStart": 29,
+      "verseEnd": 29,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/10-2SA-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "John 1:5",
+      "chapter": 1,
+      "verseStart": 5,
+      "verseEnd": 5,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/52-JHN-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "Psalm 118:105",
+      "chapter": 118,
+      "verseStart": 105,
+      "verseEnd": 105,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/21-PSA-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "2 Peter 1:19",
+      "chapter": 1,
+      "verseStart": 19,
+      "verseEnd": 19,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/71-2PE-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "John 8:12",
+      "chapter": 8,
+      "verseStart": 12,
+      "verseEnd": 12,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/52-JHN-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "2 Corinthians 4:6",
+      "chapter": 4,
+      "verseStart": 6,
+      "verseEnd": 6,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/56-2CO-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "Apocalypse 21:23",
+      "chapter": 21,
+      "verseStart": 23,
+      "verseEnd": 23,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/76-REV-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "Micheas 7:8",
+      "chapter": 7,
+      "verseStart": 8,
+      "verseEnd": 8,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/38-MIC-ENG[B]DRC1750[pd].p.sfm"
+    },
+    {
+      "reference": "Isaias 60:19",
+      "chapter": 60,
+      "verseStart": 19,
+      "verseEnd": 19,
+      "sourceId": "douay-rheims-challoner",
+      "sourceFile": "data/library/bibles/douray-rheims/27-ISA-ENG[B]DRC1750[pd].p.sfm"
+    }
+  ],
+  "mysteryPickerVerses": [
+    {
+      "reference": "Luke 1:28",
+      "book": "Luke",
+      "chapter": 1,
+      "verseStart": 28,
+      "verseEnd": 28,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Luke 1:42",
+      "book": "Luke",
+      "chapter": 1,
+      "verseStart": 42,
+      "verseEnd": 42,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Luke 1:46-47",
+      "book": "Luke",
+      "chapter": 1,
+      "verseStart": 46,
+      "verseEnd": 47,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Luke 1:48",
+      "book": "Luke",
+      "chapter": 1,
+      "verseStart": 48,
+      "verseEnd": 48,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Luke 2:19",
+      "book": "Luke",
+      "chapter": 2,
+      "verseStart": 19,
+      "verseEnd": 19,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Luke 2:51",
+      "book": "Luke",
+      "chapter": 2,
+      "verseStart": 51,
+      "verseEnd": 51,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "John 2:5",
+      "book": "John",
+      "chapter": 2,
+      "verseStart": 5,
+      "verseEnd": 5,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "John 19:27",
+      "book": "John",
+      "chapter": 19,
+      "verseStart": 27,
+      "verseEnd": 27,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Acts 1:14",
+      "book": "Acts",
+      "chapter": 1,
+      "verseStart": 14,
+      "verseEnd": 14,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Matthew 6:6",
+      "book": "Matthew",
+      "chapter": 6,
+      "verseStart": 6,
+      "verseEnd": 6,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Matthew 26:41",
+      "book": "Matthew",
+      "chapter": 26,
+      "verseStart": 41,
+      "verseEnd": 41,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "1 Thessalonians 5:17",
+      "book": "1 Thessalonians",
+      "chapter": 5,
+      "verseStart": 17,
+      "verseEnd": 17,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Philippians 4:8",
+      "book": "Philippians",
+      "chapter": 4,
+      "verseStart": 8,
+      "verseEnd": 8,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Psalm 45:11",
+      "book": "Psalm",
+      "chapter": 45,
+      "verseStart": 11,
+      "verseEnd": 11,
+      "sourceId": "douay-rheims-challoner"
+    },
+    {
+      "reference": "Colossians 3:16",
+      "book": "Colossians",
+      "chapter": 3,
+      "verseStart": 16,
+      "verseEnd": 16,
+      "sourceId": "douay-rheims-challoner"
+    }
+  ]
+}

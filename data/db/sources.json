@@ -1,0 +1,121 @@
+{
+  "met-open-access": {
+    "work": "The Metropolitan Museum of Art — Open Access",
+    "author": "The Metropolitan Museum of Art",
+    "approval": "CC0 / public domain",
+    "url": "https://www.metmuseum.org/about-the-met/policies-and-documents/open-access",
+    "type": "art"
+  },
+  "wikimedia-pd-art": {
+    "work": "Wikimedia Commons — PD-Art",
+    "author": "Wikimedia Commons",
+    "approval": "PD-Art / public domain",
+    "url": "https://commons.wikimedia.org/",
+    "type": "art"
+  },
+  "rosary-center-prayers": {
+    "work": "Prayers of the Rosary (traditional English form)",
+    "author": "Rosary Center & Confraternity (Dominican Friars, O.P.)",
+    "approval": "public-domain liturgical",
+    "url": "https://www.rosarycenter.org/how-to-pray-the-rosary-prayers-of-the-rosary",
+    "type": "prayer"
+  },
+  "rosary-center-howto": {
+    "work": "How to Pray the Rosary",
+    "author": "Rosary Center & Confraternity (Dominican Friars, O.P.)",
+    "approval": "public-domain liturgical",
+    "url": "https://www.rosarycenter.org/how-to-pray-the-rosary/",
+    "type": "liturgical"
+  },
+  "traditional-catholic-prayers-howto": {
+    "work": "How to Pray the Rosary",
+    "author": "Traditional Catholic Prayers",
+    "approval": "reference page; no page content is bundled",
+    "url": "https://traditionalcatholicprayers.com/2019/11/15/how-to-pray-the-rosary/",
+    "type": "liturgical"
+  },
+  "douay-rheims-challoner": {
+    "work": "Douay-Rheims Bible, Challoner Revision (DRC 1750)",
+    "author": "Challoner revision",
+    "approval": "public domain",
+    "url": "https://github.com/BibleCorps/ENG-B-DRC1750-pd-PSFM",
+    "path": "data/library/bibles/douray-rheims",
+    "type": "bible"
+  },
+  "holy-see-mysteries": {
+    "work": "The Mysteries of the Rosary",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_en.html",
+    "type": "liturgical"
+  },
+  "holy-see-joyful": {
+    "work": "The Mysteries of the Rosary: Joyful Mysteries",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_gaudiosi_en.html",
+    "type": "liturgical"
+  },
+  "holy-see-sorrowful": {
+    "work": "The Mysteries of the Rosary: Sorrowful Mysteries",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_dolorosi_en.html",
+    "type": "liturgical"
+  },
+  "holy-see-glorious": {
+    "work": "The Mysteries of the Rosary: Glorious Mysteries",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_gloriosi_en.html",
+    "type": "liturgical"
+  },
+  "holy-see-luminous": {
+    "work": "The Mysteries of the Rosary: Mysteries of Light",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_luminosi_en.html",
+    "type": "liturgical"
+  },
+  "holy-see-howto": {
+    "work": "How to pray the Rosary, on The Mysteries of the Rosary page",
+    "author": "The Holy See",
+    "approval": "public-domain liturgical",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_en.html",
+    "type": "liturgical"
+  },
+  "usccb-fruits": {
+    "work": "How to Pray the Rosary (fruits of the mysteries)",
+    "author": "USCCB",
+    "approval": "public-domain liturgical",
+    "url": "https://www.usccb.org/how-to-pray-the-rosary",
+    "type": "liturgical"
+  },
+  "usccb-howto": {
+    "work": "How to Pray the Rosary",
+    "author": "USCCB",
+    "approval": "public-domain liturgical",
+    "url": "https://www.usccb.org/how-to-pray-the-rosary",
+    "type": "liturgical"
+  },
+  "de-montfort-secret": {
+    "work": "The Secret of the Rosary",
+    "author": "St. Louis de Montfort",
+    "translator": "Mary Barbour",
+    "publisher": "Montfort Fathers, Bay Shore, N.Y.",
+    "published": "1954",
+    "approval": "public domain in the U.S.; 1954 U.S. edition required renewal in 1981/1982 and no Stanford Copyright Renewal Database record was found",
+    "path": "data/library/texts/de-montfort-secret/secret-of-the-rosary.txt",
+    "url": "https://www.sanpiodapietrelcina.org/english/secret.htm",
+    "citationUrl": "https://www.ecatholic2000.com/montfort/rosary/rosary.shtml",
+    "renewalSearchUrl": "https://exhibits.stanford.edu/copyrightrenewals/catalog?search_field=search&q=%22Secret+of+the+Rosary%22",
+    "type": "text"
+  },
+  "rosarium-virginis-mariae": {
+    "work": "Rosarium Virginis Mariae (2002)",
+    "author": "Pope John Paul II",
+    "approval": "magisterial (apostolic letter)",
+    "url": "https://www.vatican.va/content/john-paul-ii/en/apost_letters/2002/documents/hf_jp-ii_apl_20021016_rosarium-virginis-mariae.html",
+    "type": "magisterial"
+  }
+}

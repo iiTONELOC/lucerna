@@ -1,0 +1,825 @@
+{
+  "devotion": "rosary",
+  "schedule": {
+    "sunday": "glorious",
+    "monday": "joyful",
+    "tuesday": "sorrowful",
+    "wednesday": "glorious",
+    "thursday": "luminous",
+    "friday": "sorrowful",
+    "saturday": "joyful",
+    "sourceId": "holy-see-mysteries"
+  },
+  "prayerIds": [
+    "sign-of-the-cross",
+    "apostles-creed",
+    "our-father",
+    "hail-mary",
+    "glory-be",
+    "fatima-prayer",
+    "hail-holy-queen",
+    "closing-prayer"
+  ],
+  "mysterySets": [
+    {
+      "id": "joyful",
+      "ordinal": 1,
+      "name": "Joyful Mysteries",
+      "nameSourceId": "holy-see-mysteries",
+      "mysteries": [
+        {
+          "set": "joyful",
+          "ordinal": 1,
+          "title": "The Annunciation",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Humility",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 1:26-27",
+            "book": "Luke",
+            "chapter": 1,
+            "verseStart": 26,
+            "verseEnd": 27,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-joyful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.joyful.1",
+            "locator": "First Method, paragraph 156, First decade",
+            "sourceTitle": "Incarnation",
+            "theme": "humility of heart"
+          },
+          "artId": "hans-memling--the-annunciation"
+        },
+        {
+          "set": "joyful",
+          "ordinal": 2,
+          "title": "The Visitation",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Love of Neighbor",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 1:39-42",
+            "book": "Luke",
+            "chapter": 1,
+            "verseStart": 39,
+            "verseEnd": 42,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-joyful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.joyful.2",
+            "locator": "First Method, paragraph 156, Second decade",
+            "sourceTitle": "Visitation",
+            "theme": "perfect love of neighbor"
+          },
+          "artId": "domenico-ghirlandaio--the-visitation"
+        },
+        {
+          "set": "joyful",
+          "ordinal": 3,
+          "title": "The Birth of Our Lord",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Poverty",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 2:1-7",
+            "book": "Luke",
+            "chapter": 2,
+            "verseStart": 1,
+            "verseEnd": 7,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-joyful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.joyful.3",
+            "locator": "First Method, paragraph 156, Third decade",
+            "sourceTitle": "Birth of Jesus",
+            "theme": "detachment from the world, love of poverty, and love of the poor"
+          },
+          "artId": "correggio--the-holy-night-the-nativity"
+        },
+        {
+          "set": "joyful",
+          "ordinal": 4,
+          "title": "The Presentation in the Temple",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Purity of Heart and Body",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 2:21-24",
+            "book": "Luke",
+            "chapter": 2,
+            "verseStart": 21,
+            "verseEnd": 24,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-joyful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.joyful.4",
+            "locator": "First Method, paragraph 156, Fourth decade",
+            "sourceTitle": "Presentation in the temple",
+            "theme": "wisdom and purity of heart and body"
+          },
+          "artId": "giovanni-bellini--presentation-of-jesus-at-the-temple"
+        },
+        {
+          "set": "joyful",
+          "ordinal": 5,
+          "title": "The Finding of Jesus in the Temple",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Devotion to Jesus",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 2:41-47",
+            "book": "Luke",
+            "chapter": 2,
+            "verseStart": 41,
+            "verseEnd": 47,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-joyful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.joyful.5",
+            "locator": "First Method, paragraph 156, Fifth decade",
+            "sourceTitle": "Finding of Jesus in the temple",
+            "theme": "conversion of sinners and return to Christ"
+          },
+          "artId": "paolo-veronese--christ-among-the-doctors-in-the-temple"
+        }
+      ]
+    },
+    {
+      "id": "luminous",
+      "ordinal": 2,
+      "name": "Mysteries of Light",
+      "nameSourceId": "holy-see-mysteries",
+      "mysteries": [
+        {
+          "set": "luminous",
+          "ordinal": 1,
+          "title": "The Baptism in the Jordan",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Openness to the Holy Spirit",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 3:16-17",
+            "book": "Matthew",
+            "chapter": 3,
+            "verseStart": 16,
+            "verseEnd": 17,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-luminous"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "summary-subpoint",
+            "sectionId": "third-method.summary.finding-in-the-temple.4",
+            "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 4th Hail Mary",
+            "sourceTitle": "His baptism by St. John Baptist",
+            "theme": "the baptism of Christ",
+            "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+          },
+          "artId": "piero-della-francesca--the-baptism-of-christ"
+        },
+        {
+          "set": "luminous",
+          "ordinal": 2,
+          "title": "The Wedding Feast of Cana",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "To Jesus through Mary",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "John 2:1-5",
+            "book": "John",
+            "chapter": 2,
+            "verseStart": 1,
+            "verseEnd": 5,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-luminous"
+          },
+          "reflection": {
+            "status": "candidate",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "summary-broad-candidate",
+            "sectionId": "third-method.summary.finding-in-the-temple.6",
+            "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 6th Hail Mary",
+            "sourceTitle": "His astounding miracles",
+            "theme": "Christ revealing his glory through miracles",
+            "note": "No explicit Cana reference appears in the De Montfort text; this is a broad miracle-theme candidate."
+          },
+          "artId": "paolo-veronese--the-wedding-at-cana"
+        },
+        {
+          "set": "luminous",
+          "ordinal": 3,
+          "title": "The Proclamation of the Kingdom of God",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Conversion",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Mark 1:15",
+            "book": "Mark",
+            "chapter": 1,
+            "verseStart": 15,
+            "verseEnd": 15,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-luminous"
+          },
+          "reflection": {
+            "status": "candidate",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "summary-broad-candidate",
+            "sectionId": "third-method.summary.finding-in-the-temple.5",
+            "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 5th Hail Mary",
+            "sourceTitle": "His wonderful preaching",
+            "theme": "Christ preaching conversion and the kingdom",
+            "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+          },
+          "artId": "fra-angelico--the-sermon-on-the-mount"
+        },
+        {
+          "set": "luminous",
+          "ordinal": 4,
+          "title": "The Transfiguration",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Desire for Holiness",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 17:1-2",
+            "book": "Matthew",
+            "chapter": 17,
+            "verseStart": 1,
+            "verseEnd": 2,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-luminous"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "summary-subpoint",
+            "sectionId": "third-method.summary.finding-in-the-temple.8",
+            "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 8th Hail Mary",
+            "sourceTitle": "His marvellous transfiguration",
+            "theme": "the Transfiguration of Christ",
+            "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+          },
+          "artId": "giovanni-bellini--the-transfiguration-of-christ"
+        },
+        {
+          "set": "luminous",
+          "ordinal": 5,
+          "title": "The Institution of the Eucharist",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Adoration",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 26:26",
+            "book": "Matthew",
+            "chapter": 26,
+            "verseStart": 26,
+            "verseEnd": 26,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-luminous"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "summary-subpoint",
+            "sectionId": "third-method.summary.finding-in-the-temple.10",
+            "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 10th Hail Mary",
+            "sourceTitle": "The institution of the Holy Eucharist",
+            "theme": "the institution of the Eucharist",
+            "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+          },
+          "artId": "juan-de-juanes--the-last-supper"
+        }
+      ]
+    },
+    {
+      "id": "sorrowful",
+      "ordinal": 3,
+      "name": "Sorrowful Mysteries",
+      "nameSourceId": "holy-see-mysteries",
+      "mysteries": [
+        {
+          "set": "sorrowful",
+          "ordinal": 1,
+          "title": "The Agony in the Garden",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Obedience to God's Will",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 26:36-39",
+            "book": "Matthew",
+            "chapter": 26,
+            "verseStart": 36,
+            "verseEnd": 39,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-sorrowful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.sorrowful.1",
+            "locator": "First Method, paragraph 157, Sixth decade",
+            "sourceTitle": "Agony in the garden of Olives",
+            "theme": "sorrow for sin and conformity to the will of God"
+          },
+          "artId": "giovanni-bellini--the-agony-in-the-garden"
+        },
+        {
+          "set": "sorrowful",
+          "ordinal": 2,
+          "title": "The Scourging at the Pillar",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Mortification",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 27:26",
+            "book": "Matthew",
+            "chapter": 27,
+            "verseStart": 26,
+            "verseEnd": 26,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-sorrowful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.sorrowful.2",
+            "locator": "First Method, paragraph 157, Seventh decade",
+            "sourceTitle": "Scourging",
+            "theme": "mortification of the senses"
+          },
+          "artId": "caravaggio--the-flagellation-of-christ"
+        },
+        {
+          "set": "sorrowful",
+          "ordinal": 3,
+          "title": "The Crowning with Thorns",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Courage",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Matthew 27:27-29",
+            "book": "Matthew",
+            "chapter": 27,
+            "verseStart": 27,
+            "verseEnd": 29,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-sorrowful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.sorrowful.3",
+            "locator": "First Method, paragraph 157, Eighth decade",
+            "sourceTitle": "Crowning with Thorns",
+            "theme": "contempt of the world"
+          },
+          "artId": "caravaggio--the-crowning-with-thorns"
+        },
+        {
+          "set": "sorrowful",
+          "ordinal": 4,
+          "title": "The Carrying of the Cross",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Patience",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Mark 15:21-22",
+            "book": "Mark",
+            "chapter": 15,
+            "verseStart": 21,
+            "verseEnd": 22,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-sorrowful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.sorrowful.4",
+            "locator": "First Method, paragraph 157, Ninth decade",
+            "sourceTitle": "Carrying the Cross",
+            "theme": "patience in carrying the cross"
+          },
+          "artId": "el-greco--christ-carrying-the-cross"
+        },
+        {
+          "set": "sorrowful",
+          "ordinal": 5,
+          "title": "The Crucifixion",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Sorrow for our Sins",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 23:33-46",
+            "book": "Luke",
+            "chapter": 23,
+            "verseStart": 33,
+            "verseEnd": 46,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-sorrowful"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.sorrowful.5",
+            "locator": "First Method, paragraph 157, Tenth decade",
+            "sourceTitle": "Crucifixion on Mount Calvary",
+            "theme": "horror of sin, love for the Cross, and grace of a holy death"
+          },
+          "artId": "diego-velazquez--christ-crucified"
+        }
+      ]
+    },
+    {
+      "id": "glorious",
+      "ordinal": 4,
+      "name": "Glorious Mysteries",
+      "nameSourceId": "holy-see-mysteries",
+      "mysteries": [
+        {
+          "set": "glorious",
+          "ordinal": 1,
+          "title": "The Resurrection",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Faith",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 24:1-5",
+            "book": "Luke",
+            "chapter": 24,
+            "verseStart": 1,
+            "verseEnd": 5,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-glorious"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.glorious.1",
+            "locator": "First Method, paragraph 158, Eleventh decade",
+            "sourceTitle": "Resurrection",
+            "theme": "lively faith"
+          },
+          "artId": "piero-della-francesca--the-resurrection"
+        },
+        {
+          "set": "glorious",
+          "ordinal": 2,
+          "title": "The Ascension",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Hope",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Mark 16:19",
+            "book": "Mark",
+            "chapter": 16,
+            "verseStart": 19,
+            "verseEnd": 19,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-glorious"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.glorious.2",
+            "locator": "First Method, paragraph 158, Twelfth decade",
+            "sourceTitle": "Ascension",
+            "theme": "firm hope and longing for heaven"
+          },
+          "artId": "pietro-perugino--the-ascension-of-christ"
+        },
+        {
+          "set": "glorious",
+          "ordinal": 3,
+          "title": "The Descent of the Holy Spirit",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Wisdom",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Acts 2:1-4",
+            "book": "Acts",
+            "chapter": 2,
+            "verseStart": 1,
+            "verseEnd": 4,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-glorious"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.glorious.3",
+            "locator": "First Method, paragraph 158, Thirteenth decade",
+            "sourceTitle": "Pentecost",
+            "theme": "holy wisdom and the practice of truth"
+          },
+          "artId": "el-greco--pentecost"
+        },
+        {
+          "set": "glorious",
+          "ordinal": 4,
+          "title": "The Assumption",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Devotion to Mary",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Luke 1:48-49",
+            "book": "Luke",
+            "chapter": 1,
+            "verseStart": 48,
+            "verseEnd": 49,
+            "sourceId": "douay-rheims-challoner",
+            "selectionSourceId": "holy-see-glorious"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.glorious.4",
+            "locator": "First Method, paragraph 158, Fourteenth decade",
+            "sourceTitle": "Assumption",
+            "theme": "true devotion to Mary and a happy death"
+          },
+          "artId": "titian--assumption-of-the-virgin-assunta"
+        },
+        {
+          "set": "glorious",
+          "ordinal": 5,
+          "title": "The Crowning of Our Lady Queen of Heaven",
+          "titleSourceId": "holy-see-mysteries",
+          "fruit": "Grace of a Happy Death",
+          "fruitSourceId": "usccb-fruits",
+          "scripture": {
+            "reference": "Apocalypse (Revelation) 12:1",
+            "book": "Apocalypse",
+            "chapter": 12,
+            "verseStart": 1,
+            "verseEnd": 1,
+            "sourceId": "douay-rheims-challoner",
+            "bookAlias": "Revelation",
+            "selectionSourceId": "holy-see-glorious"
+          },
+          "reflection": {
+            "status": "mapped",
+            "sourceId": "de-montfort-secret",
+            "mappingType": "direct-decade-offering",
+            "sectionId": "first-method.glorious.5",
+            "locator": "First Method, paragraph 158, Fifteenth decade",
+            "sourceTitle": "Crowning in glory of Mary",
+            "theme": "perseverance, increase in virtue, and the eternal crown"
+          },
+          "artId": "diego-velazquez--coronation-of-the-virgin"
+        }
+      ]
+    }
+  ],
+  "prayerStageArt": {
+    "sign-of-the-cross": [
+      "workshop-of-hans-memling--salvator-mundi",
+      "antonello-da-messina--salvator-mundi",
+      "domenico-fetti--salvator-mundi",
+      "el-greco--christ-as-saviour",
+      "juan-de-juanes--el-salvador",
+      "marco-d-oggiono--salvator-mundi",
+      "andrea-previtali--salvator-mundi",
+      "benedetto-diana--salvator-mundi",
+      "giampietrino--salvator-mundi",
+      "gerard-david--christ-blessing"
+    ],
+    "apostles-creed": [
+      "taddeo-di-bartolo--christ-and-the-twelve-apostles",
+      "workshop-of-el-greco--saint-andrew",
+      "peter-paul-rubens--saint-james-the-apostle",
+      "peter-paul-rubens--saint-john-the-apostle",
+      "peter-paul-rubens--saint-matthew-the-apostle",
+      "peter-paul-rubens--saint-matthias-the-apostle",
+      "jusepe-de-ribera--saint-andrew",
+      "el-greco--pentecost",
+      "el-greco--saints-peter-and-paul",
+      "jusepe-de-ribera--saints-peter-and-paul"
+    ],
+    "our-father": [
+      "fra-angelico--the-sermon-on-the-mount",
+      "cosimo-rosselli--the-sermon-on-the-mount",
+      "jan-brueghel-the-elder--the-sermon-on-the-mount",
+      "claude-lorrain--the-sermon-on-the-mount",
+      "domenico-ghirlandaio--calling-of-the-apostles",
+      "james-tissot--the-sermon-of-the-beatitudes",
+      "frans-francken-ii--the-sermon-on-the-mount",
+      "guillaume-fouace--le-sermon-sur-la-montagne"
+    ],
+    "hail-mary": [
+      "hans-memling--the-annunciation",
+      "sandro-botticelli--the-annunciation",
+      "petrus-christus--the-annunciation",
+      "philippe-de-champaigne--the-annunciation",
+      "murillo--immaculate-conception",
+      "sassoferrato--madonna-in-prayer",
+      "raphael--the-sistine-madonna",
+      "annibale-carracci--the-coronation-of-the-virgin",
+      "follower-of-botticelli--the-coronation-of-the-virgin",
+      "peter-paul-rubens--immaculate-conception"
+    ],
+    "glory-be": [
+      "agnolo-gaddi--the-trinity",
+      "masaccio--the-holy-trinity",
+      "el-greco--the-holy-trinity",
+      "titian--the-trinity-in-glory-la-gloria",
+      "jusepe-de-ribera--the-holy-trinity",
+      "guido-reni--la-trinita",
+      "spanish-painter--the-trinity-adored-by-all-saints"
+    ],
+    "fatima-prayer": [
+      "pompeo-batoni--sacred-heart-of-jesus",
+      "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
+      "guido-reni--st-michael-archangel"
+    ],
+    "hail-holy-queen": [
+      "piero-della-francesca--madonna-della-misericordia",
+      "enguerrand-quarton--the-coronation-of-the-virgin",
+      "fra-angelico--the-coronation-of-the-virgin",
+      "gentile-da-fabriano--the-coronation-of-the-virgin"
+    ],
+    "closing-prayer": [
+      "caravaggio--madonna-of-the-rosary",
+      "lorenzo-lotto--madonna-of-the-rosary",
+      "bartolome-esteban-murillo--the-virgin-of-the-rosary",
+      "sassoferrato--madonna-del-rosario",
+      "alonso-cano--virgen-del-rosario"
+    ]
+  },
+  "guidance": {
+    "settings": {
+      "preferenceId": "showGuidance",
+      "default": true
+    },
+    "sourceIds": [
+      "rosary-center-howto",
+      "traditional-catholic-prayers-howto",
+      "usccb-howto",
+      "holy-see-howto",
+      "rosarium-virginis-mariae"
+    ],
+    "silentSteps": [
+      "opening-sign-of-the-cross",
+      "apostles-creed",
+      "opening-our-father",
+      "opening-glory-be",
+      "closing-sign-of-the-cross"
+    ],
+    "openingHailMarys": [
+      {
+        "repetition": 1,
+        "text": "Pray this Hail Mary for faith.",
+        "sourceId": "rosary-center-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "rosary-center-howto",
+            "locator": "Three Hail Marys for faith, hope, and charity"
+          }
+        ]
+      },
+      {
+        "repetition": 2,
+        "text": "Pray this Hail Mary for hope.",
+        "sourceId": "rosary-center-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "rosary-center-howto",
+            "locator": "Three Hail Marys for faith, hope, and charity"
+          }
+        ]
+      },
+      {
+        "repetition": 3,
+        "text": "Pray this Hail Mary for charity.",
+        "sourceId": "rosary-center-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "rosary-center-howto",
+            "locator": "Three Hail Marys for faith, hope, and charity"
+          }
+        ]
+      }
+    ],
+    "mysteryAnnouncement": {
+      "text": "Look upon the scene, hear the word, and pause in silence before the decade begins.",
+      "sourceId": "rosarium-virginis-mariae",
+      "sourceRefs": [
+        {
+          "sourceId": "rosarium-virginis-mariae",
+          "locator": "Announcing the mystery, using an icon, hearing Scripture, and silence",
+          "sections": ["29", "30", "31"]
+        },
+        {
+          "sourceId": "holy-see-howto",
+          "locator": "Per-decade instruction; announce the mystery, pause for reflection, then pray"
+        }
+      ]
+    },
+    "decadeOurFather": {
+      "text": "Lift your mind to the Father as the decade begins.",
+      "sourceId": "rosarium-virginis-mariae",
+      "sourceRefs": [
+        {
+          "sourceId": "rosarium-virginis-mariae",
+          "locator": "The Our Father after focusing on the mystery",
+          "sections": ["32"]
+        }
+      ]
+    },
+    "decadeHailMarys": {
+      "text": "Meditate on {mystery} while praying these ten Hail Marys.",
+      "sourceId": "usccb-howto",
+      "sourceRefs": [
+        {
+          "sourceId": "usccb-howto",
+          "locator": "Step 7; ten Hail Marys while meditating on the mystery"
+        }
+      ]
+    },
+    "decadeGloryBe": {
+      "text": "Crown the decade with praise of the Trinity.",
+      "sourceId": "rosarium-virginis-mariae",
+      "sourceRefs": [
+        {
+          "sourceId": "rosarium-virginis-mariae",
+          "locator": "The Gloria as the high point of contemplation",
+          "sections": ["34"]
+        }
+      ]
+    },
+    "fatimaPrayer": {
+      "text": "Often added after each decade, as asked by Our Lady at Fatima.",
+      "sourceId": "usccb-howto",
+      "sourceRefs": [
+        {
+          "sourceId": "usccb-howto",
+          "locator": "Step 7 note; Fatima Prayer after the Glory Be"
+        }
+      ]
+    },
+    "hailHolyQueen": {
+      "text": "The five decades complete, the Rosary turns to Mary.",
+      "sourceId": "usccb-howto",
+      "sourceRefs": [
+        {
+          "sourceId": "usccb-howto",
+          "locator": "Step 8; after the five decades, say the Hail Holy Queen"
+        }
+      ]
+    },
+    "finalPrayer": {
+      "text": "Ask to imitate what the mysteries contain and obtain what they promise.",
+      "sourceId": "rosary-center-prayers",
+      "sourceRefs": [
+        {
+          "sourceId": "rosary-center-prayers",
+          "locator": "Final Prayer; imitate what they contain and obtain what they promise"
+        },
+        {
+          "sourceId": "usccb-howto",
+          "locator": "Concluding prayer sequence"
+        }
+      ]
+    },
+    "fruitLine": {
+      "note": "Per-mystery fruit text stays on each mystery as fruit and fruitSourceId.",
+      "sourceId": "rosarium-virginis-mariae",
+      "sourceRefs": [
+        {
+          "sourceId": "rosarium-virginis-mariae",
+          "locator": "Concluding each mystery with a prayer for its spiritual fruit",
+          "sections": ["35"]
+        }
+      ]
+    }
+  }
+}

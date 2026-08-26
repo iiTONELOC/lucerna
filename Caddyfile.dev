@@ -1,0 +1,29 @@
+# ── Dev Caddyfile ─────────────────────────────────────────────────────
+# Local TLS so the PWA can be installed and tested for real.
+#
+# Loopback only. `bind` is required: a `localhost:8443` site address on
+# its own still opens the listener on 0.0.0.0 and merely filters by Host
+# header. `auto_https disable_redirects` suppresses the :80 redirect
+# server, which would otherwise bind every interface. `admin off` closes
+# the config API on 2019.
+#
+# Upstream is `bun run serve:dist` (the built dist/), not the Vite dev
+# server — the service worker only exists after a build.
+#
+# Port 8443 avoids needing root to bind 443. Browsers install a PWA over
+# a non-standard HTTPS port without complaint.
+#
+# Caddy generates a local CA on first run. Service workers will not
+# register behind an untrusted cert, so trust it once:
+#   ~/.local/share/caddy/pki/authorities/local/root.crt
+{
+	admin off
+	local_certs
+	auto_https disable_redirects
+}
+
+localhost:8443 {
+	bind 127.0.0.1
+	tls internal
+	reverse_proxy 127.0.0.1:4173
+}
