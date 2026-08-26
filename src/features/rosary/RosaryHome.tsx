@@ -172,7 +172,7 @@ function DesktopMysteryHero({ hero }: { readonly hero: MysteryHero }) {
     >
       <img
         alt={`${hero.artwork.title} by ${hero.artwork.artist}`}
-        className="absolute inset-0 size-full object-cover"
+        className="absolute inset-0 size-full object-cover object-top"
         src={resolveArtAsset(hero.artwork.file)}
       />
       <div className="absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-t from-on-art-scrim to-transparent in-data-[theme=light]:h-[38%]" />
@@ -203,7 +203,7 @@ function CompactMysteryHero({
       >
         <img
           alt={`${hero.artwork.title} by ${hero.artwork.artist}`}
-          className="absolute inset-0 size-full object-cover"
+          className="absolute inset-0 size-full object-cover object-top"
           src={resolveArtAsset(hero.artwork.file)}
         />
         <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-on-art-scrim via-on-art-scrim/85 via-35% to-transparent in-data-[theme=light]:h-[58%]" />

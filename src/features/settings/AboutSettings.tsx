@@ -87,7 +87,7 @@ export function AboutSettings({ onOpenInstallGuide, onOpenReferences }: AboutSet
           Open references
         </button>
         <button className={INLINE_LINK_CLASS_NAME} onClick={onOpenInstallGuide} type="button">
-          Add Lucerna to your device
+          How to Add Lucerna to your device
         </button>
       </div>
     </section>

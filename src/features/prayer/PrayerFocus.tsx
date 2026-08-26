@@ -278,7 +278,7 @@ function PrayerHeading({
         'relative z-10 col-start-1 row-start-1 flex min-w-0 flex-col gap-1',
         dense
           ? 'px-4 pt-3 pb-2 landscape:px-5 landscape:pt-3 landscape:pb-1'
-          : 'px-4 pt-4 pb-3 sm:px-6 sm:pt-5 landscape:px-6 landscape:pt-4 landscape:pb-2 spread:px-8 spread:pt-8 spread:pb-4',
+          : 'px-4 pt-2 pb-1 sm:px-6 sm:pt-3 landscape:px-6 landscape:pt-4 landscape:pb-2 spread:px-8 spread:pt-8 spread:pb-4',
       )}
     >
       <p className={EYEBROW_CLASS_NAME}>{rubric}</p>
@@ -391,8 +391,10 @@ function ArtworkNotes(props: AuxiliaryPlaybackNotesProps) {
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col-reverse gap-0.5 px-4 pb-1 sm:px-6">
-      <AuxiliaryPlaybackNotes {...props} noteClassName={ON_ART_NOTE_CLASS_NAME} onArt />
+    <div className="absolute inset-x-0 bottom-0 z-10 flex px-4 sm:px-6">
+      <div className={ON_ART_NOTE_CLASS_NAME}>
+        <AuxiliaryPlaybackNotes {...props} onArt />
+      </div>
     </div>
   );
 }
@@ -449,7 +451,6 @@ type NoteLineProps = {
   readonly attribution?: string;
   readonly onArt: boolean;
   readonly onOpenAttribution?: () => void;
-  readonly className?: string | undefined;
 };
 
 function NoteLine({
@@ -459,7 +460,6 @@ function NoteLine({
   attribution,
   onArt,
   onOpenAttribution,
-  className,
 }: NoteLineProps) {
   const linkColors = onArt
     ? ' text-on-art-secondary italic hover:text-on-art-accent'
@@ -467,10 +467,7 @@ function NoteLine({
 
   return (
     <p
-      className={classNames(
-        'flex w-fit max-w-full min-w-0 self-start flex-wrap items-baseline gap-x-2 rounded-sm border-2 border-transparent border-l-accent-current/50 px-3 py-1 transition-colors duration-300 data-[playback-active=true]:border-accent-current motion-reduce:transition-none',
-        className,
-      )}
+      className="flex w-fit max-w-full min-w-0 self-start flex-wrap items-baseline gap-x-2 rounded-sm border-2 border-transparent border-l-accent-current/50 px-3 py-0.5 transition-colors duration-300 data-[playback-active=true]:border-accent-current motion-reduce:transition-none"
       data-playback-active={illuminated ? 'true' : 'false'}
       data-playback-phase={GuidedPlaybackPhase.Guidance}
     >
@@ -495,12 +492,10 @@ function NoteLine({
 }
 
 function FruitLine({
-  className,
   fruit,
   illuminated,
   onArt,
 }: {
-  readonly className?: string | undefined;
   readonly fruit: string;
   readonly illuminated: boolean;
   readonly onArt: boolean;
@@ -509,9 +504,8 @@ function FruitLine({
     <p
       className={classNames(
         SUBTITLE_CLASS_NAME +
-          ' w-fit max-w-full self-start rounded-sm border-2 border-transparent px-2 py-1 font-semibold transition-colors duration-300 data-[playback-active=true]:border-accent-current motion-reduce:transition-none',
+          ' w-fit max-w-full self-start rounded-sm border-2 border-transparent px-2 py-0.5 font-semibold transition-colors duration-300 data-[playback-active=true]:border-accent-current motion-reduce:transition-none',
         onArt ? 'text-on-art-accent' : 'text-accent-current',
-        className,
       )}
       data-playback-active={illuminated ? 'true' : 'false'}
       data-playback-phase={GuidedPlaybackPhase.Fruit}
@@ -740,10 +734,10 @@ type PrayerBodyProps = {
 type AuxiliaryPlaybackNotesProps = Pick<
   ReadingPageProps,
   'fruit' | 'guidedPlayback' | 'onOpenReference' | 'showGuidance' | 'step'
-> & { readonly noteClassName?: string | undefined; readonly onArt?: boolean | undefined };
+> & { readonly onArt?: boolean | undefined };
 
 const ON_ART_NOTE_CLASS_NAME =
-  'max-w-prose rounded-lg bg-black/13 backdrop-blur-xs text-shadow-lg text-shadow-black/80';
+  'flex w-fit max-w-prose flex-col rounded-lg bg-black/55 p-0.5 text-shadow-lg text-shadow-black/80 backdrop-blur-xs';
 
 const LANDSCAPE_QUERY = '(orientation: landscape)';
 
@@ -771,7 +765,6 @@ const hasAuxiliaryNotes = ({
 function AuxiliaryPlaybackNotes({
   fruit,
   guidedPlayback,
-  noteClassName,
   onArt = false,
   onOpenReference,
   showGuidance,
@@ -784,7 +777,6 @@ function AuxiliaryPlaybackNotes({
       {showGuidance && guidance !== undefined ? (
         <NoteLine
           attribution={contentCatalog.sourceById(guidance.sourceId).work}
-          className={noteClassName}
           illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Guidance}
           label="Guidance"
           onArt={onArt}
@@ -794,7 +786,6 @@ function AuxiliaryPlaybackNotes({
       ) : null}
       {fruit === null ? null : (
         <FruitLine
-          className={noteClassName}
           fruit={fruit}
           illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Fruit}
           onArt={onArt}
@@ -1266,6 +1257,11 @@ type PrayerDisplayRequest = {
   readonly progression: Progression;
 };
 
+const repeatsDecadeGuidance = (step: PrayerStep): boolean =>
+  step.archetype === StepArchetype.CountedRepetition &&
+  step.decade !== undefined &&
+  step.repetition > 1;
+
 const prayerDisplayOf = ({
   artworkPlan,
   mysterySetId,
@@ -1278,6 +1274,7 @@ const prayerDisplayOf = ({
     step.archetype !== StepArchetype.MysteryAnnouncement || preferences.showScriptureReadings;
   const showGuidance =
     preferences.showGuidance &&
+    !repeatsDecadeGuidance(step) &&
     (step.archetype !== StepArchetype.MysteryAnnouncement || showScriptureReading);
 
   return {
@@ -1383,7 +1380,7 @@ const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSession => {
   const playback = usePrayerPlayback({
     display,
     fit,
-    fruit,
+    fruit: repeatsDecadeGuidance(display.step) ? null : fruit,
     playing,
     progression: plan.progression,
     readingSpeed: preferences.readingSpeed,

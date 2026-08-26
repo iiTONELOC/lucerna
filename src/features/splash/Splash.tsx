@@ -115,10 +115,10 @@ export function Splash({ applicationReady, onDismiss, onOpenInstallGuide }: Spla
           <button
             className={INSTALL_LINK_CLASS_NAME}
             onClick={onOpenInstallGuide}
-            title="Add Lucerna to your device"
+            title="How to Add Lucerna to your device"
             type="button"
           >
-            Add Lucerna to your device
+            How to Add Lucerna to your device
           </button>
         )}
         {COPYRIGHT_NOTICE}

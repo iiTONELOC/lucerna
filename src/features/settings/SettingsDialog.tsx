@@ -1,4 +1,13 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import {
   BeadMaterial,
   OpeningDuration,
@@ -15,6 +24,9 @@ import { AboutSettings } from './AboutSettings.tsx';
 import { DiagnosticsSettings } from './DiagnosticsSettings.tsx';
 
 const SETTINGS_TITLE_ID = 'settings-title';
+const SETTINGS_CARD_MINIMUM_HEIGHT = 320;
+const SETTINGS_CARD_MAXIMUM_VIEWPORT_SHARE = 0.85;
+const SETTINGS_CARD_KEYBOARD_STEP = 24;
 const UPDATE_CHECKS_LABEL: Readonly<Record<UpdateChecks, string>> = {
   [UpdateChecks.OnLoad]: 'When it opens',
   [UpdateChecks.WhileOpen]: 'Also while open',
@@ -106,6 +118,108 @@ type SettingsDialogRefs = {
   readonly returnFocusRef: RefObject<HTMLElement | null>;
 };
 
+type CardDrag = {
+  readonly pointerId: number;
+  readonly startY: number;
+  readonly startHeight: number;
+};
+
+const clampCardHeight = (height: number): number =>
+  Math.min(
+    Math.max(height, SETTINGS_CARD_MINIMUM_HEIGHT),
+    window.innerHeight * SETTINGS_CARD_MAXIMUM_VIEWPORT_SHARE,
+  );
+
+type CardResizeContext = {
+  readonly dialogRef: RefObject<HTMLDialogElement | null>;
+  readonly dragRef: RefObject<CardDrag | null>;
+  readonly setCardHeight: (height: number) => void;
+};
+
+const beginCardResize = (
+  context: CardResizeContext,
+  event: ReactPointerEvent<HTMLElement>,
+): void => {
+  const dialog = context.dialogRef.current;
+
+  if (dialog === null) {
+    return;
+  }
+
+  context.dragRef.current = {
+    pointerId: event.pointerId,
+    startY: event.clientY,
+    startHeight: dialog.getBoundingClientRect().height,
+  };
+  event.currentTarget.setPointerCapture(event.pointerId);
+};
+
+const nudgeCardResize = (
+  context: CardResizeContext,
+  event: ReactKeyboardEvent<HTMLElement>,
+): void => {
+  if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+    return;
+  }
+
+  event.preventDefault();
+  const step = event.key === 'ArrowUp' ? SETTINGS_CARD_KEYBOARD_STEP : -SETTINGS_CARD_KEYBOARD_STEP;
+  const current = context.dialogRef.current?.getBoundingClientRect().height;
+
+  if (current !== undefined) {
+    context.setCardHeight(clampCardHeight(current + step));
+  }
+};
+
+const cardResizeHandlersOf = (context: CardResizeContext) => {
+  const finishResize = (event: ReactPointerEvent<HTMLElement>): void => {
+    if (context.dragRef.current?.pointerId === event.pointerId) {
+      context.dragRef.current = null;
+    }
+  };
+
+  return {
+    onKeyDown: (event: ReactKeyboardEvent<HTMLElement>) => nudgeCardResize(context, event),
+    onPointerCancel: finishResize,
+    onPointerDown: (event: ReactPointerEvent<HTMLElement>) => beginCardResize(context, event),
+    onPointerMove: (event: ReactPointerEvent<HTMLElement>) => {
+      const drag = context.dragRef.current;
+
+      if (drag !== null && drag.pointerId === event.pointerId) {
+        context.setCardHeight(clampCardHeight(drag.startHeight + drag.startY - event.clientY));
+      }
+    },
+    onPointerUp: finishResize,
+  };
+};
+
+const useCardResize = (dialogRef: RefObject<HTMLDialogElement | null>) => {
+  const [cardHeight, setCardHeight] = useState<number | null>(null);
+  const dragRef = useRef<CardDrag | null>(null);
+  const cardStyle: CSSProperties | undefined =
+    cardHeight === null ? undefined : { height: `${String(cardHeight)}px`, maxHeight: 'none' };
+
+  return {
+    cardStyle,
+    handleProps: cardResizeHandlersOf({ dialogRef, dragRef, setCardHeight }),
+  };
+};
+
+function ResizeHandle({ handleProps }: { readonly handleProps: object }) {
+  return (
+    <div
+      aria-label="Resize settings"
+      aria-orientation="horizontal"
+      className="flex shrink-0 cursor-row-resize touch-none justify-center py-1.5 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      role="separator"
+      tabIndex={0}
+      {...handleProps}
+    >
+      <span aria-hidden="true" className="h-1.5 w-16 rounded-full bg-accent" />
+    </div>
+  );
+}
+
 function useSettingsDialog(open: boolean): SettingsDialogRefs {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -121,7 +235,7 @@ function useSettingsDialog(open: boolean): SettingsDialogRefs {
     if (open && !dialog.open) {
       const activeElement = document.activeElement;
       returnFocusRef.current = activeElement instanceof HTMLElement ? activeElement : null;
-      dialog.showModal();
+      dialog.show();
       headingRef.current?.focus();
       return;
     }
@@ -142,9 +256,9 @@ function SettingsHeader({
   readonly onClose: () => void;
 }) {
   return (
-    <header className="flex items-center justify-between gap-4 pb-4">
+    <header className="flex shrink-0 items-center justify-between gap-4 border-b border-hairline px-5 py-1 lg:px-8">
       <h2
-        className="font-display text-title leading-title font-medium tracking-title focus:outline-none"
+        className="font-display text-nav leading-nav font-medium focus:outline-none"
         id={SETTINGS_TITLE_ID}
         ref={headingRef}
         tabIndex={-1}
@@ -420,7 +534,7 @@ function LinkSettings() {
 
 function SettingsColumns() {
   return (
-    <div className="grid lg:grid-cols-2 lg:gap-x-8">
+    <div className="grid">
       <div>
         <TextScaleSettings />
         <OpeningScreenSettings />
@@ -448,6 +562,7 @@ export function SettingsDialog({
   readonly onOpenReferences: () => void;
 }) {
   const { dialogRef, headingRef, returnFocusRef } = useSettingsDialog(open);
+  const { cardStyle, handleProps } = useCardResize(dialogRef);
 
   const handleDialogClose = (): void => {
     onClose();
@@ -462,23 +577,39 @@ export function SettingsDialog({
   return (
     <dialog
       aria-labelledby={SETTINGS_TITLE_ID}
-      className="scroll-region surface-chrome m-0 mt-auto max-h-dvh w-full max-w-none overflow-y-auto rounded-t-xl border border-hairline p-0 pt-safe-top pb-safe-bottom text-base text-foreground backdrop:bg-background/80 lg:m-auto lg:max-h-[min(90dvh,44rem)] lg:max-w-3xl lg:rounded-xl"
+      className="surface-chrome fixed inset-x-0 bottom-0 z-50 m-0 hidden h-[50dvh] w-full max-w-none flex-col rounded-t-xl border border-hairline p-0 pb-safe-bottom text-base text-foreground open:flex lg:inset-x-auto lg:right-6 lg:bottom-6 lg:h-[min(70dvh,44rem)] lg:max-w-md lg:rounded-xl"
+      style={cardStyle}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
       }}
       onClose={handleDialogClose}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      }}
       ref={dialogRef}
     >
-      <div className="p-5 lg:p-8">
-        <SettingsHeader headingRef={headingRef} onClose={onClose} />
-        <SettingsColumns />
-        <DiagnosticsSettings />
-        <AboutSettings
-          onOpenInstallGuide={onOpenInstallGuide}
-          onOpenReferences={onOpenReferences}
-        />
-      </div>
+      <ResizeHandle handleProps={handleProps} />
+      <SettingsHeader headingRef={headingRef} onClose={onClose} />
+      <SettingsBody onOpenInstallGuide={onOpenInstallGuide} onOpenReferences={onOpenReferences} />
     </dialog>
+  );
+}
+
+function SettingsBody({
+  onOpenInstallGuide,
+  onOpenReferences,
+}: {
+  readonly onOpenInstallGuide: () => void;
+  readonly onOpenReferences: () => void;
+}) {
+  return (
+    <div className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pb-5 lg:px-8 lg:pb-8">
+      <SettingsColumns />
+      <DiagnosticsSettings />
+      <AboutSettings onOpenInstallGuide={onOpenInstallGuide} onOpenReferences={onOpenReferences} />
+    </div>
   );
 }

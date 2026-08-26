@@ -89,7 +89,7 @@ export function InstallGuide({ onBack }: { readonly onBack: () => void }) {
         <header>
           <p className={EYEBROW_CLASS_NAME}>Keep Lucerna on your device</p>
           <h1 className={`${TITLE_CLASS_NAME} pt-1`} id={INSTALL_TITLE_ID}>
-            Add Lucerna to your device
+            How to Add Lucerna to your device
           </h1>
           <p className={`max-w-prose pt-3 ${SCRIPTURE_CLASS_NAME}`}>
             Lucerna works in a browser. Add it to your device and it opens like any other
