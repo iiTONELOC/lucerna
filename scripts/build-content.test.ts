@@ -36,12 +36,12 @@ test('compiles the complete devotional catalog from canonical records', async ()
   expect(content).toEqual(generated);
   expect(catalog.sources).toHaveLength(17);
   expect(catalog.prayers).toHaveLength(8);
-  expect(catalog.artworks).toHaveLength(107);
+  expect(catalog.artworks).toHaveLength(120);
   expect(catalog.rosary.mysterySets).toHaveLength(4);
   expect(mysteries).toHaveLength(20);
   expect(annunciation?.artworks[0]?.id).toBe('hans-memling--the-annunciation');
   expect(annunciation?.provenance.scripture.id).toBe('douay-rheims-challoner');
-  expect(catalog.rosary.prayerStageArt['hail-mary']).toHaveLength(10);
+  expect(catalog.rosary.prayerStageArt['hail-mary']).toHaveLength(13);
 
   for (const lookup of [
     catalog.sourceById,

@@ -696,7 +696,8 @@
       "jusepe-de-ribera--saint-andrew",
       "el-greco--pentecost",
       "el-greco--saints-peter-and-paul",
-      "jusepe-de-ribera--saints-peter-and-paul"
+      "jusepe-de-ribera--saints-peter-and-paul",
+      "peter-paul-rubens--saint-paul"
     ],
     "our-father": [
       "fra-angelico--the-sermon-on-the-mount",
@@ -707,7 +708,10 @@
       "james-tissot--the-sermon-of-the-beatitudes",
       "frans-francken-ii--the-sermon-on-the-mount",
       "guillaume-fouace--le-sermon-sur-la-montagne",
-      "rembrandt--christ-preaching-la-petite-tombe"
+      "rembrandt--christ-preaching-la-petite-tombe",
+      "james-tissot--the-lord-s-prayer-le-pater-noster",
+      "rembrandt--the-hundred-guilder-print",
+      "james-tissot--the-exhortation-to-the-apostles"
     ],
     "hail-mary": [
       "hans-memling--the-annunciation",
@@ -719,7 +723,10 @@
       "raphael--the-sistine-madonna",
       "annibale-carracci--the-coronation-of-the-virgin",
       "follower-of-botticelli--the-coronation-of-the-virgin",
-      "peter-paul-rubens--immaculate-conception"
+      "peter-paul-rubens--immaculate-conception",
+      "fra-filippo-lippi--madonna-and-child-with-two-angels",
+      "raphael--the-small-cowper-madonna",
+      "raphael--madonna-della-seggiola"
     ],
     "glory-be": [
       "agnolo-gaddi--the-trinity",
@@ -734,21 +741,27 @@
       "pompeo-batoni--sacred-heart-of-jesus",
       "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
       "guido-reni--st-michael-archangel",
-      "william-adolphe-bouguereau--pieta"
+      "william-adolphe-bouguereau--pieta",
+      "william-adolphe-bouguereau--song-of-the-angels"
     ],
     "hail-holy-queen": [
       "piero-della-francesca--madonna-della-misericordia",
       "enguerrand-quarton--the-coronation-of-the-virgin",
       "fra-angelico--the-coronation-of-the-virgin",
       "gentile-da-fabriano--the-coronation-of-the-virgin",
-      "francesco-botticini--the-assumption-of-the-virgin"
+      "francesco-botticini--the-assumption-of-the-virgin",
+      "jan-van-eyck--the-madonna-in-the-church",
+      "cimabue--maesta",
+      "fra-angelico--the-madonna-of-humility",
+      "raphael--madonna-del-granduca"
     ],
     "closing-prayer": [
       "caravaggio--madonna-of-the-rosary",
       "lorenzo-lotto--madonna-of-the-rosary",
       "bartolome-esteban-murillo--the-virgin-of-the-rosary",
       "sassoferrato--madonna-del-rosario",
-      "alonso-cano--virgen-del-rosario"
+      "alonso-cano--virgen-del-rosario",
+      "giambattista-tiepolo--the-institution-of-the-rosary"
     ]
   },
   "guidance": {

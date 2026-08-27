@@ -18,8 +18,6 @@ export type GalleryGroup = {
   readonly artworks: readonly ResolvedArtwork[];
 };
 
-const OTHER_GROUP_ID = 'further-works';
-const OTHER_GROUP_HEADING = 'Further works';
 const CENTURY_PATTERN = /(?<century>\d{1,2})(?:st|nd|rd|th) c\./u;
 const YEAR_PATTERN = /\d{4}/u;
 const UNDATED_YEAR = Number.MAX_SAFE_INTEGER;
@@ -71,10 +69,7 @@ const mysterySetsStartingWithToday = (todaySetId: string) => {
   ];
 };
 
-const mysteryGroupsOf = (
-  artworks: readonly ResolvedArtwork[],
-  todaySetId: string,
-): readonly GalleryGroup[] => {
+const mysteryGroupsOf = (todaySetId: string): readonly GalleryGroup[] => {
   const claimed = new Set<string>();
   const groups: GalleryGroup[] = [];
 
@@ -100,18 +95,7 @@ const mysteryGroupsOf = (
     }
   }
 
-  const remaining = unclaimedFrom(artworks, claimed);
-
-  return remaining.length === 0
-    ? groups
-    : [
-        ...groups,
-        {
-          id: OTHER_GROUP_ID,
-          heading: OTHER_GROUP_HEADING,
-          artworks: [...remaining].sort(byArtist),
-        },
-      ];
+  return groups;
 };
 
 const artistGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGroup[] => {
@@ -179,7 +163,7 @@ export const galleryGroupsFor = (
   todaySetId: string,
 ): readonly GalleryGroup[] => {
   if (sort === GallerySort.Mystery) {
-    return mysteryGroupsOf(artworks, todaySetId);
+    return mysteryGroupsOf(todaySetId);
   }
 
   if (sort === GallerySort.Artist) {

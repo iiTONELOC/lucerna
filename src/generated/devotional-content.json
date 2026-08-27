@@ -367,6 +367,18 @@
       "sourceId": "wikimedia-pd-art"
     },
     {
+      "id": "cimabue--maesta",
+      "artist": "Cimabue",
+      "title": "Maestà",
+      "date": "c. 1280",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Cimabue%20-%20Maest%C3%A0%20du%20Louvre.jpg",
+      "file": "art/fc7a3b3a5aa0.avif",
+      "width": 782,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
       "id": "claude-lorrain--the-sermon-on-the-mount",
       "artist": "Claude Lorrain",
       "title": "The Sermon on the Mount",
@@ -637,6 +649,19 @@
       "sourceId": "wikimedia-pd-art"
     },
     {
+      "id": "fra-angelico--the-madonna-of-humility",
+      "artist": "Fra Angelico",
+      "title": "The Madonna of Humility",
+      "date": "c. 1430",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Fra%20Angelico%2C%20The%20Madonna%20of%20Humility%2C%20c.%201430%2C%20NGA%205.jpg",
+      "file": "art/1d47c561ad27.avif",
+      "width": 898,
+      "height": 1200,
+      "sourceId": "nga-open-access",
+      "accession": "1937.1.5"
+    },
+    {
       "id": "fra-angelico--the-sermon-on-the-mount",
       "artist": "Fra Angelico",
       "title": "The Sermon on the Mount",
@@ -657,6 +682,18 @@
       "url": "https://commons.wikimedia.org/wiki/File:Transfiguration%20by%20fra%20Angelico%20%28San%20Marco%20Cell%206%29.jpg",
       "file": "art/073ce57f4599.avif",
       "width": 1022,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "fra-filippo-lippi--madonna-and-child-with-two-angels",
+      "artist": "Fra Filippo Lippi",
+      "title": "Madonna and Child with Two Angels",
+      "date": "c. 1460-65",
+      "holder": "Uffizi, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Fra%20Filippo%20Lippi%20-%20Madonna%20and%20Child%20with%20two%20Angels%20-%20Uffizi.jpg",
+      "file": "art/8d35a4ef6ff4.avif",
+      "width": 804,
       "height": 1200,
       "sourceId": "wikimedia-pd-art"
     },
@@ -733,6 +770,18 @@
       "file": "art/7abb1e96c909.avif",
       "width": 1009,
       "height": 755,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giambattista-tiepolo--the-institution-of-the-rosary",
+      "artist": "Giambattista Tiepolo",
+      "title": "The Institution of the Rosary",
+      "date": "1737-39",
+      "holder": "Santa Maria del Rosario (Gesuati), Venice",
+      "url": "https://commons.wikimedia.org/wiki/File:Giovanni%20Battista%20Tiepolo%20-%20The%20Institution%20of%20the%20Rosary%20-%20WGA22275.jpg",
+      "file": "art/5c7a3a11a4f6.avif",
+      "width": 829,
+      "height": 1200,
       "sourceId": "wikimedia-pd-art"
     },
     {
@@ -881,6 +930,30 @@
       "sourceId": "wikimedia-pd-art"
     },
     {
+      "id": "james-tissot--the-exhortation-to-the-apostles",
+      "artist": "James Tissot",
+      "title": "The Exhortation to the Apostles",
+      "date": "1886-96",
+      "holder": "Brooklyn Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Brooklyn%20Museum%20-%20The%20Exhortation%20to%20the%20Apostles%20%28Recommandation%20aux%20ap%C3%B4tres%29%20-%20James%20Tissot.jpg",
+      "file": "art/2fec32859389.avif",
+      "width": 1200,
+      "height": 898,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "james-tissot--the-lord-s-prayer-le-pater-noster",
+      "artist": "James Tissot",
+      "title": "The Lord's Prayer (Le Pater Noster)",
+      "date": "1886-96",
+      "holder": "Brooklyn Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Brooklyn%20Museum%20-%20The%20Lord%27s%20Prayer%20%28Le%20Pater%20Noster%29%20-%20James%20Tissot.jpg",
+      "file": "art/013b15a2c93c.avif",
+      "width": 921,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
       "id": "james-tissot--the-sermon-of-the-beatitudes",
       "artist": "James Tissot",
       "title": "The Sermon of the Beatitudes",
@@ -913,6 +986,18 @@
       "url": "https://commons.wikimedia.org/wiki/File:Jan%20van%20Eyck%20-%20The%20Annunciation%20-%20Google%20Art%20Project.jpg",
       "file": "art/a9d756c8925a.avif",
       "width": 455,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jan-van-eyck--the-madonna-in-the-church",
+      "artist": "Jan van Eyck",
+      "title": "The Madonna in the Church",
+      "date": "c. 1438-40",
+      "holder": "Gemäldegalerie, Berlin",
+      "url": "https://commons.wikimedia.org/wiki/File:Jan%20van%20Eyck%20-%20The%20Madonna%20in%20the%20Church%20-%20Google%20Art%20Project.jpg",
+      "file": "art/38d5fa42c397.avif",
+      "width": 577,
       "height": 1200,
       "sourceId": "wikimedia-pd-art"
     },
@@ -1146,6 +1231,18 @@
       "sourceId": "wikimedia-pd-art"
     },
     {
+      "id": "peter-paul-rubens--saint-paul",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint Paul",
+      "date": "c. 1611",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Saint%20Paul%2C%20by%20Peter%20Paul%20Rubens%20%28Museo%20del%20Prado%29.jpg",
+      "file": "art/0e5da6cb0972.avif",
+      "width": 910,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
       "id": "petrus-christus--the-annunciation",
       "artist": "Petrus Christus",
       "title": "The Annunciation",
@@ -1256,6 +1353,31 @@
       "sourceId": "wikimedia-pd-art"
     },
     {
+      "id": "raphael--madonna-del-granduca",
+      "artist": "Raphael",
+      "title": "Madonna del Granduca",
+      "date": "c. 1505",
+      "holder": "Galleria Palatina, Palazzo Pitti, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20%281483-1520%29%20-%20La%20Madonna%20del%20Granduca%20-%20178%20-%20Galleria%20Palatina.jpg",
+      "file": "art/9044173e7461.avif",
+      "width": 815,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "Palatina 178"
+    },
+    {
+      "id": "raphael--madonna-della-seggiola",
+      "artist": "Raphael",
+      "title": "Madonna della Seggiola",
+      "date": "c. 1513-14",
+      "holder": "Palazzo Pitti, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20Sanzio%20-%20Madonna%20della%20Seggiola%20%28Sedia%29%20-%20WGA18816.jpg",
+      "file": "art/87032cf54cbd.avif",
+      "width": 1000,
+      "height": 1000,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
       "id": "raphael--the-sistine-madonna",
       "artist": "Raphael",
       "title": "The Sistine Madonna",
@@ -1264,6 +1386,18 @@
       "url": "https://commons.wikimedia.org/wiki/File:Raphael_-_The_Sistine_Madonna_-_Google_Art_Project.jpg",
       "file": "art/23082e05b83d.avif",
       "width": 876,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--the-small-cowper-madonna",
+      "artist": "Raphael",
+      "title": "The Small Cowper Madonna",
+      "date": "c. 1505",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Raphael%20-%20The%20Small%20Cowper%20Madonna%20-%20Google%20Art%20Project.jpg",
+      "file": "art/2684f02be7ef.avif",
+      "width": 879,
       "height": 1200,
       "sourceId": "wikimedia-pd-art"
     },
@@ -1304,6 +1438,19 @@
       "height": 893,
       "sourceId": "nga-open-access",
       "accession": "1955.6.5"
+    },
+    {
+      "id": "rembrandt--the-hundred-guilder-print",
+      "artist": "Rembrandt",
+      "title": "The Hundred Guilder Print",
+      "date": "c. 1649",
+      "holder": "Rijksmuseum, Amsterdam",
+      "url": "https://commons.wikimedia.org/wiki/File:Rembrandt%20The%20Hundred%20Guilder%20Print.jpg",
+      "file": "art/7ae51ce1b567.avif",
+      "width": 1200,
+      "height": 872,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "RP-P-OB-602"
     },
     {
       "id": "sandro-botticelli--the-annunciation",
@@ -1464,6 +1611,18 @@
       "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Pieta%20%281876%29.jpg",
       "file": "art/1377221d7c7d.avif",
       "width": 764,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "william-adolphe-bouguereau--song-of-the-angels",
+      "artist": "William-Adolphe Bouguereau",
+      "title": "Song of the Angels",
+      "date": "1881",
+      "holder": "Forest Lawn Museum, Glendale",
+      "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Song%20of%20the%20Angels%20%281881%29.jpg",
+      "file": "art/e17fda8763fc.avif",
+      "width": 821,
       "height": 1200,
       "sourceId": "wikimedia-pd-art"
     },
@@ -2227,7 +2386,8 @@
         "jusepe-de-ribera--saint-andrew",
         "el-greco--pentecost",
         "el-greco--saints-peter-and-paul",
-        "jusepe-de-ribera--saints-peter-and-paul"
+        "jusepe-de-ribera--saints-peter-and-paul",
+        "peter-paul-rubens--saint-paul"
       ],
       "our-father": [
         "fra-angelico--the-sermon-on-the-mount",
@@ -2238,7 +2398,10 @@
         "james-tissot--the-sermon-of-the-beatitudes",
         "frans-francken-ii--the-sermon-on-the-mount",
         "guillaume-fouace--le-sermon-sur-la-montagne",
-        "rembrandt--christ-preaching-la-petite-tombe"
+        "rembrandt--christ-preaching-la-petite-tombe",
+        "james-tissot--the-lord-s-prayer-le-pater-noster",
+        "rembrandt--the-hundred-guilder-print",
+        "james-tissot--the-exhortation-to-the-apostles"
       ],
       "hail-mary": [
         "hans-memling--the-annunciation",
@@ -2250,7 +2413,10 @@
         "raphael--the-sistine-madonna",
         "annibale-carracci--the-coronation-of-the-virgin",
         "follower-of-botticelli--the-coronation-of-the-virgin",
-        "peter-paul-rubens--immaculate-conception"
+        "peter-paul-rubens--immaculate-conception",
+        "fra-filippo-lippi--madonna-and-child-with-two-angels",
+        "raphael--the-small-cowper-madonna",
+        "raphael--madonna-della-seggiola"
       ],
       "glory-be": [
         "agnolo-gaddi--the-trinity",
@@ -2265,21 +2431,27 @@
         "pompeo-batoni--sacred-heart-of-jesus",
         "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
         "guido-reni--st-michael-archangel",
-        "william-adolphe-bouguereau--pieta"
+        "william-adolphe-bouguereau--pieta",
+        "william-adolphe-bouguereau--song-of-the-angels"
       ],
       "hail-holy-queen": [
         "piero-della-francesca--madonna-della-misericordia",
         "enguerrand-quarton--the-coronation-of-the-virgin",
         "fra-angelico--the-coronation-of-the-virgin",
         "gentile-da-fabriano--the-coronation-of-the-virgin",
-        "francesco-botticini--the-assumption-of-the-virgin"
+        "francesco-botticini--the-assumption-of-the-virgin",
+        "jan-van-eyck--the-madonna-in-the-church",
+        "cimabue--maesta",
+        "fra-angelico--the-madonna-of-humility",
+        "raphael--madonna-del-granduca"
       ],
       "closing-prayer": [
         "caravaggio--madonna-of-the-rosary",
         "lorenzo-lotto--madonna-of-the-rosary",
         "bartolome-esteban-murillo--the-virgin-of-the-rosary",
         "sassoferrato--madonna-del-rosario",
-        "alonso-cano--virgen-del-rosario"
+        "alonso-cano--virgen-del-rosario",
+        "giambattista-tiepolo--the-institution-of-the-rosary"
       ]
     },
     "guidance": {
