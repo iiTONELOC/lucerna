@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { subresourceIntegrity } from './scripts/vite/subresourceIntegrity.ts';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -16,7 +15,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [react(), tailwindcss(), subresourceIntegrity()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@data': new URL('./data', import.meta.url).pathname,

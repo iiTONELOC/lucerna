@@ -6,6 +6,7 @@ import {
   selectIdentityArtifacts,
   type BuildArtifact,
 } from './pwaBuild.ts';
+import { addIntegrityToAssetTags, integrityFrom } from './subresourceIntegrity.ts';
 
 enum RequiredArtifact {
   AppleTouchIcon = 'icons/lucerna-180.png',
@@ -113,9 +114,27 @@ const loadArtifact = async (path: string): Promise<BuildArtifact> => ({
   path,
 });
 
+const stampAssetIntegrity = async (): Promise<void> => {
+  const assetsDirectory = new URL('assets/', outputDirectory);
+  const indexFile = Bun.file(new URL(RequiredArtifact.Index, outputDirectory));
+  let indexHtml = await indexFile.text();
+  const fileNames = await Array.fromAsync(
+    new Bun.Glob('*.{css,js}').scan({ cwd: assetsDirectory.pathname }),
+  );
+
+  for (const fileName of fileNames.toSorted((left, right) => left.localeCompare(right, 'en-US'))) {
+    const bytes = new Uint8Array(await Bun.file(new URL(fileName, assetsDirectory)).arrayBuffer());
+
+    indexHtml = addIntegrityToAssetTags(indexHtml, `./assets/${fileName}`, integrityFrom(bytes));
+  }
+
+  await Bun.write(indexFile, indexHtml);
+};
+
 const buildPwa = async (): Promise<void> => {
   await Promise.all(Object.values(RequiredArtifact).map(requireArtifact));
   await fingerprintIcons();
+  await stampAssetIntegrity();
 
   const artifactPaths = await collectArtifactPaths(outputDirectory);
   const artifacts = await Promise.all(artifactPaths.map(loadArtifact));

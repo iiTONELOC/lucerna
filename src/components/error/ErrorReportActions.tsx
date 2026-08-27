@@ -30,7 +30,7 @@ export function ErrorReportActions({ diagnostics }: { readonly diagnostics: stri
         Email diagnostics
       </a>
       <button
-        className={`min-h-11 px-4 text-muted transition-colors hover:text-foreground ${SUBTITLE_CLASS_NAME}`}
+        className={`focus-ring min-h-11 px-4 text-muted transition-colors hover:text-foreground ${SUBTITLE_CLASS_NAME}`}
         onClick={() => void copyDiagnostics()}
         type="button"
       >

@@ -1,4 +1,4 @@
-import { DEFAULT_PREFERENCES, parsePreferences, type Preferences } from './model.ts';
+import { parsePreferences, type Preferences } from './model.ts';
 
 const DATABASE_NAME = 'lucerna';
 const DATABASE_VERSION = 1;
@@ -29,10 +29,10 @@ const openDatabase = (): Promise<IDBDatabase | null> => {
   });
 };
 
-const readPreferences = (database: IDBDatabase): Promise<unknown> =>
+const readValue = (database: IDBDatabase, key: string): Promise<unknown> =>
   new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, 'readonly');
-    const request = transaction.objectStore(STORE_NAME).get(PREFERENCES_KEY);
+    const request = transaction.objectStore(STORE_NAME).get(key);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(toStorageError(request.error));
@@ -40,44 +40,46 @@ const readPreferences = (database: IDBDatabase): Promise<unknown> =>
     transaction.onabort = () => reject(toStorageError(transaction.error));
   });
 
-const writePreferences = (database: IDBDatabase, preferences: Preferences): Promise<void> =>
+const writeValue = (database: IDBDatabase, key: string, value: unknown): Promise<void> =>
   new Promise((resolve, reject) => {
     const transaction = database.transaction(STORE_NAME, 'readwrite');
 
-    transaction.objectStore(STORE_NAME).put(preferences, PREFERENCES_KEY);
+    transaction.objectStore(STORE_NAME).put(value, key);
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(toStorageError(transaction.error));
     transaction.onabort = () => reject(toStorageError(transaction.error));
   });
 
-export const loadPreferences = async (): Promise<Preferences> => {
+export const readStoredValue = async (key: string): Promise<unknown> => {
   let database: IDBDatabase | null = null;
 
   try {
     database = await openDatabase();
-    if (database === null) {
-      return DEFAULT_PREFERENCES;
-    }
-
-    return parsePreferences(await readPreferences(database));
+    return database === null ? undefined : await readValue(database, key);
   } catch {
-    return DEFAULT_PREFERENCES;
+    return undefined;
   } finally {
     database?.close();
   }
 };
 
-export const savePreferences = async (preferences: Preferences): Promise<void> => {
+export const writeStoredValue = async (key: string, value: unknown): Promise<void> => {
   let database: IDBDatabase | null = null;
 
   try {
     database = await openDatabase();
     if (database !== null) {
-      await writePreferences(database, preferences);
+      await writeValue(database, key, value);
     }
   } catch {
-    // Preferences should never block the app from rendering.
+    return;
   } finally {
     database?.close();
   }
 };
+
+export const loadPreferences = async (): Promise<Preferences> =>
+  parsePreferences(await readStoredValue(PREFERENCES_KEY));
+
+export const savePreferences = (preferences: Preferences): Promise<void> =>
+  writeStoredValue(PREFERENCES_KEY, preferences);

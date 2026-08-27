@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { ACCENT_BUTTON_CLASS_NAME, EYEBROW_CLASS_NAME } from '../../styles.ts';
+import { ACCENT_BUTTON_CLASS_NAME, BODY_CLASS_NAME, EYEBROW_CLASS_NAME } from '../../styles.ts';
 import { applyServiceWorkerUpdate, registerServiceWorker } from './registration.ts';
 
 const UPDATE_NOTICE_ID = 'pwa-update-notice';
@@ -37,7 +37,7 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
         <p className={EYEBROW_CLASS_NAME} id={UPDATE_NOTICE_ID}>
           Update ready
         </p>
-        <p className="font-display text-body leading-body text-secondary">
+        <p className={`${BODY_CLASS_NAME} text-secondary`}>
           A new version of Lucerna is cached and ready.
         </p>
       </div>
@@ -50,7 +50,7 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
           Update now
         </button>
         <button
-          className="min-h-11 px-4 font-display text-subtitle leading-subtitle text-muted transition-colors hover:text-foreground"
+          className="focus-ring min-h-11 px-4 font-display text-subtitle leading-subtitle text-muted transition-colors hover:text-foreground"
           onClick={onDismiss}
           type="button"
         >

@@ -1,3 +1,4 @@
+import { BODY_CLASS_NAME, CITATION_CLASS_NAME, EYEBROW_CLASS_NAME } from '../../styles.ts';
 import {
   useEffect,
   useRef,
@@ -15,11 +16,16 @@ import {
   READING_SPEED_MINIMUM,
   READING_SPEED_PRESETS,
   READING_SPEED_STEP,
+  ReaderFace,
+  ReaderGround,
   ReadingSpeed,
   TextScale,
   UpdateChecks,
 } from '../../state/preferences/model.ts';
+import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
+import { contentCatalog } from '../../content/catalog.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import { SettingsScope } from './model.ts';
 import { AboutSettings } from './AboutSettings.tsx';
 import { DiagnosticsSettings } from './DiagnosticsSettings.tsx';
 
@@ -33,13 +39,21 @@ const UPDATE_CHECKS_LABEL: Readonly<Record<UpdateChecks, string>> = {
 };
 const UPDATE_CHECKS_DESCRIPTION: Readonly<Record<UpdateChecks, string>> = {
   [UpdateChecks.OnLoad]: 'Lucerna looks for a new version once, as it starts.',
-  [UpdateChecks.WhileOpen]: 'If Lucerna is in installed, the app also looks every twenty minutes.',
+  [UpdateChecks.WhileOpen]: 'If Lucerna is installed, the app also looks every twenty minutes.',
 };
 const READING_SPEED_ID = 'reading-speed';
 const TEXT_SCALE_VALUES: readonly TextScale[] = Object.values(TextScale);
 
-const TEXT_CHOICE_CLASS_NAME =
-  'min-h-11 border-b border-transparent px-1 font-display text-body leading-body text-muted transition-colors hover:text-foreground aria-pressed:border-accent aria-pressed:text-accent-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+const READER_FACE_LABEL: Readonly<Record<ReaderFace, string>> = {
+  [ReaderFace.Garamond]: 'Garamond',
+  [ReaderFace.Sans]: 'Sans serif',
+};
+const READER_GROUND_LABEL: Readonly<Record<ReaderGround, string>> = {
+  [ReaderGround.Dark]: 'Dark',
+  [ReaderGround.Parchment]: 'Parchment',
+};
+
+const TEXT_CHOICE_CLASS_NAME = `min-h-11 border-b border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-pressed:border-accent aria-pressed:text-accent-current focus-ring`;
 
 const enumLabel = (
   domain: Readonly<Record<string, string | number>>,
@@ -75,9 +89,7 @@ function SettingsGroup({
 }) {
   return (
     <fieldset className="border-t border-hairline py-4">
-      <legend className="small-caps px-0 font-display text-subtitle leading-subtitle font-semibold tracking-subtitle text-accent-current">
-        {legend}
-      </legend>
+      <legend className={`px-0 ${EYEBROW_CLASS_NAME}`}>{legend}</legend>
       <div className="[&>label:first-child]:border-t-0">{children}</div>
     </fieldset>
   );
@@ -96,8 +108,8 @@ function SwitchChoice({
 }) {
   return (
     <label className="grid min-h-14 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 border-t border-hairline py-3">
-      <span className="font-display text-body leading-body text-foreground">{label}</span>
-      <span className="font-display text-citation leading-citation text-muted">{description}</span>
+      <span className={`${BODY_CLASS_NAME} text-foreground`}>{label}</span>
+      <span className={`${CITATION_CLASS_NAME} text-muted`}>{description}</span>
       <input
         checked={value}
         className="peer sr-only"
@@ -210,7 +222,7 @@ function ResizeHandle({ handleProps }: { readonly handleProps: object }) {
     <div
       aria-label="Resize settings"
       aria-orientation="horizontal"
-      className="flex shrink-0 cursor-row-resize touch-none justify-center py-1.5 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className="flex min-h-11 flex-1 cursor-row-resize touch-none items-center justify-center outline-none focus-ring"
       role="separator"
       tabIndex={0}
       {...handleProps}
@@ -249,14 +261,16 @@ function useSettingsDialog(open: boolean): SettingsDialogRefs {
 }
 
 function SettingsHeader({
+  handleProps,
   headingRef,
   onClose,
 }: {
+  readonly handleProps: object;
   readonly headingRef: RefObject<HTMLHeadingElement | null>;
   readonly onClose: () => void;
 }) {
   return (
-    <header className="flex shrink-0 items-center justify-between gap-4 border-b border-hairline px-5 py-1 lg:px-8">
+    <header className="flex shrink-0 items-center gap-4 border-b border-hairline px-5 lg:px-8">
       <h2
         className="font-display text-nav leading-nav font-medium focus:outline-none"
         id={SETTINGS_TITLE_ID}
@@ -265,9 +279,10 @@ function SettingsHeader({
       >
         Settings
       </h2>
+      <ResizeHandle handleProps={handleProps} />
       <button
         aria-label="Close settings"
-        className="flex size-11 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="flex size-11 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-foreground focus-ring"
         onClick={onClose}
         title="Close settings"
         type="button"
@@ -278,9 +293,14 @@ function SettingsHeader({
   );
 }
 
-function TextScaleSettings() {
-  const { preferences, setTextScale } = usePreferences();
-  const textScaleIndex = TEXT_SCALE_VALUES.indexOf(preferences.textScale);
+function TextScaleGroup({
+  onChange,
+  value,
+}: {
+  readonly onChange: (next: TextScale) => void;
+  readonly value: TextScale;
+}) {
+  const textScaleIndex = TEXT_SCALE_VALUES.indexOf(value);
 
   return (
     <SettingsGroup legend="Text size">
@@ -290,15 +310,15 @@ function TextScaleSettings() {
         </span>
         <input
           aria-label="Text size"
-          aria-valuetext={enumLabel(TextScale, preferences.textScale)}
-          className="h-11 w-full cursor-pointer accent-accent"
+          aria-valuetext={enumLabel(TextScale, value)}
+          className="focus-ring h-11 w-full cursor-pointer accent-accent"
           max={TEXT_SCALE_VALUES.length - 1}
           min={0}
           onChange={(event) => {
             const textScale = TEXT_SCALE_VALUES[Number(event.currentTarget.value)];
 
             if (textScale !== undefined) {
-              setTextScale(textScale);
+              onChange(textScale);
             }
           }}
           step={1}
@@ -308,11 +328,92 @@ function TextScaleSettings() {
         <span aria-hidden="true" className="font-display text-2xl text-secondary">
           A
         </span>
-        <output className="col-span-3 text-center font-display text-citation leading-citation text-muted">
-          {enumLabel(TextScale, preferences.textScale)}
+        <output className={`col-span-3 text-center ${CITATION_CLASS_NAME} text-muted`}>
+          {enumLabel(TextScale, value)}
         </output>
       </div>
     </SettingsGroup>
+  );
+}
+
+function TextScaleSettings() {
+  const { preferences, setTextScale } = usePreferences();
+
+  return <TextScaleGroup onChange={setTextScale} value={preferences.textScale} />;
+}
+
+function ReaderFaceSettings() {
+  const { preferences, setReaderFace } = usePreferences();
+
+  return (
+    <SettingsGroup legend="Typeface">
+      <div className="flex flex-wrap gap-x-5">
+        {Object.values(ReaderFace).map((readerFace) => (
+          <button
+            aria-pressed={preferences.readerFace === readerFace}
+            className={TEXT_CHOICE_CLASS_NAME}
+            key={readerFace}
+            onClick={() => setReaderFace(readerFace)}
+            type="button"
+          >
+            {READER_FACE_LABEL[readerFace]}
+          </button>
+        ))}
+      </div>
+    </SettingsGroup>
+  );
+}
+
+function ReaderGroundSettings() {
+  const { preferences, setReaderGround } = usePreferences();
+
+  return (
+    <SettingsGroup legend="Page">
+      <div className="flex flex-wrap gap-x-5">
+        {Object.values(ReaderGround).map((readerGround) => (
+          <button
+            aria-pressed={preferences.readerGround === readerGround}
+            className={TEXT_CHOICE_CLASS_NAME}
+            key={readerGround}
+            onClick={() => setReaderGround(readerGround)}
+            type="button"
+          >
+            {READER_GROUND_LABEL[readerGround]}
+          </button>
+        ))}
+      </div>
+    </SettingsGroup>
+  );
+}
+
+function RedLetterSettings() {
+  const { preferences, setShowRedLetter } = usePreferences();
+
+  return (
+    <SettingsGroup legend="Scripture">
+      <SwitchChoice
+        description="Show the words of Christ in red in the Bible and the mystery readings."
+        label="Words of Christ in red"
+        onChange={setShowRedLetter}
+        value={preferences.showRedLetter}
+      />
+      <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
+        <RedLetterNoticeText notice={contentCatalog.bible.redLetter.notice} />
+      </p>
+    </SettingsGroup>
+  );
+}
+
+function ReaderSettings() {
+  const { preferences, setReaderTextScale } = usePreferences();
+
+  return (
+    <div>
+      <TextScaleGroup onChange={setReaderTextScale} value={preferences.readerTextScale} />
+      <ReaderFaceSettings />
+      <ReaderGroundSettings />
+      <RedLetterSettings />
+    </div>
   );
 }
 
@@ -370,7 +471,7 @@ function ReadingSpeedSlider() {
       <input
         aria-labelledby={READING_SPEED_ID}
         aria-valuetext={readingSpeedLabel(preferences.readingSpeed)}
-        className="h-11 w-full cursor-pointer accent-accent"
+        className="focus-ring h-11 w-full cursor-pointer accent-accent"
         max={READING_SPEED_MAXIMUM}
         min={READING_SPEED_MINIMUM}
         onChange={(event) => setReadingSpeed(Number(event.currentTarget.value))}
@@ -381,7 +482,7 @@ function ReadingSpeedSlider() {
       <span aria-hidden="true" className="font-display text-citation text-muted">
         2×
       </span>
-      <output className="col-span-3 text-center font-display text-citation leading-citation text-muted">
+      <output className={`col-span-3 text-center ${CITATION_CLASS_NAME} text-muted`}>
         {readingSpeedLabel(preferences.readingSpeed)}
       </output>
     </div>
@@ -391,7 +492,7 @@ function ReadingSpeedSlider() {
 function GuidedPlaybackSettings() {
   return (
     <SettingsGroup legend="Guided playback">
-      <p className="pt-2 font-display text-body leading-body text-foreground" id={READING_SPEED_ID}>
+      <p className={`pt-2 ${BODY_CLASS_NAME} text-foreground`} id={READING_SPEED_ID}>
         Reading speed
       </p>
       <ReadingSpeedPresets />
@@ -409,7 +510,7 @@ function RosaryBeadsSettings() {
         {Object.values(BeadMaterial).map((beadMaterial) => (
           <button
             aria-pressed={preferences.beadMaterial === beadMaterial}
-            className="group flex min-h-14 min-w-14 flex-col items-center justify-center gap-2 text-muted transition-colors hover:text-foreground aria-pressed:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="group flex min-h-14 min-w-14 flex-col items-center justify-center gap-2 text-muted transition-colors hover:text-foreground aria-pressed:text-foreground focus-ring"
             data-bead-material={beadMaterial}
             key={beadMaterial}
             onClick={() => setBeadMaterial(beadMaterial)}
@@ -419,9 +520,7 @@ function RosaryBeadsSettings() {
               aria-hidden="true"
               className="size-6 rounded-full border border-(--bead-dark) bg-radial-[circle_at_30%_25%] from-(--bead-light) via-(--bead-fill) via-58% to-(--bead-dark) outline-offset-2 outline-accent transition-[outline-color] duration-150 group-aria-pressed:outline"
             />
-            <span className="font-display text-citation leading-citation">
-              {enumLabel(BeadMaterial, beadMaterial)}
-            </span>
+            <span className={CITATION_CLASS_NAME}>{enumLabel(BeadMaterial, beadMaterial)}</span>
           </button>
         ))}
       </div>
@@ -440,6 +539,7 @@ function useRosaryOptionChoices(): readonly RosaryOptionChoice[] {
   const {
     preferences,
     setIncludeFatimaPrayer,
+    setShowDecadeOfferings,
     setShowDropCaps,
     setShowGuidance,
     setShowMysteryFruits,
@@ -465,6 +565,12 @@ function useRosaryOptionChoices(): readonly RosaryOptionChoice[] {
       setShowMysteryFruits,
     ],
     ['Guidance', 'Show meditation prompts.', preferences.showGuidance, setShowGuidance],
+    [
+      'Decade offerings',
+      "Show St. Louis de Montfort's offering with each mystery.",
+      preferences.showDecadeOfferings,
+      setShowDecadeOfferings,
+    ],
     [
       'Drop caps',
       'Enlarge the opening letter when space allows.',
@@ -510,7 +616,7 @@ function UpdateSettings() {
           </button>
         ))}
       </div>
-      <p className="pt-2 font-display text-citation leading-citation text-muted">
+      <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
         {UPDATE_CHECKS_DESCRIPTION[preferences.updateChecks]}
       </p>
     </SettingsGroup>
@@ -543,6 +649,7 @@ function SettingsColumns() {
       </div>
       <div>
         <RosaryOptionsSettings />
+        <RedLetterSettings />
         <LinkSettings />
         <UpdateSettings />
       </div>
@@ -550,22 +657,20 @@ function SettingsColumns() {
   );
 }
 
-export function SettingsDialog({
-  open,
-  onClose,
-  onOpenInstallGuide,
-  onOpenReferences,
-}: {
+type SettingsDialogProps = {
   readonly open: boolean;
+  readonly scope: SettingsScope;
   readonly onClose: () => void;
   readonly onOpenInstallGuide: () => void;
   readonly onOpenReferences: () => void;
-}) {
-  const { dialogRef, headingRef, returnFocusRef } = useSettingsDialog(open);
+};
+
+export function SettingsDialog(props: SettingsDialogProps) {
+  const { dialogRef, headingRef, returnFocusRef } = useSettingsDialog(props.open);
   const { cardStyle, handleProps } = useCardResize(dialogRef);
 
   const handleDialogClose = (): void => {
-    onClose();
+    props.onClose();
     const returnFocus = returnFocusRef.current;
     returnFocusRef.current = null;
 
@@ -581,19 +686,22 @@ export function SettingsDialog({
       style={cardStyle}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        props.onClose();
       }}
       onClose={handleDialogClose}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
-          onClose();
+          props.onClose();
         }
       }}
       ref={dialogRef}
     >
-      <ResizeHandle handleProps={handleProps} />
-      <SettingsHeader headingRef={headingRef} onClose={onClose} />
-      <SettingsBody onOpenInstallGuide={onOpenInstallGuide} onOpenReferences={onOpenReferences} />
+      <SettingsHeader handleProps={handleProps} headingRef={headingRef} onClose={props.onClose} />
+      <SettingsBody
+        onOpenInstallGuide={props.onOpenInstallGuide}
+        onOpenReferences={props.onOpenReferences}
+        scope={props.scope}
+      />
     </dialog>
   );
 }
@@ -601,15 +709,26 @@ export function SettingsDialog({
 function SettingsBody({
   onOpenInstallGuide,
   onOpenReferences,
+  scope,
 }: {
   readonly onOpenInstallGuide: () => void;
   readonly onOpenReferences: () => void;
+  readonly scope: SettingsScope;
 }) {
   return (
-    <div className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pb-5 lg:px-8 lg:pb-8">
-      <SettingsColumns />
-      <DiagnosticsSettings />
-      <AboutSettings onOpenInstallGuide={onOpenInstallGuide} onOpenReferences={onOpenReferences} />
+    <div className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-5 lg:px-8 lg:pb-8">
+      {scope === SettingsScope.Reader ? (
+        <ReaderSettings />
+      ) : (
+        <>
+          <SettingsColumns />
+          <DiagnosticsSettings />
+          <AboutSettings
+            onOpenInstallGuide={onOpenInstallGuide}
+            onOpenReferences={onOpenReferences}
+          />
+        </>
+      )}
     </div>
   );
 }

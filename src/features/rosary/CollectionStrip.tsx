@@ -2,7 +2,7 @@ import { resolveArtAsset } from '../../assets/art.ts';
 import type { ResolvedArtwork } from '../../content/catalog.ts';
 import { TrackEdgeControls } from '../../components/TrackEdgeControls.tsx';
 import { useHorizontalTrack } from '../../shared/useHorizontalTrack.ts';
-import { HORIZONTAL_TRACK_CLASS_NAME } from '../../styles.ts';
+import { CITATION_CLASS_NAME, HORIZONTAL_TRACK_CLASS_NAME } from '../../styles.ts';
 
 const TRACK_CLASS_NAME = `${HORIZONTAL_TRACK_CLASS_NAME} gap-2`;
 
@@ -30,10 +30,8 @@ function ArtworkCard({
         draggable={false}
         src={resolveArtAsset(artwork.file)}
       />
-      <span className="truncate font-display text-citation leading-citation text-foreground">
-        {artwork.title}
-      </span>
-      <span className="truncate font-display text-citation leading-citation text-muted">
+      <span className={`truncate ${CITATION_CLASS_NAME} text-foreground`}>{artwork.title}</span>
+      <span className={`truncate ${CITATION_CLASS_NAME} text-muted`}>
         {artwork.artist} · {artwork.date}
       </span>
     </button>

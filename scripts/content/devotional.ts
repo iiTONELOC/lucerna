@@ -4,10 +4,12 @@ import { fileURLToPath } from 'url';
 import {
   DEVOTIONAL_SCHEMA_VERSION,
   devotionalContentFrom,
+  guidanceStatementsOf,
   type Artwork,
   type DevotionalContent,
   type DevotionalSource,
   type GuidanceStatement,
+  type LibraryContent,
   type Mystery,
   type MysterySet,
   type Prayer,
@@ -22,7 +24,14 @@ import {
   requiredString,
 } from './records.ts';
 import {
-  extractPassage,
+  RED_LETTER_DATABASE,
+  bibleBookIdentifierFrom,
+  redLetterBooksFrom,
+  type RedLetterBooks,
+} from './redLetter.ts';
+import { reflectionBlockIndexOf, reflectionTextFrom } from './reflections.ts';
+import {
+  extractPassageContent,
   SCRIPTURE_SOURCE_DIRECTORY,
   type ScriptureRange,
   validateScriptureRange,
@@ -151,10 +160,75 @@ const mysteryRecordsFrom = (rosary: JsonRecord): readonly JsonRecord[] =>
     );
   });
 
+type ReflectionSourceLoader = (sourceId: string) => Promise<string>;
+
+const reflectionSourceLoaderFrom = (
+  sources: unknown,
+  repositoryRoot: URL,
+): ReflectionSourceLoader => {
+  const cache = new Map<string, Promise<string>>();
+
+  return (sourceId: string): Promise<string> => {
+    const cached = cache.get(sourceId);
+
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    const records = recordFrom(sources, ContentBuildErrorCode.MissingSource, sourceId);
+    const source = recordFrom(records[sourceId], ContentBuildErrorCode.MissingSource, sourceId);
+    const loaded = Bun.file(new URL(requiredString(source, 'path'), repositoryRoot)).text();
+
+    cache.set(sourceId, loaded);
+    return loaded;
+  };
+};
+
+const enrichReflection = async (
+  mystery: JsonRecord,
+  loadReflectionSource: ReflectionSourceLoader,
+  library: LibraryContent,
+): Promise<JsonRecord> => {
+  const reflection = recordFrom(
+    mystery['reflection'],
+    ContentBuildErrorCode.InvalidField,
+    'reflection',
+  );
+
+  if (requiredString(reflection, 'status') !== 'mapped') {
+    return reflection;
+  }
+
+  const sourceId = requiredString(reflection, 'sourceId');
+  const text = reflectionTextFrom(
+    requiredString(reflection, 'sectionId'),
+    await loadReflectionSource(sourceId),
+  );
+
+  return {
+    ...reflection,
+    text,
+    blockIndex: reflectionBlockIndexOf(library, sourceId, text),
+  };
+};
+
+type MysteryEnrichmentContext = {
+  readonly sourceFiles: ReadonlyMap<string, string>;
+  readonly loadReflectionSource: ReflectionSourceLoader;
+  readonly library: LibraryContent;
+  readonly repositoryRoot: URL;
+  readonly redLetter: RedLetterBooks;
+};
+
 const enrichMystery = async (
   mystery: JsonRecord,
-  sourceFiles: ReadonlyMap<string, string>,
-  repositoryRoot: URL,
+  {
+    sourceFiles,
+    loadReflectionSource,
+    library,
+    repositoryRoot,
+    redLetter,
+  }: MysteryEnrichmentContext,
 ): Promise<JsonRecord> => {
   const scripture = recordFrom(
     mystery['scripture'],
@@ -172,17 +246,29 @@ const enrichMystery = async (
   };
 
   validateScriptureRange(range);
+  const { text, red } = extractPassageContent(
+    await Bun.file(new URL(range.sourceFile, repositoryRoot)).text(),
+    range,
+    redLetter.get(bibleBookIdentifierFrom(book)),
+  );
 
   return {
     ...mystery,
     scripture: {
       ...scripture,
-      text: extractPassage(await Bun.file(new URL(range.sourceFile, repositoryRoot)).text(), range),
+      text,
+      ...(red.length === 0 ? {} : { red }),
     },
+    reflection: await enrichReflection(mystery, loadReflectionSource, library),
   };
 };
 
-const enrichRosary = async (value: unknown, repositoryRoot: URL): Promise<JsonRecord> => {
+const enrichRosary = async (
+  value: unknown,
+  sources: unknown,
+  library: LibraryContent,
+  repositoryRoot: URL,
+): Promise<JsonRecord> => {
   const rosary = recordFrom(value, ContentBuildErrorCode.InvalidField, 'rosary');
   const mysteries = mysteryRecordsFrom(rosary);
   const books = new Set(
@@ -193,6 +279,8 @@ const enrichRosary = async (value: unknown, repositoryRoot: URL): Promise<JsonRe
     ),
   );
   const sourceFiles = await sourceFilesForBooks(books, repositoryRoot);
+  const loadReflectionSource = reflectionSourceLoaderFrom(sources, repositoryRoot);
+  const redLetter = redLetterBooksFrom(await readJsonFile(RED_LETTER_DATABASE, repositoryRoot));
   const mysterySets = await Promise.all(
     arrayFrom(rosary.mysterySets, 'mystery sets').map(async (value, setIndex) => {
       const mysterySet = recordFrom(
@@ -204,8 +292,7 @@ const enrichRosary = async (value: unknown, repositoryRoot: URL): Promise<JsonRe
         arrayFrom(mysterySet.mysteries, `mysteries ${setIndex}`).map((mystery, index) =>
           enrichMystery(
             recordFrom(mystery, ContentBuildErrorCode.InvalidField, `mystery ${setIndex}.${index}`),
-            sourceFiles,
-            repositoryRoot,
+            { sourceFiles, loadReflectionSource, library, repositoryRoot, redLetter },
           ),
         ),
       );
@@ -237,19 +324,11 @@ const validateGuidance = (
   sources: ReadonlyMap<string, DevotionalSource>,
 ): void => {
   const { guidance } = content.rosary;
-  const statements = [
-    ...guidance.openingHailMarys,
-    guidance.mysteryAnnouncement,
-    guidance.decadeOurFather,
-    guidance.decadeHailMarys,
-    guidance.decadeGloryBe,
-    guidance.fatimaPrayer,
-    guidance.hailHolyQueen,
-    guidance.finalPrayer,
-  ];
 
   guidance.sourceIds.forEach((sourceId) => requireSource(sources, sourceId));
-  statements.forEach((statement) => validateGuidanceStatement(statement, sources));
+  guidanceStatementsOf(guidance).forEach((statement) =>
+    validateGuidanceStatement(statement, sources),
+  );
   requireSource(sources, guidance.fruitLine.sourceId);
   guidance.fruitLine.sourceRefs.forEach((reference) => validateSourceReference(reference, sources));
 };
@@ -377,7 +456,10 @@ const validateRelationships = async (
   await validateFiles(content, repositoryRoot);
 };
 
-export const buildDevotionalContent = async (repositoryRoot: URL): Promise<DevotionalContent> => {
+export const buildDevotionalContent = async (
+  repositoryRoot: URL,
+  library: LibraryContent,
+): Promise<DevotionalContent> => {
   const [sources, prayers, artworks, rosary] = await Promise.all([
     readJsonFile(SOURCE_DATABASE, repositoryRoot),
     readJsonFile(PRAYER_DATABASE, repositoryRoot),
@@ -389,7 +471,7 @@ export const buildDevotionalContent = async (repositoryRoot: URL): Promise<Devot
     sources: sourceEntriesFrom(sources),
     prayers,
     artworks,
-    rosary: await enrichRosary(rosary, repositoryRoot),
+    rosary: await enrichRosary(rosary, sources, library, repositoryRoot),
   });
 
   await validateRelationships(content, repositoryRoot);

@@ -1,6 +1,8 @@
+import type { ScriptureRedSpan } from '../../src/content/schema.ts';
 import { ContentBuildError, ContentBuildErrorCode } from './records.ts';
+import { redSpansOf, type RedLetterEntry } from './redLetter.ts';
 
-export const SCRIPTURE_SOURCE_DIRECTORY = 'data/library/bibles/douray-rheims/';
+export const SCRIPTURE_SOURCE_DIRECTORY = 'data/library/bibles/douay-rheims/';
 
 export type ScriptureRange = {
   readonly reference: string;
@@ -12,10 +14,10 @@ export type ScriptureRange = {
 };
 
 const BOOK_MARKER = String.raw`\h `;
-const CHAPTER_MARKER = String.raw`\c `;
-const VERSE_MARKER = String.raw`\v `;
-const FOOTNOTE_START = String.raw`\f `;
-const FOOTNOTE_END = String.raw`\f*`;
+export const CHAPTER_MARKER = String.raw`\c `;
+export const VERSE_MARKER = String.raw`\v `;
+export const FOOTNOTE_START = String.raw`\f `;
+export const FOOTNOTE_END = String.raw`\f*`;
 
 const sourceBookFor = (referenceBook: string): string => {
   switch (referenceBook) {
@@ -83,7 +85,7 @@ const cleanVerseText = (value: string): string => {
   return text;
 };
 
-export const extractPassage = (source: string, range: ScriptureRange): string => {
+const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<number, string> => {
   const sourceBook = source
     .split(/\r?\n/u)
     .find((line) => line.startsWith(BOOK_MARKER))
@@ -128,5 +130,40 @@ export const extractPassage = (source: string, range: ScriptureRange): string =>
     throw new ContentBuildError(ContentBuildErrorCode.MissingScripture, range.reference);
   }
 
-  return [...passage.values()].join(' ');
+  return passage;
+};
+
+export const extractPassage = (source: string, range: ScriptureRange): string =>
+  [...passageVersesFrom(source, range).values()].join(' ');
+
+export type ScripturePassageContent = {
+  readonly text: string;
+  readonly red: readonly ScriptureRedSpan[];
+};
+
+export const extractPassageContent = (
+  source: string,
+  range: ScriptureRange,
+  entries: ReadonlyMap<string, RedLetterEntry> | undefined,
+): ScripturePassageContent => {
+  const parts: string[] = [];
+  const red: ScriptureRedSpan[] = [];
+  let offset = 0;
+
+  for (const [verseNumber, verseText] of passageVersesFrom(source, range)) {
+    const entry = entries?.get(`${String(range.chapter)}:${String(verseNumber)}`);
+
+    if (entry !== undefined) {
+      const context = `${range.reference} verse ${String(verseNumber)}`;
+
+      for (const span of redSpansOf(verseText, entry, context)) {
+        red.push({ start: offset + span.start, end: offset + span.end });
+      }
+    }
+
+    parts.push(verseText);
+    offset += verseText.length + 1;
+  }
+
+  return { text: parts.join(' '), red };
 };

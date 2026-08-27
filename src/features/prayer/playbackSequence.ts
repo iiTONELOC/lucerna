@@ -2,6 +2,7 @@ import { indexAtTime, paceText, startMsAt, type PacedText } from './pacing.ts';
 
 export enum GuidedPlaybackPhase {
   Guidance = 'guidance',
+  Offering = 'offering',
   Fruit = 'fruit',
   Prayer = 'prayer',
 }
@@ -21,6 +22,7 @@ export type PlaybackPlan = {
 type PlaybackPlanRequest = {
   readonly fruitText: string;
   readonly guidanceText: string;
+  readonly offeringText: string;
   readonly paced: PacedText;
   readonly readingSpeed: number;
   readonly trailingHoldMs: number;
@@ -38,10 +40,15 @@ const appendPhase = (
 export const createPlaybackPlan = (request: PlaybackPlanRequest): PlaybackPlan => {
   const phases: PlaybackPhaseWindow[] = [];
   const guidance = paceText(request.guidanceText, request.readingSpeed);
+  const offering = paceText(request.offeringText, request.readingSpeed);
   const fruit = paceText(request.fruitText, request.readingSpeed);
 
   if (guidance.words.length > 0) {
     appendPhase(phases, GuidedPlaybackPhase.Guidance, guidance.totalMs);
+  }
+
+  if (offering.words.length > 0) {
+    appendPhase(phases, GuidedPlaybackPhase.Offering, offering.totalMs);
   }
 
   if (fruit.words.length > 0) {

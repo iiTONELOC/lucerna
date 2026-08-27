@@ -1,22 +1,23 @@
 import { useEffect, useRef } from 'react';
 import { contentCatalog } from '../../content/catalog.ts';
 import type { DevotionalSource, SourceReference } from '../../content/schema.ts';
+import { BackButton } from '../../components/buttons/BackButton.tsx';
 import { ExternalLink } from '../../components/links/ExternalLink.tsx';
+import { useEscape } from '../../shared/useEscape.ts';
 import {
+  BODY_CLASS_NAME,
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
-  SUBTITLE_CLASS_NAME,
+  INLINE_LINK_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import {
   ReferenceGroup,
   referenceGroupLabel,
   referenceTargetKey,
+  type ReadingLocation,
   type ReferenceTarget,
 } from './referenceCatalog.ts';
-
-const BACK_BUTTON_CLASS_NAME = `min-h-11 w-fit text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${SUBTITLE_CLASS_NAME}`;
-const LINK_CLASS_NAME = `inline-flex min-h-11 items-center text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent ${CITATION_CLASS_NAME}`;
 
 function ReferenceTerm({ children }: { readonly children: string }) {
   return <dt className="small-caps tracking-subtitle text-muted">{children}</dt>;
@@ -27,6 +28,12 @@ function SourceDetails({ source }: { readonly source: DevotionalSource }) {
     <dl className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-2 ${CITATION_CLASS_NAME}`}>
       <ReferenceTerm>Author</ReferenceTerm>
       <dd className="wrap-break-word text-secondary">{source.author}</dd>
+      {source.note === undefined ? null : (
+        <>
+          <ReferenceTerm>Purpose</ReferenceTerm>
+          <dd className="wrap-break-word text-secondary">{source.note}</dd>
+        </>
+      )}
       {source.translator === undefined ? null : (
         <>
           <ReferenceTerm>Translator</ReferenceTerm>
@@ -51,7 +58,7 @@ function SourceDetails({ source }: { readonly source: DevotionalSource }) {
   );
 }
 
-function ArtworkDetails({ artworkId }: { readonly artworkId: string }) {
+function ArtworkRecordDetails({ artworkId }: { readonly artworkId: string }) {
   const artwork = contentCatalog.artworkById(artworkId);
 
   return (
@@ -74,19 +81,36 @@ function ArtworkDetails({ artworkId }: { readonly artworkId: string }) {
   );
 }
 
-function ExactLocation({ target }: { readonly target: ReferenceTarget }) {
+function ExactLocation({
+  onOpenReading,
+  target,
+}: {
+  readonly onOpenReading: (location: ReadingLocation) => void;
+  readonly target: ReferenceTarget;
+}) {
   if (target.group === ReferenceGroup.Artwork || target.locator === undefined) {
     return null;
   }
 
+  const reading = target.reading;
+
   return (
     <section className="rounded-lg border border-accent/35 bg-accent/5 p-4">
       <p className={EYEBROW_CLASS_NAME}>Cited location</p>
-      <p className="pt-2 font-display text-body leading-body text-secondary">{target.locator}</p>
+      <p className={`pt-2 ${BODY_CLASS_NAME} text-secondary`}>{target.locator}</p>
       {target.sections === undefined ? null : (
         <p className={`${CITATION_CLASS_NAME} pt-2 text-muted`}>
           Sections {target.sections.join(', ')}
         </p>
+      )}
+      {reading === undefined ? null : (
+        <button
+          className={`${INLINE_LINK_CLASS_NAME} mt-1`}
+          onClick={() => onOpenReading(reading)}
+          type="button"
+        >
+          View in the Library
+        </button>
       )}
     </section>
   );
@@ -136,21 +160,21 @@ function SourceLinks({
 
   return (
     <nav aria-label="External source links" className="flex flex-wrap gap-x-6 gap-y-2">
-      <ExternalLink className={LINK_CLASS_NAME} href={primaryUrl}>
+      <ExternalLink className={INLINE_LINK_CLASS_NAME} href={primaryUrl}>
         Open original source
       </ExternalLink>
       {artwork === undefined ? null : (
-        <ExternalLink className={LINK_CLASS_NAME} href={source.url}>
+        <ExternalLink className={INLINE_LINK_CLASS_NAME} href={source.url}>
           Open rights policy
         </ExternalLink>
       )}
       {source.citationUrl === undefined ? null : (
-        <ExternalLink className={LINK_CLASS_NAME} href={source.citationUrl}>
+        <ExternalLink className={INLINE_LINK_CLASS_NAME} href={source.citationUrl}>
           Open alternate text
         </ExternalLink>
       )}
       {source.renewalSearchUrl === undefined ? null : (
-        <ExternalLink className={LINK_CLASS_NAME} href={source.renewalSearchUrl}>
+        <ExternalLink className={INLINE_LINK_CLASS_NAME} href={source.renewalSearchUrl}>
           Open renewal search
         </ExternalLink>
       )}
@@ -171,16 +195,7 @@ function useReferenceFocus(onBack: () => void, target: ReferenceTarget) {
     headingRef.current?.focus();
   }, [target]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        onBack();
-      }
-    };
-
-    globalThis.addEventListener('keydown', onKeyDown);
-    return () => globalThis.removeEventListener('keydown', onKeyDown);
-  }, [onBack]);
+  useEscape(onBack);
 
   return headingRef;
 }
@@ -188,9 +203,11 @@ function useReferenceFocus(onBack: () => void, target: ReferenceTarget) {
 export function ReferenceFocus({
   target,
   onBack,
+  onOpenReading,
 }: {
   readonly target: ReferenceTarget;
   readonly onBack: () => void;
+  readonly onOpenReading: (location: ReadingLocation) => void;
 }) {
   const source = contentCatalog.sourceById(target.sourceId);
   const headingRef = useReferenceFocus(onBack, target);
@@ -202,9 +219,7 @@ export function ReferenceFocus({
       key={referenceTargetKey(target)}
     >
       <article className="mx-auto flex min-h-full w-full max-w-4xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-10">
-        <button className={BACK_BUTTON_CLASS_NAME} onClick={onBack} type="button">
-          Back
-        </button>
+        <BackButton onBack={onBack} />
         <header>
           <p className={EYEBROW_CLASS_NAME}>{referenceGroupLabel(target.group)}</p>
           <h1
@@ -216,11 +231,11 @@ export function ReferenceFocus({
           </h1>
         </header>
         {target.group === ReferenceGroup.Artwork ? (
-          <ArtworkDetails artworkId={target.artworkId} />
+          <ArtworkRecordDetails artworkId={target.artworkId} />
         ) : (
           <SourceDetails source={source} />
         )}
-        <ExactLocation target={target} />
+        <ExactLocation onOpenReading={onOpenReading} target={target} />
         <SupportingReferences target={target} />
         <SourceLinks source={source} target={target} />
       </article>

@@ -14,6 +14,16 @@ export enum TextScale {
   Maximum = '150',
 }
 
+export enum ReaderFace {
+  Garamond = 'garamond',
+  Sans = 'sans',
+}
+
+export enum ReaderGround {
+  Dark = 'dark',
+  Parchment = 'parchment',
+}
+
 export enum OpeningDuration {
   FiveSeconds = '5',
   TenSeconds = '10',
@@ -52,10 +62,15 @@ export enum BeadMaterial {
 export type Preferences = {
   readonly theme: Theme;
   readonly textScale: TextScale;
+  readonly readerFace: ReaderFace;
+  readonly readerTextScale: TextScale;
+  readonly readerGround: ReaderGround;
+  readonly showRedLetter: boolean;
   readonly openingDuration: OpeningDuration;
   readonly readingSpeed: number;
   readonly beadMaterial: BeadMaterial;
   readonly showGuidance: boolean;
+  readonly showDecadeOfferings: boolean;
   readonly showDropCaps: boolean;
   readonly showMysteryFruits: boolean;
   readonly showScriptureReadings: boolean;
@@ -67,10 +82,15 @@ export type Preferences = {
 export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   theme: Theme.EternalLight,
   textScale: TextScale.Standard,
+  readerFace: ReaderFace.Garamond,
+  readerTextScale: TextScale.Standard,
+  readerGround: ReaderGround.Dark,
+  showRedLetter: false,
   openingDuration: OpeningDuration.Manual,
   readingSpeed: ReadingSpeed.Steady,
   beadMaterial: BeadMaterial.Wood,
   showGuidance: true,
+  showDecadeOfferings: true,
   showDropCaps: true,
   showMysteryFruits: true,
   showScriptureReadings: true,
@@ -86,10 +106,15 @@ export enum PreferencesActionType {
   Hydrate = 'hydrate',
   SetTheme = 'set-theme',
   SetTextScale = 'set-text-scale',
+  SetReaderFace = 'set-reader-face',
+  SetReaderTextScale = 'set-reader-text-scale',
+  SetReaderGround = 'set-reader-ground',
+  SetShowRedLetter = 'set-show-red-letter',
   SetOpeningDuration = 'set-opening-duration',
   SetReadingSpeed = 'set-reading-speed',
   SetBeadMaterial = 'set-bead-material',
   SetShowGuidance = 'set-show-guidance',
+  SetShowDecadeOfferings = 'set-show-decade-offerings',
   SetShowDropCaps = 'set-show-drop-caps',
   SetShowMysteryFruits = 'set-show-mystery-fruits',
   SetShowScriptureReadings = 'set-show-scripture-readings',
@@ -102,6 +127,13 @@ export type PreferencesAction =
   | { readonly type: PreferencesActionType.Hydrate; readonly preferences: unknown }
   | { readonly type: PreferencesActionType.SetTheme; readonly theme: Theme }
   | { readonly type: PreferencesActionType.SetTextScale; readonly textScale: TextScale }
+  | { readonly type: PreferencesActionType.SetReaderFace; readonly readerFace: ReaderFace }
+  | {
+      readonly type: PreferencesActionType.SetReaderTextScale;
+      readonly readerTextScale: TextScale;
+    }
+  | { readonly type: PreferencesActionType.SetReaderGround; readonly readerGround: ReaderGround }
+  | { readonly type: PreferencesActionType.SetShowRedLetter; readonly showRedLetter: boolean }
   | {
       readonly type: PreferencesActionType.SetOpeningDuration;
       readonly openingDuration: OpeningDuration;
@@ -109,6 +141,10 @@ export type PreferencesAction =
   | { readonly type: PreferencesActionType.SetReadingSpeed; readonly readingSpeed: number }
   | { readonly type: PreferencesActionType.SetBeadMaterial; readonly beadMaterial: BeadMaterial }
   | { readonly type: PreferencesActionType.SetShowGuidance; readonly showGuidance: boolean }
+  | {
+      readonly type: PreferencesActionType.SetShowDecadeOfferings;
+      readonly showDecadeOfferings: boolean;
+    }
   | { readonly type: PreferencesActionType.SetShowDropCaps; readonly showDropCaps: boolean }
   | {
       readonly type: PreferencesActionType.SetShowMysteryFruits;
@@ -180,9 +216,27 @@ const optionalBooleanFrom = (
   fallback: boolean,
 ): boolean | null => storedOr(raw[key], fallback, booleanFrom);
 
+type ReaderPreferenceKey = 'readerFace' | 'readerTextScale' | 'readerGround' | 'showRedLetter';
+
+const parsedReaderPreferencesFrom = (
+  raw: Record<string, unknown>,
+): Pick<ParsedPreferences, ReaderPreferenceKey> => ({
+  readerFace: storedOr(raw['readerFace'], DEFAULT_PREFERENCES.readerFace, (value) =>
+    memberFrom(Object.values(ReaderFace), value),
+  ),
+  readerTextScale: storedOr(raw['readerTextScale'], DEFAULT_PREFERENCES.readerTextScale, (value) =>
+    memberFrom(Object.values(TextScale), value),
+  ),
+  readerGround: storedOr(raw['readerGround'], DEFAULT_PREFERENCES.readerGround, (value) =>
+    memberFrom(Object.values(ReaderGround), value),
+  ),
+  showRedLetter: optionalBooleanFrom(raw, 'showRedLetter', DEFAULT_PREFERENCES.showRedLetter),
+});
+
 const parsedPreferencesFrom = (raw: Record<string, unknown>): ParsedPreferences => ({
   theme: memberFrom(Object.values(Theme), raw['theme']),
   textScale: memberFrom(Object.values(TextScale), raw['textScale']),
+  ...parsedReaderPreferencesFrom(raw),
   openingDuration: storedOr(raw['openingDuration'], DEFAULT_PREFERENCES.openingDuration, (value) =>
     memberFrom(Object.values(OpeningDuration), value),
   ),
@@ -191,6 +245,11 @@ const parsedPreferencesFrom = (raw: Record<string, unknown>): ParsedPreferences 
     memberFrom(Object.values(BeadMaterial), value),
   ),
   showGuidance: optionalBooleanFrom(raw, 'showGuidance', DEFAULT_PREFERENCES.showGuidance),
+  showDecadeOfferings: optionalBooleanFrom(
+    raw,
+    'showDecadeOfferings',
+    DEFAULT_PREFERENCES.showDecadeOfferings,
+  ),
   showDropCaps: optionalBooleanFrom(raw, 'showDropCaps', DEFAULT_PREFERENCES.showDropCaps),
   showMysteryFruits: optionalBooleanFrom(
     raw,
@@ -244,9 +303,11 @@ type ReadingPreferencesAction = Extract<
   {
     readonly type:
       | PreferencesActionType.SetShowGuidance
+      | PreferencesActionType.SetShowDecadeOfferings
       | PreferencesActionType.SetShowDropCaps
       | PreferencesActionType.SetShowMysteryFruits
       | PreferencesActionType.SetShowScriptureReadings
+      | PreferencesActionType.SetShowRedLetter
       | PreferencesActionType.SetIncludeFatimaPrayer;
   }
 >;
@@ -258,12 +319,16 @@ const reduceReadingPreference = (
   switch (action.type) {
     case PreferencesActionType.SetShowGuidance:
       return { ...state, showGuidance: action.showGuidance };
+    case PreferencesActionType.SetShowDecadeOfferings:
+      return { ...state, showDecadeOfferings: action.showDecadeOfferings };
     case PreferencesActionType.SetShowDropCaps:
       return { ...state, showDropCaps: action.showDropCaps };
     case PreferencesActionType.SetShowMysteryFruits:
       return { ...state, showMysteryFruits: action.showMysteryFruits };
     case PreferencesActionType.SetShowScriptureReadings:
       return { ...state, showScriptureReadings: action.showScriptureReadings };
+    case PreferencesActionType.SetShowRedLetter:
+      return { ...state, showRedLetter: action.showRedLetter };
     case PreferencesActionType.SetIncludeFatimaPrayer:
       return { ...state, includeFatimaPrayer: action.includeFatimaPrayer };
   }
@@ -276,6 +341,12 @@ const reduceDirectPreference = (
   switch (action.type) {
     case PreferencesActionType.SetTextScale:
       return { ...state, textScale: action.textScale };
+    case PreferencesActionType.SetReaderFace:
+      return { ...state, readerFace: action.readerFace };
+    case PreferencesActionType.SetReaderTextScale:
+      return { ...state, readerTextScale: action.readerTextScale };
+    case PreferencesActionType.SetReaderGround:
+      return { ...state, readerGround: action.readerGround };
     case PreferencesActionType.SetOpeningDuration:
       return { ...state, openingDuration: action.openingDuration };
     case PreferencesActionType.SetReadingSpeed:

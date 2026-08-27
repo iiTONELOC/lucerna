@@ -3,6 +3,8 @@ import type {
   BeadMaterial,
   OpeningDuration,
   Preferences,
+  ReaderFace,
+  ReaderGround,
   TextScale,
   Theme,
   UpdateChecks,
@@ -12,10 +14,15 @@ export type PreferencesContextValue = {
   readonly preferences: Preferences;
   readonly setTheme: (theme: Theme) => void;
   readonly setTextScale: (textScale: TextScale) => void;
+  readonly setReaderFace: (readerFace: ReaderFace) => void;
+  readonly setReaderTextScale: (readerTextScale: TextScale) => void;
+  readonly setReaderGround: (readerGround: ReaderGround) => void;
+  readonly setShowRedLetter: (showRedLetter: boolean) => void;
   readonly setOpeningDuration: (openingDuration: OpeningDuration) => void;
   readonly setReadingSpeed: (readingSpeed: number) => void;
   readonly setBeadMaterial: (beadMaterial: BeadMaterial) => void;
   readonly setShowGuidance: (showGuidance: boolean) => void;
+  readonly setShowDecadeOfferings: (showDecadeOfferings: boolean) => void;
   readonly setShowDropCaps: (showDropCaps: boolean) => void;
   readonly setShowMysteryFruits: (showMysteryFruits: boolean) => void;
   readonly setShowScriptureReadings: (showScriptureReadings: boolean) => void;

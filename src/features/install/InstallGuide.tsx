@@ -1,20 +1,17 @@
 import { resolveInstallAsset } from '../../assets/install.ts';
+import { BackButton } from '../../components/buttons/BackButton.tsx';
 import {
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
   NAV_CLASS_NAME,
   SCRIPTURE_CLASS_NAME,
-  SUBTITLE_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import { INSTALL_SECTIONS, type InstallSection, type InstallStep } from './installGuide.ts';
 
 const INSTALL_TITLE_ID = 'install-title';
-const SECTION_LINK_CLASS_NAME = `inline-flex min-h-11 items-center rounded-lg border border-hairline px-3 text-secondary transition-colors hover:border-accent/60 hover:text-accent-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${NAV_CLASS_NAME}`;
-const STEP_NUMBER_CLASS_NAME =
-  'flex size-8 shrink-0 items-center justify-center rounded-full border border-accent/50 font-display text-citation leading-citation text-accent-current';
-const BACK_BUTTON_CLASS_NAME = `min-h-11 w-fit text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${SUBTITLE_CLASS_NAME}`;
-
+const SECTION_LINK_CLASS_NAME = `inline-flex min-h-11 items-center rounded-lg border border-hairline px-3 text-secondary transition-colors hover:border-accent/60 hover:text-accent-current focus-ring ${NAV_CLASS_NAME}`;
+const STEP_NUMBER_CLASS_NAME = `flex size-8 shrink-0 items-center justify-center rounded-full border border-accent/50 ${CITATION_CLASS_NAME} text-accent-current`;
 function InstallSectionLinks() {
   return (
     <nav aria-label="Devices" className="flex flex-wrap gap-2">
@@ -83,13 +80,11 @@ export function InstallGuide({ onBack }: { readonly onBack: () => void }) {
       className="scroll-region h-dvh overflow-x-hidden overflow-y-auto bg-background pt-safe-top text-foreground"
     >
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pt-5 pb-[60dvh] sm:px-6 lg:px-8 lg:pt-10">
-        <button className={BACK_BUTTON_CLASS_NAME} onClick={onBack} type="button">
-          Back
-        </button>
+        <BackButton onBack={onBack} />
         <header>
           <p className={EYEBROW_CLASS_NAME}>Keep Lucerna on your device</p>
           <h1 className={`${TITLE_CLASS_NAME} pt-1`} id={INSTALL_TITLE_ID}>
-            How to Add Lucerna to your device
+            How to add Lucerna to your device
           </h1>
           <p className={`max-w-prose pt-3 ${SCRIPTURE_CLASS_NAME}`}>
             Lucerna works in a browser. Add it to your device and it opens like any other

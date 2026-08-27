@@ -1,8 +1,8 @@
+import { BODY_CLASS_NAME } from '../../styles.ts';
 import { useEffect, useId, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 
-const ACTION_CLASS_NAME =
-  'flex min-h-11 items-center justify-center rounded-md border border-hairline px-4 font-display text-body leading-body transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+const DIALOG_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center rounded-md border border-hairline px-4 ${BODY_CLASS_NAME} transition-colors focus-ring`;
 
 type ExternalLinkDialogProps = {
   readonly descriptionId: string;
@@ -38,14 +38,14 @@ function ExternalLinkDialogActions({
   return (
     <div className="mt-5 flex justify-end gap-3">
       <button
-        className={ACTION_CLASS_NAME + ' text-secondary hover:text-foreground'}
+        className={DIALOG_ACTION_CLASS_NAME + ' text-secondary hover:text-foreground'}
         onClick={onClose}
         type="button"
       >
         Stay here
       </button>
       <a
-        className={ACTION_CLASS_NAME + ' border-accent text-accent-current'}
+        className={DIALOG_ACTION_CLASS_NAME + ' border-accent text-accent-current'}
         href={href}
         onClick={onClose}
         rel="noreferrer"
@@ -89,7 +89,7 @@ function ExternalLinkDialog({
         >
           Open an external website?
         </h2>
-        <p className="pt-3 font-display text-body leading-body text-secondary" id={descriptionId}>
+        <p className={`pt-3 ${BODY_CLASS_NAME} text-secondary`} id={descriptionId}>
           This page is not part of Lucerna and may require an internet connection.
         </p>
         <ExternalLinkDialogActions href={href} onClose={onClose} />

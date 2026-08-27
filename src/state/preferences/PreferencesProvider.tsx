@@ -17,6 +17,8 @@ import {
   type PreferencesAction,
   PreferencesActionType,
   preferencesReducer,
+  type ReaderFace,
+  type ReaderGround,
   type TextScale,
   type Theme,
   type UpdateChecks,
@@ -67,6 +69,14 @@ const contextValueFrom = (
   setTheme: (theme: Theme) => dispatch({ type: PreferencesActionType.SetTheme, theme }),
   setTextScale: (textScale: TextScale) =>
     dispatch({ type: PreferencesActionType.SetTextScale, textScale }),
+  setReaderFace: (readerFace: ReaderFace) =>
+    dispatch({ type: PreferencesActionType.SetReaderFace, readerFace }),
+  setReaderTextScale: (readerTextScale: TextScale) =>
+    dispatch({ type: PreferencesActionType.SetReaderTextScale, readerTextScale }),
+  setReaderGround: (readerGround: ReaderGround) =>
+    dispatch({ type: PreferencesActionType.SetReaderGround, readerGround }),
+  setShowRedLetter: (showRedLetter: boolean) =>
+    dispatch({ type: PreferencesActionType.SetShowRedLetter, showRedLetter }),
   setOpeningDuration: (openingDuration: OpeningDuration) =>
     dispatch({ type: PreferencesActionType.SetOpeningDuration, openingDuration }),
   setReadingSpeed: (readingSpeed: number) =>
@@ -75,6 +85,8 @@ const contextValueFrom = (
     dispatch({ type: PreferencesActionType.SetBeadMaterial, beadMaterial }),
   setShowGuidance: (showGuidance: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowGuidance, showGuidance }),
+  setShowDecadeOfferings: (showDecadeOfferings: boolean) =>
+    dispatch({ type: PreferencesActionType.SetShowDecadeOfferings, showDecadeOfferings }),
   setShowDropCaps: (showDropCaps: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowDropCaps, showDropCaps }),
   setShowMysteryFruits: (showMysteryFruits: boolean) =>

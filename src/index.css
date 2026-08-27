@@ -58,6 +58,7 @@
   --color-secondary: var(--theme-secondary);
   --color-muted: var(--theme-muted);
   --color-accent: var(--theme-accent);
+  --color-christ: var(--theme-christ);
   --color-edge-light: var(--theme-edge-light);
   --color-accent-current: var(--theme-accent-current);
   --color-accent-strong: var(--theme-accent-strong);
@@ -71,7 +72,9 @@
   --text-mark: clamp(4.5rem, calc(12 * var(--type-scale-unit)), 10rem);
   --leading-mark: 1;
   --tracking-mark: 0.1em;
-  --text-title: clamp(1.75rem, calc(4 * var(--type-scale-unit)), 3rem);
+  --text-title: calc(
+    var(--reader-scale, 1) * clamp(1.75rem, calc(4 * var(--type-scale-unit)), 3rem)
+  );
   --leading-title: 1.1;
   --tracking-title: -0.008em;
   --text-nav: clamp(1.125rem, calc(1.25 * var(--type-scale-unit)), 1.375rem);
@@ -79,20 +82,34 @@
   --tracking-nav: 0em;
   --text-body: clamp(1rem, calc(1.1 * var(--type-scale-unit)), 1.25rem);
   --leading-body: 1.6;
-  --text-subtitle: clamp(0.875rem, var(--type-scale-unit), 1.125rem);
+  --text-subtitle: calc(var(--reader-scale, 1) * clamp(0.875rem, var(--type-scale-unit), 1.125rem));
   --leading-subtitle: 1.3;
   --tracking-subtitle: 0.09em;
   --text-scripture: clamp(1.0625rem, calc(1.5 * var(--type-scale-unit)), 1.75rem);
   --leading-scripture: 1.72;
-  --text-citation: clamp(0.8125rem, calc(0.9 * var(--type-scale-unit)), 1.125rem);
+  --text-citation: calc(
+    var(--reader-scale, 1) * clamp(0.8125rem, calc(0.9 * var(--type-scale-unit)), 1.125rem)
+  );
   --leading-citation: 1.4;
   --text-legal: clamp(0.6875rem, calc(0.72 * var(--type-scale-unit)), 0.8125rem);
   --leading-legal: 1.4;
   --tracking-legal: 0.04em;
+  --text-reading: calc(
+    var(--reader-scale, 1) * clamp(1.0625rem, calc(1.35 * var(--type-scale-unit)), 1.4375rem)
+  );
+  --leading-reading: 1.72;
+  --text-chapter: calc(
+    var(--reader-scale, 1) * clamp(1.375rem, calc(2.2 * var(--type-scale-unit)), 1.875rem)
+  );
+  --leading-chapter: 1.2;
+  --color-rose-white: #f4efe3;
+  --color-rose-red: #b04a55;
+  --color-rose-tree: #c9855e;
+  --color-rose-bud: #c87d90;
   --font-lucerna: 'EB Garamond', Georgia, serif;
   --font-display: var(--font-lucerna);
   --font-mark: var(--font-lucerna);
-  --font-reading: var(--font-lucerna);
+  --font-reading: var(--reader-face, var(--font-lucerna));
   --spacing-safe-top: env(safe-area-inset-top);
   --spacing-safe-right: env(safe-area-inset-right);
   --spacing-safe-bottom: env(safe-area-inset-bottom);
@@ -101,6 +118,10 @@
 
 @utility small-caps {
   font-variant-caps: small-caps;
+}
+
+@utility normal-caps {
+  font-variant-caps: normal;
 }
 
 @utility art-ambient {
@@ -186,6 +207,13 @@
   }
 }
 
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--theme-accent);
+    outline-offset: 2px;
+  }
+}
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -201,6 +229,7 @@
     --theme-accent: #d5b86f;
     --theme-accent-current: #f2db91;
     --theme-accent-strong: #fffdf5;
+    --theme-christ: #cf6b58;
     --theme-accent-foreground: #0a0806;
     --theme-edge-light: rgb(242 219 145 / 0.1);
     --theme-on-art-scrim: #0a0806;
@@ -246,6 +275,30 @@
     font-size: 150%;
   }
 
+  [data-reader-face='sans'] {
+    --reader-face: ui-sans-serif, system-ui, sans-serif;
+  }
+
+  [data-reader-scale='88'] {
+    --reader-scale: 0.88;
+  }
+
+  [data-reader-scale='113'] {
+    --reader-scale: 1.13;
+  }
+
+  [data-reader-scale='125'] {
+    --reader-scale: 1.25;
+  }
+
+  [data-reader-scale='138'] {
+    --reader-scale: 1.38;
+  }
+
+  [data-reader-scale='150'] {
+    --reader-scale: 1.5;
+  }
+
   [data-theme='light'] {
     color-scheme: light;
     --theme-background: #f2ece0;
@@ -259,6 +312,7 @@
     --theme-accent: #8a6408;
     --theme-accent-current: #7f5600;
     --theme-accent-strong: #5a3a00;
+    --theme-christ: #9a2b1d;
     --theme-accent-foreground: #fffcf4;
     --theme-edge-light: rgb(255 255 255 / 0.9);
     --bead-active-core: #fffdf5;
@@ -329,6 +383,7 @@
       --theme-accent: LinkText;
       --theme-accent-current: Highlight;
       --theme-accent-strong: HighlightText;
+      --theme-christ: CanvasText;
       --theme-accent-foreground: Canvas;
       --theme-edge-light: ButtonText;
       --theme-on-art-scrim: Canvas;

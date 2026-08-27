@@ -18,7 +18,16 @@ let updateChecks: UpdateChecks = UpdateChecks.OnLoad;
 let updateChecksInstalled = false;
 let reloading = false;
 
+let settleOfflineReady = (): void => {};
+
+const offlineReady = new Promise<void>((resolve) => {
+  settleOfflineReady = resolve;
+});
+
+export const whenOfflineReady = (): Promise<void> => offlineReady;
+
 const reportError = (error: unknown): void => {
+  settleOfflineReady();
   errorCallback?.(error);
 };
 
@@ -133,6 +142,7 @@ export const registerServiceWorker = (config: ServiceWorkerRegistrationConfig): 
   updateChecks = config.updateChecks ?? UpdateChecks.OnLoad;
 
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) {
+    settleOfflineReady();
     return;
   }
 
@@ -143,6 +153,9 @@ export const registerServiceWorker = (config: ServiceWorkerRegistrationConfig): 
 
   registrationStarted = true;
   installControllerChangeHandler();
+  void navigator.serviceWorker.ready.then(() => {
+    settleOfflineReady();
+  });
 
   const scriptUrl = new URL('service-worker.js', document.baseURI);
   navigator.serviceWorker

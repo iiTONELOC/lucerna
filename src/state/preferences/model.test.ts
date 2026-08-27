@@ -4,6 +4,8 @@ import {
   DEFAULT_PREFERENCES,
   OpeningDuration,
   PreferencesActionType,
+  ReaderFace,
+  ReaderGround,
   ReadingSpeed,
   TextScale,
   Theme,
@@ -27,10 +29,15 @@ describe('parsePreferences', () => {
     const stored = {
       theme: Theme.Parchment,
       textScale: TextScale.Large,
+      readerFace: ReaderFace.Sans,
+      readerTextScale: TextScale.ExtraLarge,
+      readerGround: ReaderGround.Parchment,
+      showRedLetter: true,
       openingDuration: OpeningDuration.FifteenSeconds,
       readingSpeed: ReadingSpeed.Brisk,
       beadMaterial: BeadMaterial.Pearl,
       showGuidance: false,
+      showDecadeOfferings: false,
       showDropCaps: false,
       showMysteryFruits: false,
       showScriptureReadings: false,
@@ -54,7 +61,9 @@ describe('parsePreferences', () => {
       textScale: TextScale.Large,
     });
   });
+});
 
+describe('parsePreferences legacy records', () => {
   test('adds the devotional defaults to a record stored before they existed', () => {
     const parsed = parsePreferences({
       theme: Theme.Parchment,
@@ -64,7 +73,12 @@ describe('parsePreferences', () => {
 
     expect(parsed.beadMaterial).toBe(DEFAULT_PREFERENCES.beadMaterial);
     expect(parsed.readingSpeed).toBe(ReadingSpeed.Steady);
+    expect(parsed.readerFace).toBe(ReaderFace.Garamond);
+    expect(parsed.readerTextScale).toBe(TextScale.Standard);
+    expect(parsed.readerGround).toBe(ReaderGround.Dark);
+    expect(parsed.showRedLetter).toBe(false);
     expect(parsed.showGuidance).toBe(true);
+    expect(parsed.showDecadeOfferings).toBe(true);
     expect(parsed.showDropCaps).toBe(true);
     expect(parsed.showMysteryFruits).toBe(true);
     expect(parsed.showScriptureReadings).toBe(true);

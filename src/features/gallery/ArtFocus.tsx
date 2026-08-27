@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
+import { BackButton } from '../../components/buttons/BackButton.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
-import { CITATION_CLASS_NAME, SUBTITLE_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
+import { CITATION_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
 import { artworkReferenceTarget, type ReferenceTarget } from '../references/referenceCatalog.ts';
 
-const BACK_BUTTON_CLASS_NAME = `min-h-11 w-fit text-muted transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${SUBTITLE_CLASS_NAME}`;
-const QUIET_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center small-caps tracking-subtitle text-accent-current transition-colors hover:text-accent disabled:text-muted disabled:opacity-40 ${CITATION_CLASS_NAME}`;
+const QUIET_ACTION_CLASS_NAME = `focus-ring flex min-h-11 items-center justify-center small-caps tracking-subtitle text-accent-current transition-colors hover:text-accent disabled:text-muted disabled:opacity-40 ${CITATION_CLASS_NAME}`;
 
 type ArtFocusProps = {
   readonly artworkId: string;
@@ -35,7 +35,7 @@ function ArtworkProvenance({
       </dl>
 
       <button
-        className={`w-fit small-caps tracking-subtitle text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent ${CITATION_CLASS_NAME}`}
+        className={`focus-ring w-fit small-caps tracking-subtitle text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent ${CITATION_CLASS_NAME}`}
         onClick={() => onOpenReference(artworkReferenceTarget(artwork))}
         type="button"
       >
@@ -58,7 +58,7 @@ function ArtworkDetails({
     <>
       <button
         aria-expanded={expanded}
-        className={`flex min-h-11 w-fit items-center small-caps tracking-subtitle text-accent-current lg:hidden ${CITATION_CLASS_NAME}`}
+        className={`focus-ring flex min-h-11 w-fit items-center small-caps tracking-subtitle text-accent-current lg:hidden ${CITATION_CLASS_NAME}`}
         onClick={() => setExpanded((current) => !current)}
         type="button"
       >
@@ -242,14 +242,7 @@ export function ArtFocus({ artworkId, onBack, onNavigate, onOpenReference }: Art
       <div className="relative isolate grid h-full min-h-136 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] lg:grid-rows-[auto_minmax(0,1fr)]">
         <ArtworkBackdrop artwork={artwork} />
         <header className="relative z-20 flex shrink-0 px-4 pt-4 lg:col-span-2 lg:px-8 lg:pt-6">
-          <button
-            aria-label="Back to the collection"
-            className={BACK_BUTTON_CLASS_NAME}
-            onClick={onBack}
-            type="button"
-          >
-            Back
-          </button>
+          <BackButton label="Back to the collection" onBack={onBack} />
         </header>
         <ArtworkStage artwork={artwork} />
         <ArtworkSidebar

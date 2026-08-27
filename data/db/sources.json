@@ -46,8 +46,32 @@
     "author": "Challoner revision",
     "approval": "public domain",
     "url": "https://github.com/BibleCorps/ENG-B-DRC1750-pd-PSFM",
-    "path": "data/library/bibles/douray-rheims",
+    "path": "data/library/bibles/douay-rheims",
     "type": "bible"
+  },
+  "world-english-bible": {
+    "work": "World English Bible (WEB)",
+    "author": "eBible.org revision of the ASV 1901",
+    "approval": "public domain",
+    "url": "https://ebible.org/web/",
+    "type": "bible",
+    "note": "Cross-referenced with the Douay-Rheims for the words of Christ marking; not the text of the readings."
+  },
+  "king-james-version": {
+    "work": "King James Version (1769 Blayney text)",
+    "author": "Church of England, eBible.org edition",
+    "approval": "public domain",
+    "url": "https://ebible.org/kjv/",
+    "type": "bible",
+    "note": "Cross-referenced with the Douay-Rheims for the words of Christ marking; not the text of the readings."
+  },
+  "claude-fable-5": {
+    "work": "Claude Fable 5",
+    "author": "Anthropic",
+    "approval": "commercial AI service",
+    "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+    "type": "apparatus",
+    "note": "AI tooling used for the words of Christ cross-reference."
   },
   "holy-see-mysteries": {
     "work": "The Mysteries of the Rosary",

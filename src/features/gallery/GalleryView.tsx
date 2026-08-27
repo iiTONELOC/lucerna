@@ -56,7 +56,7 @@ function SortControl({ sort, onSelectSort }: SortControlProps) {
           return (
             <button
               aria-pressed={selected}
-              className={`min-h-11 ${SUBTITLE_CLASS_NAME} transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${selected ? 'text-accent-current underline decoration-accent-current underline-offset-8' : 'text-muted hover:text-accent'}`}
+              className={`min-h-11 ${SUBTITLE_CLASS_NAME} transition-colors focus-ring ${selected ? 'text-accent-current underline decoration-accent-current underline-offset-8' : 'text-muted hover:text-accent'}`}
               key={candidate}
               onClick={() => onSelectSort(candidate)}
               type="button"
@@ -144,7 +144,7 @@ export function GalleryView({
       aria-labelledby={GALLERY_TITLE_ID}
       className="scroll-region flex min-h-0 w-full flex-1 flex-col overflow-y-auto"
     >
-      <div className="flex w-full flex-col gap-4 px-1 pb-10">
+      <div className="flex w-full flex-col gap-4 px-1 pb-4">
         <GalleryHeader />
         <SortControl onSelectSort={setSort} sort={sort} />
 

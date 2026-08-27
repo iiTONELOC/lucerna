@@ -4,12 +4,11 @@ import lucernaMark from '../../assets/brand/lucerna-mark.svg';
 import { OpeningDuration } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { ACCENT_BUTTON_CLASS_NAME, MARK_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
+import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 import { useInstalled } from '../install/useInstalled.ts';
 import { selectOpeningVerse, type SplashVerse } from './splashModel.ts';
 
 const SPLASH_TITLE_ID = 'splash-title';
-const MILLISECONDS_PER_SECOND = 1_000;
-
 type SplashProps = {
   readonly applicationReady: boolean;
   readonly onDismiss: () => void;
@@ -18,7 +17,7 @@ type SplashProps = {
 
 type DismissProps = Pick<SplashProps, 'applicationReady' | 'onDismiss'>;
 
-const INSTALL_LINK_CLASS_NAME = `min-h-11 text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${SUBTITLE_CLASS_NAME}`;
+const INSTALL_LINK_CLASS_NAME = `min-h-11 text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent focus-ring ${SUBTITLE_CLASS_NAME}`;
 
 const automaticHoldMilliseconds = (openingDuration: OpeningDuration): number | null =>
   openingDuration === OpeningDuration.Manual
@@ -115,10 +114,10 @@ export function Splash({ applicationReady, onDismiss, onOpenInstallGuide }: Spla
           <button
             className={INSTALL_LINK_CLASS_NAME}
             onClick={onOpenInstallGuide}
-            title="How to Add Lucerna to your device"
+            title="How to add Lucerna to your device"
             type="button"
           >
-            How to Add Lucerna to your device
+            How to add Lucerna to your device
           </button>
         )}
         {COPYRIGHT_NOTICE}

@@ -5,10 +5,13 @@ export enum ContentBuildErrorCode {
   InvalidSplashRecord = 'invalid-splash-record',
   InvalidSourceRange = 'invalid-source-range',
   InvalidSplashDatabase = 'invalid-splash-database',
+  InvalidLibraryDatabase = 'invalid-library-database',
   DuplicateReference = 'duplicate-reference',
   MissingSource = 'missing-source',
   UnterminatedFootnote = 'unterminated-footnote',
   UnsupportedMarker = 'unsupported-marker',
+  InvalidBibleStructure = 'invalid-bible-structure',
+  InvalidRedLetter = 'invalid-red-letter',
   InvalidVerse = 'invalid-verse',
   MissingScripture = 'missing-scripture',
   InvalidSourceBook = 'invalid-source-book',
@@ -33,6 +36,7 @@ const ERROR_MESSAGE: Readonly<Record<ContentBuildErrorCode, ErrorMessageDefiniti
   [ContentBuildErrorCode.InvalidSourceRange]: {
     message: 'Invalid splash verse source range',
   },
+  [ContentBuildErrorCode.InvalidLibraryDatabase]: { message: 'Invalid library database' },
   [ContentBuildErrorCode.InvalidSplashDatabase]: { message: 'Invalid splash verse database' },
   [ContentBuildErrorCode.InvalidSplashRecord]: { message: 'Invalid splash verse record' },
   [ContentBuildErrorCode.InvalidVerse]: {
@@ -46,6 +50,14 @@ const ERROR_MESSAGE: Readonly<Record<ContentBuildErrorCode, ErrorMessageDefiniti
   [ContentBuildErrorCode.MissingSource]: {
     fallback: 'unknown',
     message: 'Missing source ',
+  },
+  [ContentBuildErrorCode.InvalidBibleStructure]: {
+    fallback: UNKNOWN_SOURCE_CONTEXT,
+    message: 'Invalid bible structure at ',
+  },
+  [ContentBuildErrorCode.InvalidRedLetter]: {
+    fallback: 'unknown entry',
+    message: 'Invalid red letter entry at ',
   },
   [ContentBuildErrorCode.UnsupportedMarker]: { message: 'Unsupported scripture marker' },
   [ContentBuildErrorCode.UnterminatedFootnote]: { message: 'Unterminated scripture footnote' },

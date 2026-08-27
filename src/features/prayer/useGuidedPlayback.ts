@@ -33,6 +33,7 @@ type GuidedPlaybackRequest = {
   readonly announcement: boolean;
   readonly fruitText: string;
   readonly guidanceText: string;
+  readonly offeringText: string;
   readonly isLastStep: boolean;
   readonly onAdvance: () => void;
   readonly onPlayingChange: (playing: boolean) => void;
@@ -248,6 +249,7 @@ export const useGuidedPlayback = ({
   announcement,
   fruitText,
   guidanceText,
+  offeringText,
   isLastStep,
   onAdvance,
   onPlayingChange,
@@ -262,11 +264,12 @@ export const useGuidedPlayback = ({
       createPlaybackPlan({
         fruitText,
         guidanceText,
+        offeringText,
         paced,
         readingSpeed,
         trailingHoldMs: playbackHoldMs(announcement, readingSpeed),
       }),
-    [announcement, fruitText, guidanceText, paced, readingSpeed],
+    [announcement, fruitText, guidanceText, offeringText, paced, readingSpeed],
   );
   const callbacks = usePlaybackCallbacks({ isLastStep, onAdvance, onPlayingChange });
   const { activePhase, activeWordIndex, timeline } = usePlaybackTimeline(plan, stepKey);

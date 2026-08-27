@@ -3,7 +3,7 @@ import { clearErrorDiagnostics, lastErrorDiagnostics } from '../../components/er
 import { ErrorReportActions } from '../../components/error/ErrorReportActions.tsx';
 import { Chevron } from '../../components/icons/Chevron.tsx';
 import { ChevronDirection } from '../../components/icons/model.ts';
-import { CITATION_CLASS_NAME, INLINE_LINK_CLASS_NAME } from '../../styles.ts';
+import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, INLINE_LINK_CLASS_NAME } from '../../styles.ts';
 
 const DIAGNOSTICS_TITLE_ID = 'settings-diagnostics-title';
 
@@ -17,7 +17,9 @@ function RetainedReport({
   return (
     <>
       <details className="group mt-3 rounded-md border border-hairline bg-background p-3">
-        <summary className="flex cursor-pointer list-none items-center gap-2 font-display text-citation leading-citation text-secondary [&::-webkit-details-marker]:hidden">
+        <summary
+          className={`focus-ring flex cursor-pointer list-none items-center gap-2 ${CITATION_CLASS_NAME} text-secondary [&::-webkit-details-marker]:hidden`}
+        >
           <Chevron
             className="size-4 shrink-0 transition-transform group-open:rotate-90"
             direction={ChevronDirection.Right}
@@ -45,19 +47,14 @@ export function DiagnosticsSettings() {
 
   return (
     <section aria-labelledby={DIAGNOSTICS_TITLE_ID} className="border-t border-hairline pt-4">
-      <h3
-        className="small-caps font-display text-subtitle leading-subtitle font-semibold tracking-subtitle text-accent-current"
-        id={DIAGNOSTICS_TITLE_ID}
-      >
+      <h3 className={EYEBROW_CLASS_NAME} id={DIAGNOSTICS_TITLE_ID}>
         Diagnostics
       </h3>
-      <p className="pt-3 font-display text-citation leading-citation text-muted">
+      <p className={`pt-3 ${CITATION_CLASS_NAME} text-muted`}>
         Lucerna keeps the last error on this device. Nothing is sent unless you send it.
       </p>
       {diagnostics === null ? (
-        <p className="pt-3 font-display text-citation leading-citation text-muted">
-          No error has been recorded.
-        </p>
+        <p className={`pt-3 ${CITATION_CLASS_NAME} text-muted`}>No error has been recorded.</p>
       ) : (
         <RetainedReport
           diagnostics={diagnostics}

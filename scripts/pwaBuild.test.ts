@@ -8,7 +8,7 @@ import {
   selectIdentityArtifacts,
   type BuildArtifact,
 } from './pwaBuild.ts';
-import { addIntegrityToAssetTags, integrityFrom } from './vite/subresourceIntegrity.ts';
+import { addIntegrityToAssetTags, integrityFrom } from './subresourceIntegrity.ts';
 
 const artifact = (path: string, contents: string): BuildArtifact => ({
   bytes: new TextEncoder().encode(contents),

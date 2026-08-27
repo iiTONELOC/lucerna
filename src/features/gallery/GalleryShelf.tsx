@@ -27,7 +27,7 @@ function GalleryArtworkCard({ artwork, onOpenArtwork, registerButton }: GalleryA
     <li className="flex aspect-4/5 w-[clamp(18rem,30cqi,40rem)] shrink-0 self-start">
       <article className="flex size-full" data-artwork-id={artwork.id}>
         <button
-          className="group edge-lit relative flex size-full flex-col overflow-hidden rounded-xl bg-surface text-left hover:ring-2 hover:ring-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="group edge-lit relative flex size-full flex-col overflow-hidden rounded-xl bg-surface text-left hover:ring-2 hover:ring-accent focus-ring"
           onClick={() => onOpenArtwork(artwork.id)}
           ref={(button) => registerButton(artwork.id, button)}
           type="button"

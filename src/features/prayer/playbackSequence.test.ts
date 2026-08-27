@@ -10,14 +10,16 @@ import {
 } from './playbackSequence.ts';
 
 const GUIDANCE_TEXT = 'Look upon the scene, hear the word, and pause in silence.';
+const OFFERING_TEXT = 'Offering. We offer you, Lord Jesus, this first decade.';
 const FRUIT_TEXT = 'Fruit of the Mystery. Humility.';
 
-const prayerPlan = (hasGuidance: boolean, hasFruit: boolean) => {
+const prayerPlan = (hasGuidance: boolean, hasFruit: boolean, hasOffering = false) => {
   const readingSpeed = ReadingSpeed.Steady;
 
   return createPlaybackPlan({
     fruitText: hasFruit ? FRUIT_TEXT : '',
     guidanceText: hasGuidance ? GUIDANCE_TEXT : '',
+    offeringText: hasOffering ? OFFERING_TEXT : '',
     paced: paceText('Hail Mary, full of grace.', readingSpeed),
     readingSpeed,
     trailingHoldMs: playbackHoldMs(false, readingSpeed),
@@ -29,6 +31,17 @@ test('orders guidance, fruit, and prayer without pacing auxiliary text word by w
 
   expect(plan.phases.map(({ phase }) => phase)).toEqual([
     GuidedPlaybackPhase.Guidance,
+    GuidedPlaybackPhase.Fruit,
+    GuidedPlaybackPhase.Prayer,
+  ]);
+});
+
+test('reads the offering between the guidance and the fruit', () => {
+  const plan = prayerPlan(true, true, true);
+
+  expect(plan.phases.map(({ phase }) => phase)).toEqual([
+    GuidedPlaybackPhase.Guidance,
+    GuidedPlaybackPhase.Offering,
     GuidedPlaybackPhase.Fruit,
     GuidedPlaybackPhase.Prayer,
   ]);
@@ -48,6 +61,7 @@ test('advances after the final auxiliary phase when the prayer text is hidden', 
   const plan = createPlaybackPlan({
     fruitText: FRUIT_TEXT,
     guidanceText: GUIDANCE_TEXT,
+    offeringText: '',
     paced: paceText('', readingSpeed),
     readingSpeed,
     trailingHoldMs: playbackHoldMs(true, readingSpeed),
@@ -65,6 +79,7 @@ test('retains the existing hold for a step with no visible content', () => {
   const plan = createPlaybackPlan({
     fruitText: '',
     guidanceText: '',
+    offeringText: '',
     paced: paceText('', readingSpeed),
     readingSpeed,
     trailingHoldMs: holdMs,
@@ -89,6 +104,7 @@ test('paces guidance and fruit from their visible words at the selected speed', 
   const unhurried = createPlaybackPlan({
     fruitText: FRUIT_TEXT,
     guidanceText: GUIDANCE_TEXT,
+    offeringText: '',
     paced: paceText('', ReadingSpeed.Unhurried),
     readingSpeed: ReadingSpeed.Unhurried,
     trailingHoldMs: playbackHoldMs(false, ReadingSpeed.Unhurried),
@@ -96,6 +112,7 @@ test('paces guidance and fruit from their visible words at the selected speed', 
   const brisk = createPlaybackPlan({
     fruitText: FRUIT_TEXT,
     guidanceText: GUIDANCE_TEXT,
+    offeringText: '',
     paced: paceText('', ReadingSpeed.Brisk),
     readingSpeed: ReadingSpeed.Brisk,
     trailingHoldMs: playbackHoldMs(false, ReadingSpeed.Brisk),

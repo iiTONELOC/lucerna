@@ -1,6 +1,8 @@
 import { format } from 'prettier';
 
+import { buildBibleContent } from './content/bible.ts';
 import { buildDevotionalContent, SOURCE_DATABASE } from './content/devotional.ts';
+import { buildLibraryContent } from './content/library.ts';
 import {
   ContentBuildError,
   ContentBuildErrorCode,
@@ -30,6 +32,9 @@ type SplashVerseRecord = ScriptureRange & {
 const SPLASH_DATABASE = 'data/db/splash-verses.json';
 const GENERATED_SPLASH_CONTENT = 'src/generated/splash-verses.json';
 const GENERATED_DEVOTIONAL_CONTENT = 'src/generated/devotional-content.json';
+const GENERATED_LIBRARY_CONTENT = 'src/generated/library-content.json';
+const GENERATED_BIBLE_DIRECTORY = 'src/generated/bible/douay-rheims/';
+const GENERATED_BIBLE_INDEX = 'src/generated/bible/douay-rheims/index.json';
 
 const parseSplashVerse = (value: unknown): SplashVerseRecord => {
   const record = recordFrom(value, ContentBuildErrorCode.InvalidSplashRecord);
@@ -92,12 +97,30 @@ export const buildSplashContent = async (
   );
 };
 
+const writeBibleContent = async (repositoryRoot: URL): Promise<void> => {
+  const bible = await buildBibleContent(repositoryRoot);
+  const directory = new URL(GENERATED_BIBLE_DIRECTORY, repositoryRoot);
+
+  await Promise.all(
+    bible.books.map((book) =>
+      Bun.write(new URL(`${book.id}.json`, directory), `${JSON.stringify(book)}\n`),
+    ),
+  );
+  await Bun.write(
+    new URL(GENERATED_BIBLE_INDEX, repositoryRoot),
+    await format(JSON.stringify(bible.index), { parser: 'json' }),
+  );
+};
+
 const writeContent = async (): Promise<void> => {
   const repositoryRoot = new URL('../', import.meta.url);
-  const [splashContent, devotionalContent] = await Promise.all([
+  const [splashContent, libraryContent] = await Promise.all([
     buildSplashContent(repositoryRoot),
-    buildDevotionalContent(repositoryRoot),
+    buildLibraryContent(repositoryRoot),
   ]);
+  const devotionalContent = await buildDevotionalContent(repositoryRoot, libraryContent);
+
+  await writeBibleContent(repositoryRoot);
 
   await Bun.write(
     new URL(GENERATED_SPLASH_CONTENT, repositoryRoot),
@@ -106,6 +129,10 @@ const writeContent = async (): Promise<void> => {
   await Bun.write(
     new URL(GENERATED_DEVOTIONAL_CONTENT, repositoryRoot),
     await format(JSON.stringify(devotionalContent), { parser: 'json' }),
+  );
+  await Bun.write(
+    new URL(GENERATED_LIBRARY_CONTENT, repositoryRoot),
+    await format(JSON.stringify(libraryContent), { parser: 'json' }),
   );
 };
 

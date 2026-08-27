@@ -1,4 +1,9 @@
-import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
+import {
+  BODY_CLASS_NAME,
+  CITATION_CLASS_NAME,
+  EYEBROW_CLASS_NAME,
+  TITLE_CLASS_NAME,
+} from '../../styles.ts';
 import {
   referenceSections,
   type ReferenceRecord,
@@ -20,11 +25,11 @@ function ReferenceCard({
   return (
     <li>
       <button
-        className="flex min-h-16 w-full flex-col justify-center rounded-lg border border-hairline bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-accent/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="flex h-full min-h-16 w-full flex-col justify-center rounded-lg border border-hairline bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-accent/5 focus-ring"
         onClick={() => onOpen(record.target)}
         type="button"
       >
-        <span className="font-display text-body leading-body text-foreground">{record.title}</span>
+        <span className={`${BODY_CLASS_NAME} text-foreground`}>{record.title}</span>
         <span className={`${CITATION_CLASS_NAME} pt-1 text-muted`}>{record.subtitle}</span>
       </button>
     </li>
@@ -52,9 +57,7 @@ function ReferenceSectionView({
           ? '1 reference'
           : `${String(section.records.length)} references`}
       </h2>
-      <p className="max-w-prose pt-2 font-display text-body leading-body text-secondary">
-        {section.description}
-      </p>
+      <p className={`max-w-prose pt-2 ${BODY_CLASS_NAME} text-secondary`}>{section.description}</p>
       <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         {section.records.map((record) => (
           <ReferenceCard key={record.id} onOpen={onOpen} record={record} />
@@ -76,7 +79,7 @@ export function ReferencesView({ onOpenReference }: ReferencesViewProps) {
           <h1 className={`${TITLE_CLASS_NAME} pt-1`} id="references-title">
             References
           </h1>
-          <p className="max-w-prose pt-3 font-display text-body leading-body text-secondary">
+          <p className={`max-w-prose pt-3 ${BODY_CLASS_NAME} text-secondary`}>
             These records identify the texts, guidance, Scripture, and artwork used in Lucerna.
             Every record is available offline.
           </p>

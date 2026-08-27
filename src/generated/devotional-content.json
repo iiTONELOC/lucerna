@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "sources": [
     {
+      "id": "claude-fable-5",
+      "work": "Claude Fable 5",
+      "author": "Anthropic",
+      "approval": "commercial AI service",
+      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+      "type": "apparatus",
+      "note": "AI tooling used for the words of Christ cross-reference."
+    },
+    {
       "id": "de-montfort-secret",
       "work": "The Secret of the Rosary",
       "author": "St. Louis de Montfort",
@@ -22,7 +31,7 @@
       "approval": "public domain",
       "url": "https://github.com/BibleCorps/ENG-B-DRC1750-pd-PSFM",
       "type": "bible",
-      "path": "data/library/bibles/douray-rheims"
+      "path": "data/library/bibles/douay-rheims"
     },
     {
       "id": "holy-see-glorious",
@@ -71,6 +80,15 @@
       "approval": "public-domain liturgical",
       "url": "https://www.vatican.va/special/rosary/documents/misteri_dolorosi_en.html",
       "type": "liturgical"
+    },
+    {
+      "id": "king-james-version",
+      "work": "King James Version (1769 Blayney text)",
+      "author": "Church of England, eBible.org edition",
+      "approval": "public domain",
+      "url": "https://ebible.org/kjv/",
+      "type": "bible",
+      "note": "Cross-referenced with the Douay-Rheims for the words of Christ marking; not the text of the readings."
     },
     {
       "id": "met-open-access",
@@ -143,6 +161,15 @@
       "approval": "PD-Art / public domain",
       "url": "https://commons.wikimedia.org/",
       "type": "art"
+    },
+    {
+      "id": "world-english-bible",
+      "work": "World English Bible (WEB)",
+      "author": "eBible.org revision of the ASV 1901",
+      "approval": "public domain",
+      "url": "https://ebible.org/web/",
+      "type": "bible",
+      "note": "Cross-referenced with the Douay-Rheims for the words of Christ marking; not the text of the readings."
     }
   ],
   "prayers": [
@@ -1718,7 +1745,9 @@
               "sectionId": "first-method.joyful.1",
               "locator": "First Method, paragraph 156, First decade",
               "sourceTitle": "Incarnation",
-              "theme": "humility of heart"
+              "theme": "humility of heart",
+              "text": "We offer you, Lord Jesus, this first decade in honour of your Incarnation. Through this mystery and the intercession of your holy Mother we ask for humility of heart.",
+              "blockIndex": 649
             },
             "artIds": [
               "hans-memling--the-annunciation",
@@ -1753,7 +1782,9 @@
               "sectionId": "first-method.joyful.2",
               "locator": "First Method, paragraph 156, Second decade",
               "sourceTitle": "Visitation",
-              "theme": "perfect love of neighbor"
+              "theme": "perfect love of neighbor",
+              "text": "We offer you, Lord Jesus, this second decade in honour of the Visitation of your holy Mother to her cousin Saint Elizabeth. Through this mystery and the intercession of Mary we ask for a perfect love of our neighbour.",
+              "blockIndex": 652
             },
             "artIds": [
               "domenico-ghirlandaio--the-visitation",
@@ -1785,7 +1816,9 @@
               "sectionId": "first-method.joyful.3",
               "locator": "First Method, paragraph 156, Third decade",
               "sourceTitle": "Birth of Jesus",
-              "theme": "detachment from the world, love of poverty, and love of the poor"
+              "theme": "detachment from the world, love of poverty, and love of the poor",
+              "text": "We offer you, Child Jesus, this third decade in honour of your holy Birth. Through this mystery and the intercession of your blessed Mother we ask for detachment from the things of this world, love of poverty and love of the poor.",
+              "blockIndex": 655
             },
             "artIds": [
               "correggio--the-holy-night-the-nativity",
@@ -1816,7 +1849,9 @@
               "sectionId": "first-method.joyful.4",
               "locator": "First Method, paragraph 156, Fourth decade",
               "sourceTitle": "Presentation in the temple",
-              "theme": "wisdom and purity of heart and body"
+              "theme": "wisdom and purity of heart and body",
+              "text": "We offer you, O Lord Jesus, this fourth decade in honour of your Presentation in the temple by the hands of Mary. Through this mystery and the intercession of your blessed Mother we ask for the gift of wisdom and purity of heart and body.",
+              "blockIndex": 658
             },
             "artIds": [
               "giovanni-bellini--presentation-of-jesus-at-the-temple",
@@ -1848,7 +1883,9 @@
               "sectionId": "first-method.joyful.5",
               "locator": "First Method, paragraph 156, Fifth decade",
               "sourceTitle": "Finding of Jesus in the temple",
-              "theme": "conversion of sinners and return to Christ"
+              "theme": "conversion of sinners and return to Christ",
+              "text": "We offer you, Lord Jesus, this fifth decade to honour Mary's Finding you in the temple among the learned men after she had lost you. Through this mystery and the intercession of your blessed Mother we ask you to convert us and all sinners, heretics, schismatics and pagans.",
+              "blockIndex": 661
             },
             "artIds": [
               "paolo-veronese--christ-among-the-doctors-in-the-temple",
@@ -1888,7 +1925,9 @@
               "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 4th Hail Mary",
               "sourceTitle": "His baptism by St. John Baptist",
               "theme": "the baptism of Christ",
-              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "His baptism by St. John Baptist.",
+              "blockIndex": 832
             },
             "artIds": [
               "piero-della-francesca--the-baptism-of-christ",
@@ -1911,7 +1950,8 @@
               "verseEnd": 5,
               "sourceId": "douay-rheims-challoner",
               "selectionSourceId": "holy-see-luminous",
-              "text": "And the third day, there was a marriage in Cana of Galilee: and the mother of Jesus was there. And Jesus also was invited, and his disciples, to the marriage. And the wine failing, the mother of Jesus saith to him: They have no wine. And Jesus saith to her: Woman, what is that to me and to thee? My hour is not yet come. His mother saith to the waiters: Whatsoever he shall say to you, do ye."
+              "text": "And the third day, there was a marriage in Cana of Galilee: and the mother of Jesus was there. And Jesus also was invited, and his disciples, to the marriage. And the wine failing, the mother of Jesus saith to him: They have no wine. And Jesus saith to her: Woman, what is that to me and to thee? My hour is not yet come. His mother saith to the waiters: Whatsoever he shall say to you, do ye.",
+              "red": [{ "start": 258, "end": 321 }]
             },
             "reflection": {
               "status": "candidate",
@@ -1944,7 +1984,8 @@
               "verseEnd": 15,
               "sourceId": "douay-rheims-challoner",
               "selectionSourceId": "holy-see-luminous",
-              "text": "And saying: The time is accomplished and the kingdom of God is at hand. Repent and believe the gospel:"
+              "text": "And saying: The time is accomplished and the kingdom of God is at hand. Repent and believe the gospel:",
+              "red": [{ "start": 12, "end": 102 }]
             },
             "reflection": {
               "status": "candidate",
@@ -1991,7 +2032,9 @@
               "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 8th Hail Mary",
               "sourceTitle": "His marvellous transfiguration",
               "theme": "the Transfiguration of Christ",
-              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "His marvellous transfiguration.",
+              "blockIndex": 840
             },
             "artIds": [
               "giovanni-bellini--the-transfiguration-of-christ",
@@ -2014,7 +2057,8 @@
               "verseEnd": 26,
               "sourceId": "douay-rheims-challoner",
               "selectionSourceId": "holy-see-luminous",
-              "text": "And whilst they were at supper, Jesus took bread and blessed and broke and gave to his disciples and said: Take ye and eat. This is my body."
+              "text": "And whilst they were at supper, Jesus took bread and blessed and broke and gave to his disciples and said: Take ye and eat. This is my body.",
+              "red": [{ "start": 107, "end": 140 }]
             },
             "reflection": {
               "status": "mapped",
@@ -2024,7 +2068,9 @@
               "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 10th Hail Mary",
               "sourceTitle": "The institution of the Holy Eucharist",
               "theme": "the institution of the Eucharist",
-              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "The institution of the Holy Eucharist.",
+              "blockIndex": 844
             },
             "artIds": [
               "juan-de-juanes--the-last-supper",
@@ -2055,7 +2101,12 @@
               "verseEnd": 39,
               "sourceId": "douay-rheims-challoner",
               "selectionSourceId": "holy-see-sorrowful",
-              "text": "Then Jesus came with them into a country place which is called Gethsemani. And he said to his disciples: Sit you here, till I go yonder and pray. And taking with him Peter and the two sons of Zebedee, he began to grow sorrowful and to be sad. Then he saith to them: My soul is sorrowful even unto death. Stay you here and watch with me. And going a little further, he fell upon his face, praying and saying: My Father, if it be possible, let this chalice pass from me. Nevertheless, not as I will but as thou wilt."
+              "text": "Then Jesus came with them into a country place which is called Gethsemani. And he said to his disciples: Sit you here, till I go yonder and pray. And taking with him Peter and the two sons of Zebedee, he began to grow sorrowful and to be sad. Then he saith to them: My soul is sorrowful even unto death. Stay you here and watch with me. And going a little further, he fell upon his face, praying and saying: My Father, if it be possible, let this chalice pass from me. Nevertheless, not as I will but as thou wilt.",
+              "red": [
+                { "start": 105, "end": 145 },
+                { "start": 266, "end": 336 },
+                { "start": 408, "end": 514 }
+              ]
             },
             "reflection": {
               "status": "mapped",
@@ -2064,7 +2115,9 @@
               "sectionId": "first-method.sorrowful.1",
               "locator": "First Method, paragraph 157, Sixth decade",
               "sourceTitle": "Agony in the garden of Olives",
-              "theme": "sorrow for sin and conformity to the will of God"
+              "theme": "sorrow for sin and conformity to the will of God",
+              "text": "We offer you, Lord Jesus, this sixth decade in honour of your intense Agony in the garden of Olives. Through this mystery and the intercession of your holy Mother we ask for perfect sorrow for our sins and perfect conformity to your holy will.",
+              "blockIndex": 665
             },
             "artIds": [
               "giovanni-bellini--the-agony-in-the-garden",
@@ -2096,7 +2149,9 @@
               "sectionId": "first-method.sorrowful.2",
               "locator": "First Method, paragraph 157, Seventh decade",
               "sourceTitle": "Scourging",
-              "theme": "mortification of the senses"
+              "theme": "mortification of the senses",
+              "text": "We offer you, Lord Jesus, this seventh decade in honour of your cruel Scourging. Through this mystery and the intercession of your holy Mother we ask for the grace to mortify our senses.",
+              "blockIndex": 668
             },
             "artIds": [
               "caravaggio--the-flagellation-of-christ",
@@ -2128,7 +2183,9 @@
               "sectionId": "first-method.sorrowful.3",
               "locator": "First Method, paragraph 157, Eighth decade",
               "sourceTitle": "Crowning with Thorns",
-              "theme": "contempt of the world"
+              "theme": "contempt of the world",
+              "text": "We offer you, Lord Jesus, this eighth decade in honour of being Crowned with Thorns. Through this mystery and the intercession of your holy Mother we ask for a deep contempt of the world.",
+              "blockIndex": 671
             },
             "artIds": [
               "caravaggio--the-crowning-with-thorns",
@@ -2160,7 +2217,9 @@
               "sectionId": "first-method.sorrowful.4",
               "locator": "First Method, paragraph 157, Ninth decade",
               "sourceTitle": "Carrying the Cross",
-              "theme": "patience in carrying the cross"
+              "theme": "patience in carrying the cross",
+              "text": "We offer you, Lord Jesus, this ninth decade in honour of your Carrying the Cross. Through this mystery and the intercession of your holy Mother we ask for great patience in carrying our cross after you all the days of our life.",
+              "blockIndex": 674
             },
             "artIds": [
               "el-greco--christ-carrying-the-cross",
@@ -2183,7 +2242,12 @@
               "verseEnd": 46,
               "sourceId": "douay-rheims-challoner",
               "selectionSourceId": "holy-see-sorrowful",
-              "text": "And when they were come to the place which is called Calvary, they crucified him there: and the robbers, one on the right hand, and the other on the left. And Jesus said: Father, forgive them, for they know not what they do. But they, dividing his garments, cast lots. And the people stood beholding. And the rulers with them derided him, saying: He saved others: let him save himself, if he be Christ, the elect of God. And the soldiers also mocked him, coming to him and offering him vinegar, And saying: If thou be the king of the Jews, save thyself. And there was also a superscription written over him in letters of Greek and Latin and Hebrew THIS IS THE KING OF THE JEWS. And one of those robbers who were hanged blasphemed him, saying: If thou be Christ, save thyself and us. But the other answering, rebuked him, saying: Neither dost thou fear God, seeing; thou art under the same condemnation? And we indeed justly: for we receive the due reward of our deeds. But this man hath done no evil. And he said to Jesus: Lord, remember me when thou shalt come into thy kingdom. And Jesus said to him: Amen I say to thee: This day thou shalt be with me in paradise. And it was almost the sixth hour: and there was darkness over all the earth until the ninth hour. And the sun was darkened, and the veil of the temple was rent in the midst. And Jesus crying with a loud voice, said: Father, into thy hands I commend my spirit. And saying this, he gave up the ghost."
+              "text": "And when they were come to the place which is called Calvary, they crucified him there: and the robbers, one on the right hand, and the other on the left. And Jesus said: Father, forgive them, for they know not what they do. But they, dividing his garments, cast lots. And the people stood beholding. And the rulers with them derided him, saying: He saved others: let him save himself, if he be Christ, the elect of God. And the soldiers also mocked him, coming to him and offering him vinegar, And saying: If thou be the king of the Jews, save thyself. And there was also a superscription written over him in letters of Greek and Latin and Hebrew THIS IS THE KING OF THE JEWS. And one of those robbers who were hanged blasphemed him, saying: If thou be Christ, save thyself and us. But the other answering, rebuked him, saying: Neither dost thou fear God, seeing; thou art under the same condemnation? And we indeed justly: for we receive the due reward of our deeds. But this man hath done no evil. And he said to Jesus: Lord, remember me when thou shalt come into thy kingdom. And Jesus said to him: Amen I say to thee: This day thou shalt be with me in paradise. And it was almost the sixth hour: and there was darkness over all the earth until the ninth hour. And the sun was darkened, and the veil of the temple was rent in the midst. And Jesus crying with a loud voice, said: Father, into thy hands I commend my spirit. And saying this, he gave up the ghost.",
+              "red": [
+                { "start": 171, "end": 224 },
+                { "start": 1103, "end": 1166 },
+                { "start": 1383, "end": 1426 }
+              ]
             },
             "reflection": {
               "status": "mapped",
@@ -2192,7 +2256,9 @@
               "sectionId": "first-method.sorrowful.5",
               "locator": "First Method, paragraph 157, Tenth decade",
               "sourceTitle": "Crucifixion on Mount Calvary",
-              "theme": "horror of sin, love for the Cross, and grace of a holy death"
+              "theme": "horror of sin, love for the Cross, and grace of a holy death",
+              "text": "We offer you, Lord Jesus, this tenth decade in honour of your Crucifixion on Mount Calvary. Through this mystery and the intercession of your holy Mother we ask for a great horror of sin, a love for the Cross and the grace of a holy death for us and for those who are now in their last agony.",
+              "blockIndex": 677
             },
             "artIds": [
               "diego-velazquez--christ-crucified",
@@ -2231,9 +2297,14 @@
               "sectionId": "first-method.glorious.1",
               "locator": "First Method, paragraph 158, Eleventh decade",
               "sourceTitle": "Resurrection",
-              "theme": "lively faith"
+              "theme": "lively faith",
+              "text": "We offer you, Lord Jesus, this eleventh decade in honour of your triumphant Resurrection. Through this mystery and through the intercession of your holy Mother we ask for a lively faith.",
+              "blockIndex": 681
             },
-            "artIds": ["piero-della-francesca--the-resurrection", "el-greco--the-resurrection"]
+            "artIds": [
+              "piero-della-francesca--the-resurrection",
+              "el-greco--the-resurrection"
+            ]
           },
           {
             "set": "glorious",
@@ -2259,9 +2330,14 @@
               "sectionId": "first-method.glorious.2",
               "locator": "First Method, paragraph 158, Twelfth decade",
               "sourceTitle": "Ascension",
-              "theme": "firm hope and longing for heaven"
+              "theme": "firm hope and longing for heaven",
+              "text": "We offer you, Lord Jesus, this twelfth decade in honour of your glorious Ascension. Through this mystery and the intercession of your holy Mother we ask for a firm hope and a great longing for heaven.",
+              "blockIndex": 684
             },
-            "artIds": ["pietro-perugino--the-ascension-of-christ", "giotto--ascension"]
+            "artIds": [
+              "pietro-perugino--the-ascension-of-christ",
+              "giotto--ascension"
+            ]
           },
           {
             "set": "glorious",
@@ -2287,7 +2363,9 @@
               "sectionId": "first-method.glorious.3",
               "locator": "First Method, paragraph 158, Thirteenth decade",
               "sourceTitle": "Pentecost",
-              "theme": "holy wisdom and the practice of truth"
+              "theme": "holy wisdom and the practice of truth",
+              "text": "We offer you, O Holy Spirit, this thirteenth decade in honour of the mystery of Pentecost. Through this mystery and the intercession of Mary, your most holy Spouse, we ask for your holy wisdom that we may know, taste and practice your truth and share it with everyone.",
+              "blockIndex": 687
             },
             "artIds": ["el-greco--pentecost", "titian--pentecost"]
           },
@@ -2315,7 +2393,9 @@
               "sectionId": "first-method.glorious.4",
               "locator": "First Method, paragraph 158, Fourteenth decade",
               "sourceTitle": "Assumption",
-              "theme": "true devotion to Mary and a happy death"
+              "theme": "true devotion to Mary and a happy death",
+              "text": "We offer you, Lord Jesus, this fourteenth decade in honour of the Immaculate Conception of your holy Mother and her Assumption into heaven body and soul. Through these two mysteries and her intercession we ask for the gift of true devotion to her in order to live a good life and have a happy death.",
+              "blockIndex": 690
             },
             "artIds": [
               "titian--assumption-of-the-virgin-assunta",
@@ -2349,7 +2429,9 @@
               "sectionId": "first-method.glorious.5",
               "locator": "First Method, paragraph 158, Fifteenth decade",
               "sourceTitle": "Crowning in glory of Mary",
-              "theme": "perseverance, increase in virtue, and the eternal crown"
+              "theme": "perseverance, increase in virtue, and the eternal crown",
+              "text": "We offer you, Lord Jesus, this fifteenth and last decade in honour of the Crowning in glory of your holy Mother in heaven. Through this mystery and her intercession we ask for perseverance and an increase in virtue up to the moment of our death and thereafter the eternal crown that is prepared for us. We ask for the same grace for all the just and all our benefactors.",
+              "blockIndex": 693
             },
             "artIds": [
               "diego-velazquez--coronation-of-the-virgin",

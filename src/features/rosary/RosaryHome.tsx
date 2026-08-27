@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
+import { AmbientGround } from '../../components/art/AmbientGround.tsx';
+import { ArtworkCreditLine } from '../../components/art/ArtworkCreditLine.tsx';
 import { contentCatalog, type ResolvedArtwork } from '../../content/catalog.ts';
 import {
   ACCENT_BUTTON_CLASS_NAME,
-  AMBIENT_SCRIM_CLASS_NAME,
   EYEBROW_CLASS_NAME,
   NAV_CLASS_NAME,
-  SCRIPTURE_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import { CollectionStrip } from './CollectionStrip.tsx';
@@ -14,19 +14,6 @@ import { dailyMysteryIndex, scheduledMysterySetId, Weekday } from './schedule.ts
 
 const PANEL_CLASS_NAME =
   'edge-lit overflow-hidden rounded-xl bg-surface/72 backdrop-blur-md backdrop-saturate-150';
-
-function AmbientGround({ source }: { readonly source: string }) {
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <img
-        alt=""
-        className="art-ambient absolute inset-0 size-full object-cover opacity-[0.52]!"
-        src={source}
-      />
-      <div className={AMBIENT_SCRIM_CLASS_NAME} />
-    </div>
-  );
-}
 const SECTION_HEADING_CLASS_NAME = `${TITLE_CLASS_NAME} py-4`;
 
 const WEEKDAY_ORDER: readonly Weekday[] = [
@@ -64,7 +51,7 @@ function MysteryPicker({ onSelect, selectedSetId, todaySetId }: MysteryPickerPro
         return (
           <button
             aria-current={selected ? 'true' : undefined}
-            className={`relative flex min-h-11 flex-col gap-0.5 px-4 py-3 text-left transition-colors ${index === 0 ? '' : 'border-t border-hairline'} ${selected ? 'bg-linear-to-r from-accent/10 to-transparent to-70%' : 'hover:bg-foreground/4'}`}
+            className={`focus-ring relative flex min-h-11 flex-col gap-0.5 px-4 py-3 text-left transition-colors ${index === 0 ? '' : 'border-t border-hairline'} ${selected ? 'bg-linear-to-r from-accent/10 to-transparent to-70%' : 'hover:bg-foreground/4'}`}
             key={mysterySet.id}
             onClick={() => onSelect(mysterySet.id)}
             type="button"
@@ -104,7 +91,7 @@ function CollectionPreview({ artworks, onOpenArtwork, onOpenGallery }: Collectio
       <div className="flex items-center justify-between">
         <h2 className={SECTION_HEADING_CLASS_NAME}>Lucerna Collection</h2>
         <button
-          className="min-h-9 small-caps font-display text-subtitle leading-subtitle tracking-subtitle text-muted transition-colors hover:text-accent"
+          className="focus-ring min-h-9 small-caps font-display text-subtitle leading-subtitle tracking-subtitle text-muted transition-colors hover:text-accent"
           onClick={onOpenGallery}
           type="button"
         >
@@ -130,6 +117,7 @@ type MysteryHero = {
   readonly isToday: boolean;
   readonly mysterySetName: string;
   readonly onBegin: () => void;
+  readonly onOpenArtwork: (artworkId: string) => void;
 };
 
 function MysteryHeroCopy({
@@ -141,17 +129,15 @@ function MysteryHeroCopy({
 }) {
   return (
     <div
-      className={`relative z-10 mt-auto flex flex-col gap-2 ${compact ? 'p-5' : 'max-w-lg p-8'}`}
+      className={`relative z-10 mt-auto flex flex-col gap-2 text-shadow-lg text-shadow-black/80 ${compact ? 'px-5 pt-5 pb-2' : 'max-w-lg px-8 pt-8 pb-3'}`}
     >
       {hero.isToday ? (
         <p className={`${EYEBROW_CLASS_NAME} text-on-art-accent!`}>Selected for today</p>
       ) : null}
       <h1 className={`${TITLE_CLASS_NAME} text-on-art-foreground!`}>{hero.mysterySetName}</h1>
-      <p className={`${SCRIPTURE_CLASS_NAME} text-on-art-secondary!`}>
-        {compact
-          ? 'Enter a quiet prayer space shaped by devotional art.'
-          : 'Enter a quiet prayer space shaped by devotional art. The interface withdraws once the Rosary begins.'}
-      </p>
+      {compact ? (
+        <ArtworkCreditLine artwork={hero.artwork} onArt onOpenArtwork={hero.onOpenArtwork} />
+      ) : null}
       <button
         className={`mt-1 border-on-art-accent! text-on-art-accent! hover:bg-on-art-accent! hover:text-on-art-accent-foreground! ${ACCENT_BUTTON_CLASS_NAME}`}
         onClick={hero.onBegin}
@@ -172,11 +158,14 @@ function DesktopMysteryHero({ hero }: { readonly hero: MysteryHero }) {
     >
       <img
         alt={`${hero.artwork.title} by ${hero.artwork.artist}`}
-        className="absolute inset-0 size-full object-cover object-top"
+        className="absolute inset-0 size-full object-cover object-[50%_25%]"
         src={resolveArtAsset(hero.artwork.file)}
       />
-      <div className="absolute inset-x-0 bottom-0 h-[45%] bg-linear-to-t from-on-art-scrim to-transparent in-data-[theme=light]:h-[38%]" />
+      <div className="absolute inset-x-0 bottom-0 h-[55%] bg-linear-to-t from-on-art-scrim to-transparent in-data-[theme=light]:h-[46%]" />
       <MysteryHeroCopy compact={false} hero={hero} />
+      <div className="absolute right-8 bottom-4 z-10 max-w-md text-right">
+        <ArtworkCreditLine artwork={hero.artwork} onArt onOpenArtwork={hero.onOpenArtwork} />
+      </div>
     </section>
   );
 }
@@ -203,10 +192,10 @@ function CompactMysteryHero({
       >
         <img
           alt={`${hero.artwork.title} by ${hero.artwork.artist}`}
-          className="absolute inset-0 size-full object-cover object-top"
+          className="absolute inset-0 size-full object-cover object-[50%_25%]"
           src={resolveArtAsset(hero.artwork.file)}
         />
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-on-art-scrim via-on-art-scrim/85 via-35% to-transparent in-data-[theme=light]:h-[58%]" />
+        <div className="absolute inset-x-0 bottom-0 h-4/5 bg-linear-to-t from-on-art-scrim via-on-art-scrim/85 via-35% to-transparent in-data-[theme=light]:h-[70%]" />
         <MysteryHeroCopy compact hero={hero} />
       </section>
 
@@ -313,6 +302,7 @@ export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: Rosa
     isToday: selectedSetId === todaySetId,
     mysterySetName: selectedSet.name,
     onBegin: () => onBeginRosary(selectedSetId),
+    onOpenArtwork,
   };
 
   return (

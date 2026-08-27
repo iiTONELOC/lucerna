@@ -3,31 +3,40 @@ import {
   type ContentCatalog,
   type ResolvedArtwork,
 } from '../../content/catalog.ts';
-import type {
-  DevotionalSource,
-  GuidanceStatement,
-  RosaryGuidance,
-  SourceReference,
+import {
+  guidanceStatementsOf,
+  type DevotionalSource,
+  type GuidanceStatement,
+  type MysteryReflection,
+  type SourceReference,
 } from '../../content/schema.ts';
 
 export enum ReferenceGroup {
   RosaryText = 'rosary-text',
   Scripture = 'scripture',
   Guidance = 'guidance',
+  Apparatus = 'apparatus',
   Artwork = 'artwork',
   Rights = 'rights',
 }
+
+export type ReadingLocation = {
+  readonly workId: string;
+  readonly blockIndex: number;
+};
 
 export type SourceReferenceTarget = {
   readonly group:
     | ReferenceGroup.RosaryText
     | ReferenceGroup.Scripture
     | ReferenceGroup.Guidance
+    | ReferenceGroup.Apparatus
     | ReferenceGroup.Rights;
   readonly sourceId: string;
   readonly locator?: string;
   readonly sections?: readonly string[];
   readonly supportingReferences?: readonly SourceReference[];
+  readonly reading?: ReadingLocation;
 };
 
 export type ArtworkReferenceTarget = {
@@ -56,6 +65,7 @@ const GROUP_ORDER: readonly ReferenceGroup[] = Object.freeze([
   ReferenceGroup.RosaryText,
   ReferenceGroup.Scripture,
   ReferenceGroup.Guidance,
+  ReferenceGroup.Apparatus,
   ReferenceGroup.Artwork,
   ReferenceGroup.Rights,
 ]);
@@ -67,7 +77,9 @@ export const referenceGroupLabel = (group: ReferenceGroup): string => {
     case ReferenceGroup.Scripture:
       return 'Scripture';
     case ReferenceGroup.Guidance:
-      return 'Guidance';
+      return 'Rosary Guidance';
+    case ReferenceGroup.Apparatus:
+      return 'Apparatus';
     case ReferenceGroup.Artwork:
       return 'Artwork';
     case ReferenceGroup.Rights:
@@ -78,11 +90,13 @@ export const referenceGroupLabel = (group: ReferenceGroup): string => {
 const groupDescription = (group: ReferenceGroup): string => {
   switch (group) {
     case ReferenceGroup.RosaryText:
-      return 'Sources for the prayers, mystery names, weekly schedule, fruits, and reflections.';
+      return 'Sources for the prayers, mystery names, weekly schedule, fruits, passage selections, and reflections.';
     case ReferenceGroup.Scripture:
-      return 'The Bible edition used for the readings and the source for each selected passage.';
+      return 'The Bible edition used for the readings.';
     case ReferenceGroup.Guidance:
       return 'The instructions behind the prompts shown during prayer.';
+    case ReferenceGroup.Apparatus:
+      return 'The words of Christ marking and the editions cross-referenced to prepare it.';
     case ReferenceGroup.Artwork:
       return 'The source record and rights note for every artwork bundled with Lucerna.';
     case ReferenceGroup.Rights:
@@ -117,7 +131,12 @@ const rosaryTextSources = (catalog: ContentCatalog): readonly DevotionalSource[]
     sourceIds.push(mysterySet.nameSourceId);
 
     for (const mystery of mysterySet.mysteries) {
-      sourceIds.push(mystery.titleSourceId, mystery.fruitSourceId, mystery.reflection.sourceId);
+      sourceIds.push(
+        mystery.titleSourceId,
+        mystery.fruitSourceId,
+        mystery.scripture.selectionSourceId,
+        mystery.reflection.sourceId,
+      );
     }
   }
 
@@ -129,32 +148,33 @@ const scriptureSources = (catalog: ContentCatalog): readonly DevotionalSource[] 
 
   for (const mysterySet of catalog.rosary.mysterySets) {
     for (const mystery of mysterySet.mysteries) {
-      sourceIds.push(mystery.scripture.sourceId, mystery.scripture.selectionSourceId);
+      sourceIds.push(mystery.scripture.sourceId);
     }
   }
 
   return uniqueSources(catalog, sourceIds);
 };
 
-type ReferenceBearingGuidance = Pick<GuidanceStatement, 'sourceId' | 'sourceRefs'>;
+const apparatusSources = (catalog: ContentCatalog): readonly DevotionalSource[] => {
+  const redLetter = catalog.bible.redLetter;
 
-const guidanceStatements = (guidance: RosaryGuidance): readonly ReferenceBearingGuidance[] => [
-  ...guidance.openingHailMarys,
-  guidance.mysteryAnnouncement,
-  guidance.decadeOurFather,
-  guidance.decadeHailMarys,
-  guidance.decadeGloryBe,
-  guidance.fatimaPrayer,
-  guidance.hailHolyQueen,
-  guidance.finalPrayer,
-  guidance.fruitLine,
-];
+  return uniqueSources(catalog, [
+    ...redLetter.witnesses.map(({ id }) => id),
+    ...redLetter.tools.map(({ id }) => id),
+  ]);
+};
+
+type ReferenceBearingGuidance = Pick<GuidanceStatement, 'sourceId' | 'sourceRefs'>;
 
 const guidanceSources = (catalog: ContentCatalog): readonly DevotionalSource[] => {
   const guidance = catalog.rosary.guidance;
   const sourceIds = [...guidance.sourceIds];
+  const statements: readonly ReferenceBearingGuidance[] = [
+    ...guidanceStatementsOf(guidance),
+    guidance.fruitLine,
+  ];
 
-  for (const statement of guidanceStatements(guidance)) {
+  for (const statement of statements) {
     sourceIds.push(statement.sourceId, ...statement.sourceRefs.map(({ sourceId }) => sourceId));
   }
 
@@ -202,6 +222,8 @@ const recordsForGroup = (
       return sourceRecords(group, scriptureSources(catalog));
     case ReferenceGroup.Guidance:
       return sourceRecords(group, guidanceSources(catalog));
+    case ReferenceGroup.Apparatus:
+      return sourceRecords(group, apparatusSources(catalog));
     case ReferenceGroup.Artwork:
       return artworkRecords(catalog);
     case ReferenceGroup.Rights:
@@ -226,6 +248,27 @@ export const artworkReferenceTarget = (artwork: ResolvedArtwork): ArtworkReferen
   artworkId: artwork.id,
   group: ReferenceGroup.Artwork,
   sourceId: artwork.sourceId,
+});
+
+export const rosaryTextReferenceTarget = (sourceId: string): SourceReferenceTarget => ({
+  group: ReferenceGroup.RosaryText,
+  sourceId,
+});
+
+export const apparatusReferenceTarget = (sourceId: string): SourceReferenceTarget => ({
+  group: ReferenceGroup.Apparatus,
+  sourceId,
+});
+
+export const reflectionReferenceTarget = (
+  reflection: MysteryReflection,
+): SourceReferenceTarget => ({
+  group: ReferenceGroup.Guidance,
+  locator: reflection.locator,
+  sourceId: reflection.sourceId,
+  ...(reflection.blockIndex === undefined
+    ? {}
+    : { reading: { workId: reflection.sourceId, blockIndex: reflection.blockIndex } }),
 });
 
 export const guidanceReferenceTarget = (guidance: GuidanceStatement): SourceReferenceTarget => {

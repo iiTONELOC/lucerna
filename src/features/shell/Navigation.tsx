@@ -1,25 +1,14 @@
 import type { ReactNode } from 'react';
 import lucernaMark from '../../assets/brand/lucerna-mark.svg';
+import { SettingsGlyph } from '../../components/icons/SettingsGlyph.tsx';
 import { Theme } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import { BODY_CLASS_NAME } from '../../styles.ts';
 import { ApplicationView, applicationViewLabel } from './model.ts';
 
 const MARK_BACKDROP_CLASS_NAME = 'rounded-xl';
 
 const RAIL_ICON_SIZE_CLASS_NAME = 'size-5';
-
-export function SettingsGlyph({ className }: { readonly className: string }) {
-  return (
-    <svg aria-hidden="true" className={className} fill="none" viewBox="0 0 24 24">
-      <path
-        d="M2 7h11m5 0h4M2 17h4m5 0h11M13 3v8M6 13v8"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.5"
-      />
-    </svg>
-  );
-}
 
 function ExpandGlyph({ expanded }: { readonly expanded: boolean }) {
   const points = expanded ? '14 6 8 12 14 18' : '10 6 16 12 10 18';
@@ -59,6 +48,17 @@ const VIEW_ICONS: Readonly<Record<ApplicationView, ReactNode>> = {
       />
     </svg>
   ),
+  [ApplicationView.Library]: (
+    <svg aria-hidden="true" className={RAIL_ICON_SIZE_CLASS_NAME} fill="none" viewBox="0 0 24 24">
+      <path
+        d="M4.5 4.5h4v15h-4zM9.5 4.5h4v15h-4zM15.2 5.6l3.9-1 3.6 14.5-3.9 1z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  ),
   [ApplicationView.References]: (
     <svg aria-hidden="true" className={RAIL_ICON_SIZE_CLASS_NAME} fill="none" viewBox="0 0 24 24">
       <path
@@ -75,20 +75,29 @@ const VIEW_ICONS: Readonly<Record<ApplicationView, ReactNode>> = {
 const PRIMARY_NAVIGATION_VIEWS: readonly ApplicationView[] = [
   ApplicationView.Rosary,
   ApplicationView.Gallery,
+  ApplicationView.Library,
 ];
 
-type LanternTriggerProps = {
-  readonly onGoHome: () => void;
-};
+const SELECTED_ITEM_CLASS_NAME = 'bg-accent/10 text-foreground';
+const RESTING_ITEM_CLASS_NAME = 'text-muted hover:bg-foreground/5 hover:text-foreground';
 
-export function LanternTrigger({ onGoHome }: LanternTriggerProps) {
+const itemStateClassName = (selected: boolean): string =>
+  selected ? SELECTED_ITEM_CLASS_NAME : RESTING_ITEM_CLASS_NAME;
+
+function LanternButton({
+  className,
+  onGoHome,
+}: {
+  readonly className: string;
+  readonly onGoHome: () => void;
+}) {
   const { preferences } = usePreferences();
   const isParchment = preferences.theme === Theme.Parchment;
 
   return (
     <button
       aria-label="Go to the Rosary"
-      className={`flex size-10 shrink-0 items-center justify-center text-accent transition-colors ${MARK_BACKDROP_CLASS_NAME} ${isParchment ? 'bg-accent-strong hover:bg-accent-current' : 'hover:bg-foreground/5'}`}
+      className={`focus-ring flex shrink-0 items-center justify-center text-accent transition-colors ${MARK_BACKDROP_CLASS_NAME} ${isParchment ? 'bg-accent-strong hover:bg-accent-current' : 'hover:bg-foreground/5'} ${className}`}
       onClick={onGoHome}
       title="Go to the Rosary"
       type="button"
@@ -98,6 +107,14 @@ export function LanternTrigger({ onGoHome }: LanternTriggerProps) {
   );
 }
 
+type LanternTriggerProps = {
+  readonly onGoHome: () => void;
+};
+
+export function LanternTrigger({ onGoHome }: LanternTriggerProps) {
+  return <LanternButton className="size-10" onGoHome={onGoHome} />;
+}
+
 type MobileQuickNavProps = {
   readonly activeView: ApplicationView;
   readonly onOpenSettings: () => void;
@@ -105,7 +122,7 @@ type MobileQuickNavProps = {
 };
 
 const QUICK_NAV_ITEM_CLASS_NAME =
-  'flex size-11 items-center justify-center rounded-md transition-colors';
+  'focus-ring flex size-11 items-center justify-center rounded-md transition-colors';
 
 export function MobileQuickNav({ activeView, onOpenSettings, onSelectView }: MobileQuickNavProps) {
   return (
@@ -118,7 +135,7 @@ export function MobileQuickNav({ activeView, onOpenSettings, onSelectView }: Mob
           <button
             aria-current={selected ? 'page' : undefined}
             aria-label={label}
-            className={`${QUICK_NAV_ITEM_CLASS_NAME} ${selected ? 'bg-accent/10 text-foreground' : 'text-muted hover:bg-foreground/5 hover:text-foreground'}`}
+            className={`${QUICK_NAV_ITEM_CLASS_NAME} ${itemStateClassName(selected)}`}
             key={view}
             onClick={() => onSelectView(view)}
             title={label}
@@ -133,7 +150,7 @@ export function MobileQuickNav({ activeView, onOpenSettings, onSelectView }: Mob
 
       <button
         aria-label="Settings"
-        className={`${QUICK_NAV_ITEM_CLASS_NAME} text-muted hover:bg-foreground/5 hover:text-foreground`}
+        className={`${QUICK_NAV_ITEM_CLASS_NAME} ${RESTING_ITEM_CLASS_NAME}`}
         onClick={onOpenSettings}
         title="Settings"
         type="button"
@@ -154,7 +171,46 @@ type DesktopRailProps = {
 };
 
 const RAIL_ITEM_CLASS_NAME =
-  'flex min-h-9 items-center gap-3 rounded-md px-3 py-2 transition-colors pointer-coarse:min-h-11';
+  'focus-ring flex min-h-9 items-center gap-3 rounded-md px-3 py-2 transition-colors pointer-coarse:min-h-11';
+
+const railItemClassName = (expanded: boolean, selected: boolean): string =>
+  `${RAIL_ITEM_CLASS_NAME} ${expanded ? '' : 'justify-center'} ${itemStateClassName(selected)}`;
+
+function RailLabel({
+  children,
+  expanded,
+}: {
+  readonly children: string;
+  readonly expanded: boolean;
+}) {
+  return expanded ? <span className={BODY_CLASS_NAME}>{children}</span> : null;
+}
+
+type RailViewItemProps = {
+  readonly activeView: ApplicationView;
+  readonly expanded: boolean;
+  readonly onSelectView: (view: ApplicationView) => void;
+  readonly view: ApplicationView;
+};
+
+function RailViewItem({ activeView, expanded, onSelectView, view }: RailViewItemProps) {
+  const selected = activeView === view;
+  const label = applicationViewLabel(view);
+
+  return (
+    <button
+      aria-current={selected ? 'page' : undefined}
+      aria-label={expanded ? undefined : label}
+      className={railItemClassName(expanded, selected)}
+      onClick={() => onSelectView(view)}
+      title={expanded ? undefined : label}
+      type="button"
+    >
+      {VIEW_ICONS[view]}
+      <RailLabel expanded={expanded}>{label}</RailLabel>
+    </button>
+  );
+}
 
 type DesktopViewNavigationProps = Pick<
   DesktopRailProps,
@@ -164,25 +220,15 @@ type DesktopViewNavigationProps = Pick<
 function DesktopViewNavigation({ activeView, expanded, onSelectView }: DesktopViewNavigationProps) {
   return (
     <nav aria-label="Primary" className="mt-4 flex flex-col gap-1">
-      {PRIMARY_NAVIGATION_VIEWS.map((view) => {
-        const selected = activeView === view;
-        const label = applicationViewLabel(view);
-
-        return (
-          <button
-            aria-current={selected ? 'page' : undefined}
-            aria-label={expanded ? undefined : label}
-            className={`${RAIL_ITEM_CLASS_NAME} ${expanded ? '' : 'justify-center'} ${selected ? 'bg-accent/10 text-foreground' : 'text-muted hover:bg-foreground/5 hover:text-foreground'}`}
-            key={view}
-            onClick={() => onSelectView(view)}
-            title={expanded ? undefined : label}
-            type="button"
-          >
-            {VIEW_ICONS[view]}
-            {expanded ? <span className="font-display text-body leading-body">{label}</span> : null}
-          </button>
-        );
-      })}
+      {PRIMARY_NAVIGATION_VIEWS.map((view) => (
+        <RailViewItem
+          activeView={activeView}
+          expanded={expanded}
+          key={view}
+          onSelectView={onSelectView}
+          view={view}
+        />
+      ))}
     </nav>
   );
 }
@@ -192,46 +238,23 @@ type DesktopRailActionsProps = Pick<
   'activeView' | 'expanded' | 'onOpenSettings' | 'onSelectView' | 'onToggleExpanded'
 >;
 
-const railActionPositionClassName = (expanded: boolean): string =>
-  expanded ? '' : 'justify-center';
-
 function DesktopExpandAction({
   expanded,
   onToggleExpanded,
 }: Pick<DesktopRailProps, 'expanded' | 'onToggleExpanded'>) {
+  const label = expanded ? 'Collapse navigation' : 'Expand navigation';
+
   return (
     <button
       aria-expanded={expanded}
-      aria-label={expanded ? 'Collapse navigation' : 'Expand navigation'}
-      className={`${RAIL_ITEM_CLASS_NAME} ${railActionPositionClassName(expanded)} text-muted hover:bg-foreground/5 hover:text-foreground`}
+      aria-label={label}
+      className={railItemClassName(expanded, false)}
       onClick={onToggleExpanded}
-      title={expanded ? 'Collapse navigation' : 'Expand navigation'}
+      title={label}
       type="button"
     >
       <ExpandGlyph expanded={expanded} />
-      {expanded ? <span className="font-display text-body leading-body">Collapse</span> : null}
-    </button>
-  );
-}
-
-function DesktopReferencesAction({
-  activeView,
-  expanded,
-  onSelectView,
-}: Pick<DesktopRailProps, 'activeView' | 'expanded' | 'onSelectView'>) {
-  const selected = activeView === ApplicationView.References;
-
-  return (
-    <button
-      aria-current={selected ? 'page' : undefined}
-      aria-label={expanded ? undefined : 'References'}
-      className={`${RAIL_ITEM_CLASS_NAME} ${railActionPositionClassName(expanded)} ${selected ? 'bg-accent/10 text-foreground' : 'text-muted hover:bg-foreground/5 hover:text-foreground'}`}
-      onClick={() => onSelectView(ApplicationView.References)}
-      title={expanded ? undefined : 'References'}
-      type="button"
-    >
-      {VIEW_ICONS[ApplicationView.References]}
-      {expanded ? <span className="font-display text-body leading-body">References</span> : null}
+      <RailLabel expanded={expanded}>Collapse</RailLabel>
     </button>
   );
 }
@@ -243,13 +266,13 @@ function DesktopSettingsAction({
   return (
     <button
       aria-label={expanded ? undefined : 'Settings'}
-      className={`${RAIL_ITEM_CLASS_NAME} ${railActionPositionClassName(expanded)} text-muted hover:bg-foreground/5 hover:text-foreground`}
+      className={railItemClassName(expanded, false)}
       onClick={onOpenSettings}
       title={expanded ? undefined : 'Settings'}
       type="button"
     >
       <SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />
-      {expanded ? <span className="font-display text-body leading-body">Settings</span> : null}
+      <RailLabel expanded={expanded}>Settings</RailLabel>
     </button>
   );
 }
@@ -258,10 +281,11 @@ function DesktopRailActions(props: DesktopRailActionsProps) {
   return (
     <div className="mt-auto flex flex-col gap-1">
       <DesktopExpandAction expanded={props.expanded} onToggleExpanded={props.onToggleExpanded} />
-      <DesktopReferencesAction
+      <RailViewItem
         activeView={props.activeView}
         expanded={props.expanded}
         onSelectView={props.onSelectView}
+        view={ApplicationView.References}
       />
       <DesktopSettingsAction expanded={props.expanded} onOpenSettings={props.onOpenSettings} />
     </div>
@@ -276,22 +300,11 @@ export function DesktopRail({
   onSelectView,
   onToggleExpanded,
 }: DesktopRailProps) {
-  const { preferences } = usePreferences();
-  const isParchment = preferences.theme === Theme.Parchment;
-
   return (
     <aside
       className={`hidden shrink-0 flex-col rounded-xl border border-hairline bg-surface p-2 spread:flex lg:flex ${expanded ? 'spread:w-56 lg:w-56' : 'spread:w-16 lg:w-16'}`}
     >
-      <button
-        aria-label="Go to the Rosary"
-        className={`flex size-12 shrink-0 items-center justify-center text-accent transition-colors ${MARK_BACKDROP_CLASS_NAME} ${isParchment ? 'bg-accent-strong hover:bg-accent-current' : 'hover:bg-foreground/5'}`}
-        onClick={onGoHome}
-        title="Go to the Rosary"
-        type="button"
-      >
-        <img alt="" aria-hidden="true" className="size-10 max-w-none" src={lucernaMark} />
-      </button>
+      <LanternButton className="size-12" onGoHome={onGoHome} />
 
       <DesktopViewNavigation
         activeView={activeView}

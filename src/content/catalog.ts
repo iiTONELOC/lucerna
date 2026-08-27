@@ -1,9 +1,17 @@
+import generatedBibleIndex from '../generated/bible/douay-rheims/index.json' with { type: 'json' };
 import generatedContent from '../generated/devotional-content.json' with { type: 'json' };
+import generatedLibrary from '../generated/library-content.json' with { type: 'json' };
 import {
+  bibleIndexFrom,
   devotionalContentFrom,
+  libraryContentFrom,
   type Artwork,
+  type BibleBookSummary,
+  type BibleIndex,
   type DevotionalContent,
   type DevotionalSource,
+  type LibraryContent,
+  type LibraryWork,
   type Mystery,
   type MysterySet,
   type Prayer,
@@ -15,10 +23,11 @@ export enum CatalogLookupErrorCode {
   MissingPrayer = 'missing-prayer',
   MissingArtwork = 'missing-artwork',
   MissingMysterySet = 'missing-mystery-set',
+  MissingLibraryWork = 'missing-library-work',
   DuplicateIdentifier = 'duplicate-identifier',
 }
 
-type CatalogRecordType = 'artwork' | 'mystery set' | 'prayer' | 'source';
+type CatalogRecordType = 'artwork' | 'library work' | 'mystery set' | 'prayer' | 'source';
 
 const lookupErrorMessage = (
   code: CatalogLookupErrorCode,
@@ -75,15 +84,34 @@ export type ResolvedRosary = Omit<RosaryContent, 'mysterySets' | 'prayerStageArt
   readonly prayerStageArt: Readonly<Record<string, readonly ResolvedArtwork[]>>;
 };
 
+export type ResolvedLibraryWork = LibraryWork & {
+  readonly source: DevotionalSource;
+};
+
+export type ResolvedRedLetter = {
+  readonly notice: string;
+  readonly witnesses: readonly DevotionalSource[];
+  readonly tools: readonly DevotionalSource[];
+};
+
+export type ResolvedBible = {
+  readonly source: DevotionalSource;
+  readonly redLetter: ResolvedRedLetter;
+  readonly books: readonly BibleBookSummary[];
+};
+
 export type ContentCatalog = {
   readonly sources: readonly DevotionalSource[];
   readonly prayers: readonly ResolvedPrayer[];
   readonly artworks: readonly ResolvedArtwork[];
   readonly rosary: ResolvedRosary;
+  readonly libraryWorks: readonly ResolvedLibraryWork[];
+  readonly bible: ResolvedBible;
   readonly sourceById: (id: string) => DevotionalSource;
   readonly prayerById: (id: string) => ResolvedPrayer;
   readonly artworkById: (id: string) => ResolvedArtwork;
   readonly mysterySetById: (id: string) => ResolvedMysterySet;
+  readonly libraryWorkById: (id: string) => ResolvedLibraryWork;
 };
 
 const recordsById = <RecordType extends { readonly id: string }>(
@@ -148,7 +176,57 @@ const resolvedMysterySetsFrom = (
     })),
   }));
 
-export const createContentCatalog = (content: DevotionalContent): ContentCatalog => {
+const resolvedStageArtFrom = (
+  stageArt: Readonly<Record<string, readonly string[]>>,
+  artworkById: (id: string) => ResolvedArtwork,
+): Readonly<Record<string, readonly ResolvedArtwork[]>> =>
+  Object.fromEntries(
+    Object.entries(stageArt).map(([prayerId, artIds]) => [
+      prayerId,
+      artIds.map((artId) => artworkById(artId)),
+    ]),
+  );
+
+const resolvedLibraryFrom = (
+  library: LibraryContent,
+  sourceById: (id: string) => DevotionalSource,
+): Pick<ContentCatalog, 'libraryWorks' | 'libraryWorkById'> => {
+  const libraryWorks = library.works.map<ResolvedLibraryWork>((work) => ({
+    ...work,
+    source: sourceById(work.sourceId),
+  }));
+  const libraryWorkRecords = recordsById(libraryWorks, 'library work');
+
+  return {
+    libraryWorks,
+    libraryWorkById: (id: string): ResolvedLibraryWork =>
+      requiredRecord(
+        libraryWorkRecords,
+        id,
+        CatalogLookupErrorCode.MissingLibraryWork,
+        'library work',
+      ),
+  };
+};
+
+const resolvedBibleFrom = (
+  bible: BibleIndex,
+  sourceById: (id: string) => DevotionalSource,
+): ResolvedBible => ({
+  source: sourceById(bible.sourceId),
+  redLetter: {
+    notice: bible.redLetter.notice,
+    witnesses: bible.redLetter.witnessSourceIds.map(sourceById),
+    tools: bible.redLetter.toolSourceIds.map(sourceById),
+  },
+  books: bible.books,
+});
+
+export const createContentCatalog = (
+  content: DevotionalContent,
+  library: LibraryContent,
+  bible: BibleIndex,
+): ContentCatalog => {
   const sourceRecords = recordsById(content.sources, 'source');
   const sourceById = (id: string): DevotionalSource =>
     requiredRecord(sourceRecords, id, CatalogLookupErrorCode.MissingSource, 'source');
@@ -170,12 +248,7 @@ export const createContentCatalog = (content: DevotionalContent): ContentCatalog
   const mysterySetRecords = recordsById(mysterySets, 'mystery set');
   const mysterySetById = (id: string): ResolvedMysterySet =>
     requiredRecord(mysterySetRecords, id, CatalogLookupErrorCode.MissingMysterySet, 'mystery set');
-  const prayerStageArt = Object.fromEntries(
-    Object.entries(content.rosary.prayerStageArt).map(([prayerId, artIds]) => [
-      prayerId,
-      artIds.map((artId) => artworkById(artId)),
-    ]),
-  );
+  const { libraryWorks, libraryWorkById } = resolvedLibraryFrom(library, sourceById);
 
   return {
     sources: content.sources,
@@ -186,13 +259,20 @@ export const createContentCatalog = (content: DevotionalContent): ContentCatalog
       scheduleSource: sourceById(content.rosary.schedule.sourceId),
       prayers: content.rosary.prayerIds.map((prayerId) => prayerById(prayerId)),
       mysterySets,
-      prayerStageArt,
+      prayerStageArt: resolvedStageArtFrom(content.rosary.prayerStageArt, artworkById),
     },
+    libraryWorks,
+    bible: resolvedBibleFrom(bible, sourceById),
     sourceById,
     prayerById,
     artworkById,
     mysterySetById,
+    libraryWorkById,
   };
 };
 
-export const contentCatalog = createContentCatalog(devotionalContentFrom(generatedContent));
+export const contentCatalog = createContentCatalog(
+  devotionalContentFrom(generatedContent),
+  libraryContentFrom(generatedLibrary),
+  bibleIndexFrom(generatedBibleIndex),
+);

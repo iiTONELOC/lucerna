@@ -27,7 +27,9 @@ function DiagnosticDetails({ details }: { readonly details: string | undefined }
 
   return (
     <details className="group rounded-md border border-hairline bg-background p-3">
-      <summary className="flex cursor-pointer list-none items-center gap-2 font-display text-citation leading-citation text-secondary [&::-webkit-details-marker]:hidden">
+      <summary
+        className={`flex cursor-pointer list-none items-center gap-2 ${CITATION_CLASS_NAME} text-secondary [&::-webkit-details-marker]:hidden`}
+      >
         <Chevron
           className="size-4 shrink-0 transition-transform group-open:rotate-90"
           direction={ChevronDirection.Right}
