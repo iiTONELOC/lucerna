@@ -34,12 +34,12 @@ test('compiles the complete devotional catalog from canonical records', async ()
   const annunciation = catalog.mysterySetById('joyful').mysteries[0];
 
   expect(content).toEqual(generated);
-  expect(catalog.sources).toHaveLength(16);
+  expect(catalog.sources).toHaveLength(17);
   expect(catalog.prayers).toHaveLength(8);
-  expect(catalog.artworks).toHaveLength(74);
+  expect(catalog.artworks).toHaveLength(107);
   expect(catalog.rosary.mysterySets).toHaveLength(4);
   expect(mysteries).toHaveLength(20);
-  expect(annunciation?.artwork.id).toBe('hans-memling--the-annunciation');
+  expect(annunciation?.artworks[0]?.id).toBe('hans-memling--the-annunciation');
   expect(annunciation?.provenance.scripture.id).toBe('douay-rheims-challoner');
   expect(catalog.rosary.prayerStageArt['hail-mary']).toHaveLength(10);
 

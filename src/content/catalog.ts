@@ -53,7 +53,7 @@ export type ResolvedArtwork = Artwork & {
 };
 
 export type ResolvedMystery = Mystery & {
-  readonly artwork: ResolvedArtwork;
+  readonly artworks: readonly ResolvedArtwork[];
   readonly provenance: {
     readonly title: DevotionalSource;
     readonly fruit: DevotionalSource;
@@ -137,7 +137,7 @@ const resolvedMysterySetsFrom = (
     nameSource: sourceById(mysterySet.nameSourceId),
     mysteries: [...mysterySet.mysteries].sort(byOrdinal).map<ResolvedMystery>((mystery) => ({
       ...mystery,
-      artwork: artworkById(mystery.artId),
+      artworks: mystery.artIds.map((artId) => artworkById(artId)),
       provenance: {
         title: sourceById(mystery.titleSourceId),
         fruit: sourceById(mystery.fruitSourceId),

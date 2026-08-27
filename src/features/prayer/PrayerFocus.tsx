@@ -904,12 +904,13 @@ const artworkPoolForStep = (
   step: PrayerStep,
   mysteryArtworkByDecade: ReadonlyMap<number, ResolvedArtwork>,
 ): readonly ResolvedArtwork[] => {
-  if (step.archetype === StepArchetype.MysteryAnnouncement) {
-    return [step.mystery.artwork];
-  }
-
-  if (step.prayerId === PrayerId.HailMary && step.decade !== undefined) {
-    const mysteryArtwork = mysteryArtworkByDecade.get(step.decade);
+  if (
+    step.archetype === StepArchetype.MysteryAnnouncement ||
+    (step.decade !== undefined &&
+      (step.prayerId === PrayerId.HailMary || step.prayerId === PrayerId.OurFather))
+  ) {
+    const mysteryArtwork =
+      step.decade === undefined ? undefined : mysteryArtworkByDecade.get(step.decade);
 
     if (mysteryArtwork === undefined) {
       throw new CatalogLookupError(
@@ -965,7 +966,10 @@ const mysteryArtworkByDecadeFor = (
 
   for (const step of progression.steps) {
     if (step.archetype === StepArchetype.MysteryAnnouncement) {
-      mysteryArtworkByDecade.set(step.decade, step.mystery.artwork);
+      mysteryArtworkByDecade.set(
+        step.decade,
+        requiredArtwork(shuffled(step.mystery.artworks), step.mystery.title),
+      );
     }
   }
 

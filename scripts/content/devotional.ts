@@ -319,7 +319,7 @@ const validateMystery = (
   requireSource(context.sources, mystery.fruitSourceId);
   requireSource(context.sources, mystery.scripture.selectionSourceId);
   requireSource(context.sources, mystery.reflection.sourceId);
-  requireId(context.artworks, mystery.artId, 'mystery art');
+  mystery.artIds.forEach((artId) => requireId(context.artworks, artId, 'mystery art'));
 
   if (
     mystery.set !== mysterySetId ||

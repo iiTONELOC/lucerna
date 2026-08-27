@@ -72,7 +72,7 @@ export type Mystery = {
   readonly fruitSourceId: string;
   readonly scripture: ScripturePassage;
   readonly reflection: MysteryReflection;
-  readonly artId: string;
+  readonly artIds: readonly string[];
 };
 
 export type MysterySet = {
@@ -327,6 +327,16 @@ const reflectionFrom = (value: unknown, path: string): MysteryReflection => {
   };
 };
 
+const mysteryArtIdsFrom = (value: unknown, path: string): readonly string[] => {
+  const artIds = stringArrayFrom(value, path);
+
+  if (artIds.length === 0) {
+    return invalid(path);
+  }
+
+  return artIds;
+};
+
 const mysteryFrom = (value: unknown, path: string): Mystery => {
   const mystery = recordFrom(value, path);
 
@@ -339,7 +349,7 @@ const mysteryFrom = (value: unknown, path: string): Mystery => {
     fruitSourceId: stringFrom(mystery, 'fruitSourceId', path),
     scripture: scriptureFrom(mystery['scripture'], `${path}.scripture`),
     reflection: reflectionFrom(mystery['reflection'], `${path}.reflection`),
-    artId: stringFrom(mystery, 'artId', path),
+    artIds: mysteryArtIdsFrom(mystery['artIds'], `${path}.artIds`),
   };
 };
 

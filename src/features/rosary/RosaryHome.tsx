@@ -126,7 +126,7 @@ type RosaryHomeProps = {
 type RosaryMystery = (typeof contentCatalog)['rosary']['mysterySets'][number]['mysteries'][number];
 
 type MysteryHero = {
-  readonly artwork: RosaryMystery['artwork'];
+  readonly artwork: RosaryMystery['artworks'][number];
   readonly isToday: boolean;
   readonly mysterySetName: string;
   readonly onBegin: () => void;
@@ -272,7 +272,7 @@ const dailyArtworksFor = (
   const seen = new Set<string>([heroArtworkId]);
   const daily: ResolvedArtwork[] = [];
 
-  for (const artwork of [...mysteries.map((mystery) => mystery.artwork), ...stageArtworks]) {
+  for (const artwork of [...mysteries.flatMap((mystery) => mystery.artworks), ...stageArtworks]) {
     if (!seen.has(artwork.id)) {
       seen.add(artwork.id);
       daily.push(artwork);
@@ -282,10 +282,7 @@ const dailyArtworksFor = (
   return daily;
 };
 
-export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: RosaryHomeProps) {
-  const today = new Date();
-  const todaySetId = scheduledMysterySetId(today, contentCatalog.rosary.schedule);
-  const [selectedSetId, setSelectedSetId] = useState(todaySetId);
+const dailyHeroArtworkFor = (today: Date, selectedSetId: string): ResolvedArtwork => {
   const selectedSet = contentCatalog.mysterySetById(selectedSetId);
   const heroMysteryIndex = dailyMysteryIndex(today, selectedSetId, selectedSet.mysteries.length);
   const heroMystery = selectedSet.mysteries[heroMysteryIndex];
@@ -294,12 +291,26 @@ export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: Rosa
     throw new RangeError('Mystery set must not be empty');
   }
 
-  const heroArtwork = heroMystery.artwork;
-  const isToday = selectedSetId === todaySetId;
+  const heroArtwork =
+    heroMystery.artworks[dailyMysteryIndex(today, heroMystery.title, heroMystery.artworks.length)];
+
+  if (heroArtwork === undefined) {
+    throw new RangeError('Mystery must carry at least one artwork');
+  }
+
+  return heroArtwork;
+};
+
+export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: RosaryHomeProps) {
+  const today = new Date();
+  const todaySetId = scheduledMysterySetId(today, contentCatalog.rosary.schedule);
+  const [selectedSetId, setSelectedSetId] = useState(todaySetId);
+  const selectedSet = contentCatalog.mysterySetById(selectedSetId);
+  const heroArtwork = dailyHeroArtworkFor(today, selectedSetId);
   const dailyArtworks = dailyArtworksFor(selectedSet.mysteries, heroArtwork.id);
   const hero: MysteryHero = {
     artwork: heroArtwork,
-    isToday,
+    isToday: selectedSetId === todaySetId,
     mysterySetName: selectedSet.name,
     onBegin: () => onBeginRosary(selectedSetId),
   };

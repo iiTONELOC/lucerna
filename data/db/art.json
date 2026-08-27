@@ -25,6 +25,30 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "ambrogio-lorenzetti--presentation-at-the-temple",
+    "artist": "Ambrogio Lorenzetti",
+    "title": "Presentation at the Temple",
+    "date": "1342",
+    "holder": "Uffizi, Florence",
+    "url": "https://commons.wikimedia.org/wiki/File:Ambrogio%20Lorenzetti%20-%20Presentazione%20di%20Ges%C3%B9%20al%20tempio%20-%20Google%20Art%20Project.jpg",
+    "file": "art/7612681ee749.avif",
+    "width": 838,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "andrea-mantegna--the-agony-in-the-garden",
+    "artist": "Andrea Mantegna",
+    "title": "The Agony in the Garden",
+    "date": "c. 1455-56",
+    "holder": "The National Gallery, London",
+    "url": "https://commons.wikimedia.org/wiki/File:Mantegna%2C%20Andrea%20-%20Agony%20in%20the%20Garden%20-%20National%20Gallery%2C%20London.jpg",
+    "file": "art/baa989f3f192.avif",
+    "width": 1200,
+    "height": 929,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "andrea-previtali--salvator-mundi",
     "artist": "Andrea Previtali",
     "title": "Salvator Mundi",
@@ -33,6 +57,18 @@
     "url": "https://commons.wikimedia.org/wiki/File:Andrea_Previtali_-_Salvator_Mundi_-_Google_Art_Project.jpg",
     "file": "art/0bfe188f2035.avif",
     "width": 1023,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "andrea-del-verrocchio-and-leonardo-da-vinci--the-baptism-of-christ",
+    "artist": "Andrea del Verrocchio and Leonardo da Vinci",
+    "title": "The Baptism of Christ",
+    "date": "c. 1475",
+    "holder": "Uffizi, Florence",
+    "url": "https://commons.wikimedia.org/wiki/File:Andrea%20del%20Verrocchio%2C%20Leonardo%20da%20Vinci%20-%20Baptism%20of%20Christ%20-%20Uffizi.jpg",
+    "file": "art/5c3e6466a8b9.avif",
+    "width": 1007,
     "height": 1200,
     "sourceId": "wikimedia-pd-art"
   },
@@ -48,6 +84,18 @@
     "height": 1026,
     "sourceId": "met-open-access",
     "accession": "1971.155"
+  },
+  {
+    "id": "anthony-van-dyck--christ-crowned-with-thorns",
+    "artist": "Anthony van Dyck",
+    "title": "Christ Crowned with Thorns",
+    "date": "1618-20",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:Anthony%20van%20Dyck%20-%20Crowning%20with%20Thorns%20-%20WGA07433.jpg",
+    "file": "art/7ccc36e7d5f8.avif",
+    "width": 1065,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
   },
   {
     "id": "antonello-da-messina--salvator-mundi",
@@ -219,18 +267,6 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
-    "id": "el-greco--christ-as-saviour",
-    "artist": "El Greco",
-    "title": "Christ as Saviour",
-    "date": "c. 1610-14",
-    "holder": "National Galleries of Scotland",
-    "url": "https://commons.wikimedia.org/wiki/File:El_Greco_-_Christ_as_Saviour_-_Google_Art_Project.jpg",
-    "file": "art/c01cac9592ec.avif",
-    "width": 940,
-    "height": 1200,
-    "sourceId": "wikimedia-pd-art"
-  },
-  {
     "id": "el-greco--christ-carrying-the-cross",
     "artist": "El Greco",
     "title": "Christ Carrying the Cross",
@@ -241,6 +277,18 @@
     "width": 868,
     "height": 1200,
     "sourceId": "met-open-access"
+  },
+  {
+    "id": "el-greco--christ-as-saviour",
+    "artist": "El Greco",
+    "title": "Christ as Saviour",
+    "date": "c. 1610-14",
+    "holder": "National Galleries of Scotland",
+    "url": "https://commons.wikimedia.org/wiki/File:El_Greco_-_Christ_as_Saviour_-_Google_Art_Project.jpg",
+    "file": "art/c01cac9592ec.avif",
+    "width": 940,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
   },
   {
     "id": "el-greco--pentecost",
@@ -267,6 +315,44 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "el-greco--the-agony-in-the-garden",
+    "artist": "El Greco",
+    "title": "The Agony in the Garden",
+    "date": "c. 1590",
+    "holder": "Toledo Museum of Art",
+    "url": "https://commons.wikimedia.org/wiki/File:El%20Greco%20-%20The%20Agony%20in%20the%20Garden%20-%20WGA10484.jpg",
+    "file": "art/db206b3b104c.avif",
+    "width": 1129,
+    "height": 1000,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "el-greco--the-assumption-of-the-virgin",
+    "artist": "El Greco",
+    "title": "The Assumption of the Virgin",
+    "date": "1577",
+    "holder": "Art Institute of Chicago",
+    "url": "https://commons.wikimedia.org/wiki/File:Domenico%20Theotok%C3%B3poulos%2C%20called%20El%20Greco%20-%20The%20Assumption%20of%20the%20Virgin%20-%201906.99%20-%20Art%20Institute%20of%20Chicago.jpg",
+    "file": "art/18d7f5f446c9.avif",
+    "width": 602,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "1906.99"
+  },
+  {
+    "id": "el-greco--the-baptism-of-christ",
+    "artist": "El Greco",
+    "title": "The Baptism of Christ",
+    "date": "1597-1600",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:El%20bautismo%20de%20Cristo%20%28El%20Greco%2C%201597%29.jpg",
+    "file": "art/89246f641ea6.avif",
+    "width": 488,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "P000821"
+  },
+  {
     "id": "el-greco--the-holy-trinity",
     "artist": "El Greco",
     "title": "The Holy Trinity",
@@ -277,6 +363,19 @@
     "width": 842,
     "height": 1200,
     "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "el-greco--the-resurrection",
+    "artist": "El Greco",
+    "title": "The Resurrection",
+    "date": "1597-1600",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:El%20Greco%20-%20The%20Resurrection%20-%20WGA10530.jpg",
+    "file": "art/c51a945065d9.avif",
+    "width": 554,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "P000825"
   },
   {
     "id": "enguerrand-quarton--the-coronation-of-the-virgin",
@@ -304,6 +403,31 @@
     "accession": "49.7.4"
   },
   {
+    "id": "fra-angelico--presentation-in-the-temple",
+    "artist": "Fra Angelico",
+    "title": "Presentation in the Temple",
+    "date": "c. 1440-42",
+    "holder": "Convent of San Marco, Florence",
+    "url": "https://commons.wikimedia.org/wiki/File:Presentation%20of%20Jesus%20at%20the%20Temple%20by%20Fra%20Angelico%20%28San%20Marco%20Cell%2010%29.jpg",
+    "file": "art/fd27fd4dd090.avif",
+    "width": 1036,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "fra-angelico--the-annunciation",
+    "artist": "Fra Angelico",
+    "title": "The Annunciation",
+    "date": "c. 1425-28",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:La%20Anunciaci%C3%B3n%2C%20de%20Fra%20Angelico.jpg",
+    "file": "art/ef5bfb118691.avif",
+    "width": 1200,
+    "height": 960,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "P000015"
+  },
+  {
     "id": "fra-angelico--the-coronation-of-the-virgin",
     "artist": "Fra Angelico",
     "title": "The Coronation of the Virgin",
@@ -326,6 +450,44 @@
     "width": 1200,
     "height": 800,
     "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "fra-angelico--transfiguration",
+    "artist": "Fra Angelico",
+    "title": "Transfiguration",
+    "date": "c. 1440-42",
+    "holder": "Convent of San Marco, Florence",
+    "url": "https://commons.wikimedia.org/wiki/File:Transfiguration%20by%20fra%20Angelico%20%28San%20Marco%20Cell%206%29.jpg",
+    "file": "art/073ce57f4599.avif",
+    "width": 1022,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "francesco-botticini--the-assumption-of-the-virgin",
+    "artist": "Francesco Botticini",
+    "title": "The Assumption of the Virgin",
+    "date": "c. 1475-76",
+    "holder": "The National Gallery, London",
+    "url": "https://commons.wikimedia.org/wiki/File:Francesco%20Botticini%20-%20The%20Assumption%20of%20the%20Virgin.jpg",
+    "file": "art/3113112f0ce5.avif",
+    "width": 1200,
+    "height": 728,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "NG1126"
+  },
+  {
+    "id": "francisco-de-zurbaran--the-crucifixion",
+    "artist": "Francisco de Zurbarán",
+    "title": "The Crucifixion",
+    "date": "1627",
+    "holder": "Art Institute of Chicago",
+    "url": "https://commons.wikimedia.org/wiki/File:Francisco%20de%20Zurbar%C3%A1n%20-%20The%20Crucifixion%20-%201954.15%20-%20Art%20Institute%20of%20Chicago.jpg",
+    "file": "art/a25f481a8e71.avif",
+    "width": 675,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "1954.15"
   },
   {
     "id": "frans-francken-ii--the-sermon-on-the-mount",
@@ -365,6 +527,18 @@
     "accession": "2009.415"
   },
   {
+    "id": "gerard-david--the-marriage-at-cana",
+    "artist": "Gerard David",
+    "title": "The Marriage at Cana",
+    "date": "c. 1500",
+    "holder": "Musée du Louvre, Paris",
+    "url": "https://commons.wikimedia.org/wiki/File:Gerard%20David%20-%20The%20Marriage%20at%20Cana%20-%20WGA6020.jpg",
+    "file": "art/7abb1e96c909.avif",
+    "width": 1009,
+    "height": 755,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "giampietrino--salvator-mundi",
     "artist": "Giampietrino",
     "title": "Salvator Mundi",
@@ -374,6 +548,42 @@
     "file": "art/0b71092790df.avif",
     "width": 888,
     "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "giotto--ascension",
+    "artist": "Giotto",
+    "title": "Ascension",
+    "date": "1304-06",
+    "holder": "Cappella degli Scrovegni, Padua",
+    "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2038%20Scenes%20from%20the%20Life%20of%20Christ%20-%2022.%20Ascension%20-%20WGA09226.jpg",
+    "file": "art/50348fe80e8f.avif",
+    "width": 1000,
+    "height": 927,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "giotto--marriage-at-cana",
+    "artist": "Giotto",
+    "title": "Marriage at Cana",
+    "date": "1304-06",
+    "holder": "Cappella degli Scrovegni, Padua",
+    "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2024%20Scenes%20from%20the%20Life%20of%20Christ%20-%208.%20Marriage%20at%20Cana%20-%20WGA09202.jpg",
+    "file": "art/21a0e64d514b.avif",
+    "width": 1000,
+    "height": 926,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "giotto--visitation",
+    "artist": "Giotto",
+    "title": "Visitation",
+    "date": "1306",
+    "holder": "Cappella degli Scrovegni, Padua",
+    "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2016%20Scenes%20from%20the%20Life%20of%20the%20Virgin%20-%207.%20Visitation%20-%20WGA09192.jpg",
+    "file": "art/9dae50177e4b.avif",
+    "width": 848,
+    "height": 1000,
     "sourceId": "wikimedia-pd-art"
   },
   {
@@ -462,6 +672,18 @@
     "accession": "17.190.7"
   },
   {
+    "id": "jacopo-tintoretto--the-last-supper",
+    "artist": "Jacopo Tintoretto",
+    "title": "The Last Supper",
+    "date": "1592-94",
+    "holder": "San Giorgio Maggiore, Venice",
+    "url": "https://commons.wikimedia.org/wiki/File:Jacopo%20Tintoretto%20-%20The%20Last%20Supper%20-%20WGA22649.jpg",
+    "file": "art/c73f7a9e6c3b.avif",
+    "width": 1200,
+    "height": 763,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "james-tissot--the-sermon-of-the-beatitudes",
     "artist": "James Tissot",
     "title": "The Sermon of the Beatitudes",
@@ -483,6 +705,18 @@
     "file": "art/e4c0b60b5d02.avif",
     "width": 1200,
     "height": 881,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "jan-van-eyck--the-annunciation",
+    "artist": "Jan van Eyck",
+    "title": "The Annunciation",
+    "date": "c. 1434-36",
+    "holder": "National Gallery of Art, Washington",
+    "url": "https://commons.wikimedia.org/wiki/File:Jan%20van%20Eyck%20-%20The%20Annunciation%20-%20Google%20Art%20Project.jpg",
+    "file": "art/a9d756c8925a.avif",
+    "width": 455,
+    "height": 1200,
     "sourceId": "wikimedia-pd-art"
   },
   {
@@ -546,6 +780,18 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "leonardo-da-vinci--the-last-supper",
+    "artist": "Leonardo da Vinci",
+    "title": "The Last Supper",
+    "date": "1495-98",
+    "holder": "Santa Maria delle Grazie, Milan",
+    "url": "https://commons.wikimedia.org/wiki/File:%C3%9Altima%20Cena%20-%20Da%20Vinci%205.jpg",
+    "file": "art/3f1a87df073d.avif",
+    "width": 1200,
+    "height": 676,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "lorenzo-lotto--madonna-of-the-rosary",
     "artist": "Lorenzo Lotto",
     "title": "Madonna of the Rosary",
@@ -604,6 +850,19 @@
     "width": 818,
     "height": 1200,
     "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "nicolas-poussin--the-assumption-of-the-virgin",
+    "artist": "Nicolas Poussin",
+    "title": "The Assumption of the Virgin",
+    "date": "c. 1630-32",
+    "holder": "National Gallery of Art, Washington",
+    "url": "https://commons.wikimedia.org/wiki/File:Nicolas%20Poussin%2C%20The%20Assumption%20of%20the%20Virgin%2C%20c.%201630-1632%2C%20NGA%2046470.jpg",
+    "file": "art/b0363d89548d.avif",
+    "width": 877,
+    "height": 1200,
+    "sourceId": "nga-open-access",
+    "accession": "1963.5.1"
   },
   {
     "id": "paolo-veronese--christ-among-the-doctors-in-the-temple",
@@ -740,6 +999,18 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "piero-della-francesca--the-flagellation-of-christ",
+    "artist": "Piero della Francesca",
+    "title": "The Flagellation of Christ",
+    "date": "c. 1459-60",
+    "holder": "Galleria Nazionale delle Marche, Urbino",
+    "url": "https://commons.wikimedia.org/wiki/File:Piero%20della%20Francesca%20-%20The%20Flagellation%20-%20WGA17600.jpg",
+    "file": "art/b51a2bc6a76a.avif",
+    "width": 1200,
+    "height": 874,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "piero-della-francesca--the-resurrection",
     "artist": "Piero della Francesca",
     "title": "The Resurrection",
@@ -776,6 +1047,18 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "raphael--christ-falls-on-the-way-to-calvary",
+    "artist": "Raphael",
+    "title": "Christ Falls on the Way to Calvary",
+    "date": "c. 1515-16",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20Sanzio%20-%20Christ%20Falls%20on%20the%20Way%20to%20Calvary%20-%20WGA18828.jpg",
+    "file": "art/622853fb36a5.avif",
+    "width": 864,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "raphael--the-sistine-madonna",
     "artist": "Raphael",
     "title": "The Sistine Madonna",
@@ -786,6 +1069,44 @@
     "width": 876,
     "height": 1200,
     "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "raphael--the-transfiguration",
+    "artist": "Raphael",
+    "title": "The Transfiguration",
+    "date": "1516-20",
+    "holder": "Pinacoteca Vaticana, Rome",
+    "url": "https://commons.wikimedia.org/wiki/File:Rapha%C3%ABl%2C%20La%20Transfiguration%2C%201518%E2%80%931520%2C%20huile%20sur%20bois%2C%20405%20%C3%97%20278%20cm%2C%20Mus%C3%A9es%20du%20Vatican%2C%20Pinacoth%C3%A8que%2C%20inv.%204.jpg",
+    "file": "art/5e0362e628a0.avif",
+    "width": 812,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "inv. 4"
+  },
+  {
+    "id": "raphael--the-visitation",
+    "artist": "Raphael",
+    "title": "The Visitation",
+    "date": "c. 1517",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:Raphael%20-%20The%20visitation.jpg",
+    "file": "art/038eee9933af.avif",
+    "width": 520,
+    "height": 719,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "rembrandt--christ-preaching-la-petite-tombe",
+    "artist": "Rembrandt",
+    "title": "Christ Preaching (La Petite Tombe)",
+    "date": "c. 1652",
+    "holder": "National Gallery of Art, Washington",
+    "url": "https://commons.wikimedia.org/wiki/File:Rembrandt%20van%20Rijn%2C%20Christ%20Preaching%20%28La%20petite%20Tombe%29%2C%20c.%201652%2C%20NGA%2043413.jpg",
+    "file": "art/02373f642a26.avif",
+    "width": 1200,
+    "height": 893,
+    "sourceId": "nga-open-access",
+    "accession": "1955.6.5"
   },
   {
     "id": "sandro-botticelli--the-annunciation",
@@ -799,6 +1120,19 @@
     "height": 788,
     "sourceId": "met-open-access",
     "accession": "1975.1.74"
+  },
+  {
+    "id": "sandro-botticelli--the-mystical-nativity",
+    "artist": "Sandro Botticelli",
+    "title": "The Mystical Nativity",
+    "date": "1500",
+    "holder": "The National Gallery, London",
+    "url": "https://commons.wikimedia.org/wiki/File:Mystic%20Nativity%2C%20Sandro%20Botticelli.jpg",
+    "file": "art/2922fa6ed45a.avif",
+    "width": 828,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "NG1034"
   },
   {
     "id": "sassoferrato--madonna-del-rosario",
@@ -863,6 +1197,44 @@
     "sourceId": "wikimedia-pd-art"
   },
   {
+    "id": "titian--christ-carrying-the-cross",
+    "artist": "Titian",
+    "title": "Christ Carrying the Cross",
+    "date": "c. 1565",
+    "holder": "Museo del Prado, Madrid",
+    "url": "https://commons.wikimedia.org/wiki/File:Titian%2C%20Christ%20Carrying%20the%20Cross.%20Oil%20on%20canvas%2C%2067%20x%2077%20cm%2C%20c.%201565.%20Madrid%2C%20Museo%20Nacional%20del%20Prado.jpg",
+    "file": "art/17b85502eafd.avif",
+    "width": 1200,
+    "height": 1036,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "P000438"
+  },
+  {
+    "id": "titian--christ-crowned-with-thorns",
+    "artist": "Titian",
+    "title": "Christ Crowned with Thorns",
+    "date": "c. 1542-43",
+    "holder": "Musée du Louvre, Paris",
+    "url": "https://commons.wikimedia.org/wiki/File:Titian%20-%20The%20Crowning%20with%20Thorns%20%281545%29.jpg",
+    "file": "art/8e81745b0155.avif",
+    "width": 657,
+    "height": 1100,
+    "sourceId": "wikimedia-pd-art",
+    "accession": "INV 748"
+  },
+  {
+    "id": "titian--pentecost",
+    "artist": "Titian",
+    "title": "Pentecost",
+    "date": "c. 1545",
+    "holder": "Santa Maria della Salute, Venice",
+    "url": "https://commons.wikimedia.org/wiki/File:Tiziano%20Pentecost%C3%A9s.jpg",
+    "file": "art/b9b0b1988505.avif",
+    "width": 854,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
     "id": "titian--the-trinity-in-glory-la-gloria",
     "artist": "Titian",
     "title": "The Trinity in Glory (La Gloria)",
@@ -871,6 +1243,42 @@
     "url": "https://commons.wikimedia.org/wiki/File:Titian_-_The_Trinity_in_Glory_-_WGA22817.jpg",
     "file": "art/113108a2e589.avif",
     "width": 821,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "william-holman-hunt--the-finding-of-the-saviour-in-the-temple",
+    "artist": "William Holman Hunt",
+    "title": "The Finding of the Saviour in the Temple",
+    "date": "1854-55",
+    "holder": "Birmingham Museum and Art Gallery",
+    "url": "https://commons.wikimedia.org/wiki/File:William%20Holman%20Hunt%20-%20The%20Finding%20of%20the%20Saviour%20in%20the%20Temple%20-%20Google%20Art%20Project.jpg",
+    "file": "art/75d8f5db0dac.avif",
+    "width": 1200,
+    "height": 735,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "william-adolphe-bouguereau--pieta",
+    "artist": "William-Adolphe Bouguereau",
+    "title": "Pietà",
+    "date": "1876",
+    "holder": "Private collection",
+    "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Pieta%20%281876%29.jpg",
+    "file": "art/1377221d7c7d.avif",
+    "width": 764,
+    "height": 1200,
+    "sourceId": "wikimedia-pd-art"
+  },
+  {
+    "id": "william-adolphe-bouguereau--the-flagellation-of-our-lord",
+    "artist": "William-Adolphe Bouguereau",
+    "title": "The Flagellation of Our Lord",
+    "date": "1880",
+    "holder": "Musée des Beaux-Arts de La Rochelle",
+    "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20The%20Flagellation%20of%20Our%20Lord%20Jesus%20Christ%20%281880%29.jpg",
+    "file": "art/68cc4fcdf50e.avif",
+    "width": 839,
     "height": 1200,
     "sourceId": "wikimedia-pd-art"
   },

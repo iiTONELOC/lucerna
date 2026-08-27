@@ -52,7 +52,14 @@
             "sourceTitle": "Incarnation",
             "theme": "humility of heart"
           },
-          "artId": "hans-memling--the-annunciation"
+          "artIds": [
+            "hans-memling--the-annunciation",
+            "jan-van-eyck--the-annunciation",
+            "fra-angelico--the-annunciation",
+            "sandro-botticelli--the-annunciation",
+            "petrus-christus--the-annunciation",
+            "philippe-de-champaigne--the-annunciation"
+          ]
         },
         {
           "set": "joyful",
@@ -79,7 +86,11 @@
             "sourceTitle": "Visitation",
             "theme": "perfect love of neighbor"
           },
-          "artId": "domenico-ghirlandaio--the-visitation"
+          "artIds": [
+            "domenico-ghirlandaio--the-visitation",
+            "raphael--the-visitation",
+            "giotto--visitation"
+          ]
         },
         {
           "set": "joyful",
@@ -106,7 +117,10 @@
             "sourceTitle": "Birth of Jesus",
             "theme": "detachment from the world, love of poverty, and love of the poor"
           },
-          "artId": "correggio--the-holy-night-the-nativity"
+          "artIds": [
+            "correggio--the-holy-night-the-nativity",
+            "sandro-botticelli--the-mystical-nativity"
+          ]
         },
         {
           "set": "joyful",
@@ -133,7 +147,11 @@
             "sourceTitle": "Presentation in the temple",
             "theme": "wisdom and purity of heart and body"
           },
-          "artId": "giovanni-bellini--presentation-of-jesus-at-the-temple"
+          "artIds": [
+            "giovanni-bellini--presentation-of-jesus-at-the-temple",
+            "ambrogio-lorenzetti--presentation-at-the-temple",
+            "fra-angelico--presentation-in-the-temple"
+          ]
         },
         {
           "set": "joyful",
@@ -160,7 +178,10 @@
             "sourceTitle": "Finding of Jesus in the temple",
             "theme": "conversion of sinners and return to Christ"
           },
-          "artId": "paolo-veronese--christ-among-the-doctors-in-the-temple"
+          "artIds": [
+            "paolo-veronese--christ-among-the-doctors-in-the-temple",
+            "william-holman-hunt--the-finding-of-the-saviour-in-the-temple"
+          ]
         }
       ]
     },
@@ -196,7 +217,11 @@
             "theme": "the baptism of Christ",
             "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
           },
-          "artId": "piero-della-francesca--the-baptism-of-christ"
+          "artIds": [
+            "piero-della-francesca--the-baptism-of-christ",
+            "andrea-del-verrocchio-and-leonardo-da-vinci--the-baptism-of-christ",
+            "el-greco--the-baptism-of-christ"
+          ]
         },
         {
           "set": "luminous",
@@ -224,7 +249,11 @@
             "theme": "Christ revealing his glory through miracles",
             "note": "No explicit Cana reference appears in the De Montfort text; this is a broad miracle-theme candidate."
           },
-          "artId": "paolo-veronese--the-wedding-at-cana"
+          "artIds": [
+            "paolo-veronese--the-wedding-at-cana",
+            "gerard-david--the-marriage-at-cana",
+            "giotto--marriage-at-cana"
+          ]
         },
         {
           "set": "luminous",
@@ -252,7 +281,15 @@
             "theme": "Christ preaching conversion and the kingdom",
             "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
           },
-          "artId": "fra-angelico--the-sermon-on-the-mount"
+          "artIds": [
+            "fra-angelico--the-sermon-on-the-mount",
+            "cosimo-rosselli--the-sermon-on-the-mount",
+            "jan-brueghel-the-elder--the-sermon-on-the-mount",
+            "claude-lorrain--the-sermon-on-the-mount",
+            "james-tissot--the-sermon-of-the-beatitudes",
+            "frans-francken-ii--the-sermon-on-the-mount",
+            "guillaume-fouace--le-sermon-sur-la-montagne"
+          ]
         },
         {
           "set": "luminous",
@@ -280,7 +317,11 @@
             "theme": "the Transfiguration of Christ",
             "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
           },
-          "artId": "giovanni-bellini--the-transfiguration-of-christ"
+          "artIds": [
+            "giovanni-bellini--the-transfiguration-of-christ",
+            "raphael--the-transfiguration",
+            "fra-angelico--transfiguration"
+          ]
         },
         {
           "set": "luminous",
@@ -308,7 +349,11 @@
             "theme": "the institution of the Eucharist",
             "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
           },
-          "artId": "juan-de-juanes--the-last-supper"
+          "artIds": [
+            "juan-de-juanes--the-last-supper",
+            "leonardo-da-vinci--the-last-supper",
+            "jacopo-tintoretto--the-last-supper"
+          ]
         }
       ]
     },
@@ -343,7 +388,11 @@
             "sourceTitle": "Agony in the garden of Olives",
             "theme": "sorrow for sin and conformity to the will of God"
           },
-          "artId": "giovanni-bellini--the-agony-in-the-garden"
+          "artIds": [
+            "giovanni-bellini--the-agony-in-the-garden",
+            "andrea-mantegna--the-agony-in-the-garden",
+            "el-greco--the-agony-in-the-garden"
+          ]
         },
         {
           "set": "sorrowful",
@@ -370,7 +419,11 @@
             "sourceTitle": "Scourging",
             "theme": "mortification of the senses"
           },
-          "artId": "caravaggio--the-flagellation-of-christ"
+          "artIds": [
+            "caravaggio--the-flagellation-of-christ",
+            "piero-della-francesca--the-flagellation-of-christ",
+            "william-adolphe-bouguereau--the-flagellation-of-our-lord"
+          ]
         },
         {
           "set": "sorrowful",
@@ -397,7 +450,11 @@
             "sourceTitle": "Crowning with Thorns",
             "theme": "contempt of the world"
           },
-          "artId": "caravaggio--the-crowning-with-thorns"
+          "artIds": [
+            "caravaggio--the-crowning-with-thorns",
+            "titian--christ-crowned-with-thorns",
+            "anthony-van-dyck--christ-crowned-with-thorns"
+          ]
         },
         {
           "set": "sorrowful",
@@ -424,7 +481,11 @@
             "sourceTitle": "Carrying the Cross",
             "theme": "patience in carrying the cross"
           },
-          "artId": "el-greco--christ-carrying-the-cross"
+          "artIds": [
+            "el-greco--christ-carrying-the-cross",
+            "raphael--christ-falls-on-the-way-to-calvary",
+            "titian--christ-carrying-the-cross"
+          ]
         },
         {
           "set": "sorrowful",
@@ -451,7 +512,7 @@
             "sourceTitle": "Crucifixion on Mount Calvary",
             "theme": "horror of sin, love for the Cross, and grace of a holy death"
           },
-          "artId": "diego-velazquez--christ-crucified"
+          "artIds": ["diego-velazquez--christ-crucified", "francisco-de-zurbaran--the-crucifixion"]
         }
       ]
     },
@@ -486,7 +547,7 @@
             "sourceTitle": "Resurrection",
             "theme": "lively faith"
           },
-          "artId": "piero-della-francesca--the-resurrection"
+          "artIds": ["piero-della-francesca--the-resurrection", "el-greco--the-resurrection"]
         },
         {
           "set": "glorious",
@@ -513,7 +574,7 @@
             "sourceTitle": "Ascension",
             "theme": "firm hope and longing for heaven"
           },
-          "artId": "pietro-perugino--the-ascension-of-christ"
+          "artIds": ["pietro-perugino--the-ascension-of-christ", "giotto--ascension"]
         },
         {
           "set": "glorious",
@@ -540,7 +601,7 @@
             "sourceTitle": "Pentecost",
             "theme": "holy wisdom and the practice of truth"
           },
-          "artId": "el-greco--pentecost"
+          "artIds": ["el-greco--pentecost", "titian--pentecost"]
         },
         {
           "set": "glorious",
@@ -567,7 +628,12 @@
             "sourceTitle": "Assumption",
             "theme": "true devotion to Mary and a happy death"
           },
-          "artId": "titian--assumption-of-the-virgin-assunta"
+          "artIds": [
+            "titian--assumption-of-the-virgin-assunta",
+            "el-greco--the-assumption-of-the-virgin",
+            "nicolas-poussin--the-assumption-of-the-virgin",
+            "francesco-botticini--the-assumption-of-the-virgin"
+          ]
         },
         {
           "set": "glorious",
@@ -595,7 +661,14 @@
             "sourceTitle": "Crowning in glory of Mary",
             "theme": "perseverance, increase in virtue, and the eternal crown"
           },
-          "artId": "diego-velazquez--coronation-of-the-virgin"
+          "artIds": [
+            "diego-velazquez--coronation-of-the-virgin",
+            "enguerrand-quarton--the-coronation-of-the-virgin",
+            "fra-angelico--the-coronation-of-the-virgin",
+            "gentile-da-fabriano--the-coronation-of-the-virgin",
+            "annibale-carracci--the-coronation-of-the-virgin",
+            "follower-of-botticelli--the-coronation-of-the-virgin"
+          ]
         }
       ]
     }
@@ -633,7 +706,8 @@
       "domenico-ghirlandaio--calling-of-the-apostles",
       "james-tissot--the-sermon-of-the-beatitudes",
       "frans-francken-ii--the-sermon-on-the-mount",
-      "guillaume-fouace--le-sermon-sur-la-montagne"
+      "guillaume-fouace--le-sermon-sur-la-montagne",
+      "rembrandt--christ-preaching-la-petite-tombe"
     ],
     "hail-mary": [
       "hans-memling--the-annunciation",
@@ -659,13 +733,15 @@
     "fatima-prayer": [
       "pompeo-batoni--sacred-heart-of-jesus",
       "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
-      "guido-reni--st-michael-archangel"
+      "guido-reni--st-michael-archangel",
+      "william-adolphe-bouguereau--pieta"
     ],
     "hail-holy-queen": [
       "piero-della-francesca--madonna-della-misericordia",
       "enguerrand-quarton--the-coronation-of-the-virgin",
       "fra-angelico--the-coronation-of-the-virgin",
-      "gentile-da-fabriano--the-coronation-of-the-virgin"
+      "gentile-da-fabriano--the-coronation-of-the-virgin",
+      "francesco-botticini--the-assumption-of-the-virgin"
     ],
     "closing-prayer": [
       "caravaggio--madonna-of-the-rosary",

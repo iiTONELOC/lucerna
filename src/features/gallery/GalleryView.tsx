@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { contentCatalog } from '../../content/catalog.ts';
+import { scheduledMysterySetId } from '../rosary/schedule.ts';
 import {
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
@@ -96,7 +97,8 @@ function GallerySection({ group, onOpenArtwork, registerButton }: GallerySection
 
 const useGalleryOrganization = () => {
   const [sort, setSort] = useState(GallerySort.Mystery);
-  const groups = galleryGroupsFor(sort, contentCatalog.artworks);
+  const todaySetId = scheduledMysterySetId(new Date(), contentCatalog.rosary.schedule);
+  const groups = galleryGroupsFor(sort, contentCatalog.artworks, todaySetId);
 
   return { groups, setSort, sort };
 };

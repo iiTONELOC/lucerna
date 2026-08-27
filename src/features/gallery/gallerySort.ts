@@ -62,12 +62,24 @@ const unclaimedFrom = (
   return kept;
 };
 
-const mysteryGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGroup[] => {
+const mysterySetsStartingWithToday = (todaySetId: string) => {
+  const mysterySets = contentCatalog.rosary.mysterySets;
+
+  return [
+    ...mysterySets.filter((mysterySet) => mysterySet.id === todaySetId),
+    ...mysterySets.filter((mysterySet) => mysterySet.id !== todaySetId),
+  ];
+};
+
+const mysteryGroupsOf = (
+  artworks: readonly ResolvedArtwork[],
+  todaySetId: string,
+): readonly GalleryGroup[] => {
   const claimed = new Set<string>();
   const groups: GalleryGroup[] = [];
 
-  for (const mysterySet of contentCatalog.rosary.mysterySets) {
-    const setArtworks = mysterySet.mysteries.map((mystery) => mystery.artwork);
+  for (const mysterySet of mysterySetsStartingWithToday(todaySetId)) {
+    const setArtworks = mysterySet.mysteries.flatMap((mystery) => mystery.artworks);
 
     groups.push({
       id: mysterySet.id,
@@ -164,9 +176,10 @@ const dateGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGro
 export const galleryGroupsFor = (
   sort: GallerySort,
   artworks: readonly ResolvedArtwork[],
+  todaySetId: string,
 ): readonly GalleryGroup[] => {
   if (sort === GallerySort.Mystery) {
-    return mysteryGroupsOf(artworks);
+    return mysteryGroupsOf(artworks, todaySetId);
   }
 
   if (sort === GallerySort.Artist) {
