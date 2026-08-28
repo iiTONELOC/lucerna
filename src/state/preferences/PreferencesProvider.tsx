@@ -85,12 +85,18 @@ const contextValueFrom = (
     dispatch({ type: PreferencesActionType.SetBeadMaterial, beadMaterial }),
   setShowGuidance: (showGuidance: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowGuidance, showGuidance }),
+  setReadGuidance: (readGuidance: boolean) =>
+    dispatch({ type: PreferencesActionType.SetReadGuidance, readGuidance }),
   setShowDecadeOfferings: (showDecadeOfferings: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowDecadeOfferings, showDecadeOfferings }),
+  setReadDecadeOfferings: (readDecadeOfferings: boolean) =>
+    dispatch({ type: PreferencesActionType.SetReadDecadeOfferings, readDecadeOfferings }),
   setShowDropCaps: (showDropCaps: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowDropCaps, showDropCaps }),
   setShowMysteryFruits: (showMysteryFruits: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowMysteryFruits, showMysteryFruits }),
+  setReadMysteryFruits: (readMysteryFruits: boolean) =>
+    dispatch({ type: PreferencesActionType.SetReadMysteryFruits, readMysteryFruits }),
   setShowScriptureReadings: (showScriptureReadings: boolean) =>
     dispatch({ type: PreferencesActionType.SetShowScriptureReadings, showScriptureReadings }),
   setIncludeFatimaPrayer: (includeFatimaPrayer: boolean) =>

@@ -38,7 +38,7 @@ const notifyUpdate = (): void => {
     return;
   }
 
-  if (worker === notifiedWorker) {
+  if (!isInstalled() || worker === notifiedWorker) {
     return;
   }
 

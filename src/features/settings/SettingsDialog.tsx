@@ -25,7 +25,7 @@ import {
 import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { SettingsScope } from './model.ts';
+import { SettingsScope, SettingsTab } from './model.ts';
 import { AboutSettings } from './AboutSettings.tsx';
 import { DiagnosticsSettings } from './DiagnosticsSettings.tsx';
 
@@ -54,6 +54,17 @@ const READER_GROUND_LABEL: Readonly<Record<ReaderGround, string>> = {
 };
 
 const TEXT_CHOICE_CLASS_NAME = `min-h-11 border-b border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-pressed:border-accent aria-pressed:text-accent-current focus-ring`;
+const TAB_CLASS_NAME = `min-h-11 border-b-2 border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-selected:border-accent aria-selected:text-accent-current focus-ring`;
+
+const SETTINGS_TAB_LABEL: Readonly<Record<SettingsTab, string>> = {
+  [SettingsTab.Rosary]: 'Rosary',
+  [SettingsTab.Library]: 'Library',
+  [SettingsTab.General]: 'General',
+  [SettingsTab.About]: 'About',
+};
+
+const defaultTabOf = (scope: SettingsScope): SettingsTab =>
+  scope === SettingsScope.Reader ? SettingsTab.Library : SettingsTab.Rosary;
 
 const enumLabel = (
   domain: Readonly<Record<string, string | number>>,
@@ -95,17 +106,14 @@ function SettingsGroup({
   );
 }
 
-function SwitchChoice({
-  label,
-  description,
-  value,
-  onChange,
-}: {
+type SwitchChoiceProps = {
   readonly label: string;
   readonly description: string;
   readonly value: boolean;
   readonly onChange: (next: boolean) => void;
-}) {
+};
+
+function SwitchChoice({ label, description, value, onChange }: SwitchChoiceProps) {
   return (
     <label className="grid min-h-14 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 border-t border-hairline py-3">
       <span className={`${BODY_CLASS_NAME} text-foreground`}>{label}</span>
@@ -528,17 +536,34 @@ function RosaryBeadsSettings() {
   );
 }
 
-type RosaryOptionChoice = readonly [
-  label: string,
-  description: string,
-  value: boolean,
-  onChange: (next: boolean) => void,
-];
+type DisplayChoice = SwitchChoiceProps & {
+  readonly playback?: Pick<SwitchChoiceProps, 'value' | 'onChange'>;
+};
 
-function useRosaryOptionChoices(): readonly RosaryOptionChoice[] {
+const PLAYBACK_CHOICE_LABEL = 'Read in playback';
+const PLAYBACK_CHOICE_DESCRIPTION = 'Pause to read it during guided prayer.';
+
+function PrayersSettings() {
+  const { preferences, setIncludeFatimaPrayer } = usePreferences();
+
+  return (
+    <SettingsGroup legend="Prayers">
+      <SwitchChoice
+        description="Include O My Jesus after each decade."
+        label="Fatima prayer"
+        onChange={setIncludeFatimaPrayer}
+        value={preferences.includeFatimaPrayer}
+      />
+    </SettingsGroup>
+  );
+}
+
+function useDisplayChoices(): readonly DisplayChoice[] {
   const {
     preferences,
-    setIncludeFatimaPrayer,
+    setReadDecadeOfferings,
+    setReadGuidance,
+    setReadMysteryFruits,
     setShowDecadeOfferings,
     setShowDropCaps,
     setShowGuidance,
@@ -546,53 +571,67 @@ function useRosaryOptionChoices(): readonly RosaryOptionChoice[] {
     setShowScriptureReadings,
   } = usePreferences();
   return [
-    [
-      'Fatima prayer',
-      'Include O My Jesus after each decade.',
-      preferences.includeFatimaPrayer,
-      setIncludeFatimaPrayer,
-    ],
-    [
-      'Scripture readings',
-      'Show the brief reading with each mystery.',
-      preferences.showScriptureReadings,
-      setShowScriptureReadings,
-    ],
-    [
-      'Mystery fruits',
-      "Show each mystery's spiritual fruit.",
-      preferences.showMysteryFruits,
-      setShowMysteryFruits,
-    ],
-    ['Guidance', 'Show meditation prompts.', preferences.showGuidance, setShowGuidance],
-    [
-      'Decade offerings',
-      "Show St. Louis de Montfort's offering with each mystery.",
-      preferences.showDecadeOfferings,
-      setShowDecadeOfferings,
-    ],
-    [
-      'Drop caps',
-      'Enlarge the opening letter when space allows.',
-      preferences.showDropCaps,
-      setShowDropCaps,
-    ],
+    {
+      label: 'Scripture readings',
+      description: 'Show the brief reading with each mystery.',
+      value: preferences.showScriptureReadings,
+      onChange: setShowScriptureReadings,
+    },
+    {
+      label: 'Mystery fruits',
+      description: "Show each mystery's spiritual fruit.",
+      value: preferences.showMysteryFruits,
+      onChange: setShowMysteryFruits,
+      playback: { value: preferences.readMysteryFruits, onChange: setReadMysteryFruits },
+    },
+    {
+      label: 'Guidance',
+      description: 'Show meditation prompts.',
+      value: preferences.showGuidance,
+      onChange: setShowGuidance,
+      playback: { value: preferences.readGuidance, onChange: setReadGuidance },
+    },
+    {
+      label: 'Decade offerings',
+      description: "Show St. Louis de Montfort's offering with each mystery.",
+      value: preferences.showDecadeOfferings,
+      onChange: setShowDecadeOfferings,
+      playback: { value: preferences.readDecadeOfferings, onChange: setReadDecadeOfferings },
+    },
+    {
+      label: 'Drop caps',
+      description: 'Enlarge the opening letter when space allows.',
+      value: preferences.showDropCaps,
+      onChange: setShowDropCaps,
+    },
   ];
 }
 
-function RosaryOptionsSettings() {
-  const choices = useRosaryOptionChoices();
+function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
+  return (
+    <>
+      <SwitchChoice {...choice} />
+      {playback !== undefined && choice.value ? (
+        <div className="pl-6">
+          <SwitchChoice
+            description={PLAYBACK_CHOICE_DESCRIPTION}
+            label={PLAYBACK_CHOICE_LABEL}
+            onChange={playback.onChange}
+            value={playback.value}
+          />
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+function DisplaySettings() {
+  const choices = useDisplayChoices();
 
   return (
-    <SettingsGroup legend="Rosary options">
-      {choices.map(([label, description, value, onChange]) => (
-        <SwitchChoice
-          description={description}
-          key={label}
-          label={label}
-          onChange={onChange}
-          value={value}
-        />
+    <SettingsGroup legend="Display">
+      {choices.map((choice) => (
+        <DisplayChoiceRow key={choice.label} {...choice} />
       ))}
     </SettingsGroup>
   );
@@ -638,22 +677,54 @@ function LinkSettings() {
   );
 }
 
-function SettingsColumns() {
+function SettingsTabs({
+  onSelect,
+  selected,
+}: {
+  readonly onSelect: (tab: SettingsTab) => void;
+  readonly selected: SettingsTab;
+}) {
   return (
-    <div className="grid">
-      <div>
-        <TextScaleSettings />
-        <OpeningScreenSettings />
-        <GuidedPlaybackSettings />
-        <RosaryBeadsSettings />
-      </div>
-      <div>
-        <RosaryOptionsSettings />
-        <RedLetterSettings />
-        <LinkSettings />
-        <UpdateSettings />
-      </div>
+    <div
+      aria-label="Settings sections"
+      className="flex shrink-0 flex-wrap gap-x-5 border-b border-hairline px-5 lg:px-8"
+      role="tablist"
+    >
+      {Object.values(SettingsTab).map((tab) => (
+        <button
+          aria-selected={selected === tab}
+          className={TAB_CLASS_NAME}
+          key={tab}
+          onClick={() => onSelect(tab)}
+          role="tab"
+          type="button"
+        >
+          {SETTINGS_TAB_LABEL[tab]}
+        </button>
+      ))}
     </div>
+  );
+}
+
+function RosaryTab() {
+  return (
+    <>
+      <PrayersSettings />
+      <DisplaySettings />
+      <GuidedPlaybackSettings />
+      <RosaryBeadsSettings />
+    </>
+  );
+}
+
+function GeneralTab() {
+  return (
+    <>
+      <TextScaleSettings />
+      <OpeningScreenSettings />
+      <LinkSettings />
+      <UpdateSettings />
+    </>
   );
 }
 
@@ -668,6 +739,13 @@ type SettingsDialogProps = {
 export function SettingsDialog(props: SettingsDialogProps) {
   const { dialogRef, headingRef, returnFocusRef } = useSettingsDialog(props.open);
   const { cardStyle, handleProps } = useCardResize(dialogRef);
+  const [tab, setTab] = useState(defaultTabOf(props.scope));
+
+  useEffect(() => {
+    if (props.open) {
+      setTab(defaultTabOf(props.scope));
+    }
+  }, [props.open, props.scope]);
 
   const handleDialogClose = (): void => {
     props.onClose();
@@ -697,10 +775,12 @@ export function SettingsDialog(props: SettingsDialogProps) {
       ref={dialogRef}
     >
       <SettingsHeader handleProps={handleProps} headingRef={headingRef} onClose={props.onClose} />
+      <SettingsTabs onSelect={setTab} selected={tab} />
       <SettingsBody
+        key={tab}
         onOpenInstallGuide={props.onOpenInstallGuide}
         onOpenReferences={props.onOpenReferences}
-        scope={props.scope}
+        tab={tab}
       />
     </dialog>
   );
@@ -709,26 +789,29 @@ export function SettingsDialog(props: SettingsDialogProps) {
 function SettingsBody({
   onOpenInstallGuide,
   onOpenReferences,
-  scope,
+  tab,
 }: {
   readonly onOpenInstallGuide: () => void;
   readonly onOpenReferences: () => void;
-  readonly scope: SettingsScope;
+  readonly tab: SettingsTab;
 }) {
   return (
-    <div className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-5 lg:px-8 lg:pb-8">
-      {scope === SettingsScope.Reader ? (
-        <ReaderSettings />
-      ) : (
+    <div
+      className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-5 lg:px-8 lg:pb-8"
+      role="tabpanel"
+    >
+      {tab === SettingsTab.Rosary ? <RosaryTab /> : null}
+      {tab === SettingsTab.Library ? <ReaderSettings /> : null}
+      {tab === SettingsTab.General ? <GeneralTab /> : null}
+      {tab === SettingsTab.About ? (
         <>
-          <SettingsColumns />
-          <DiagnosticsSettings />
           <AboutSettings
             onOpenInstallGuide={onOpenInstallGuide}
             onOpenReferences={onOpenReferences}
           />
+          <DiagnosticsSettings />
         </>
-      )}
+      ) : null}
     </div>
   );
 }

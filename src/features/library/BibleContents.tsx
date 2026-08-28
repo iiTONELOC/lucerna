@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Chevron } from '../../components/icons/Chevron.tsx';
 import { ChevronDirection } from '../../components/icons/model.ts';
 import { contentCatalog } from '../../content/catalog.ts';
 import { BibleTestament, LibraryCategory, type BibleBookSummary } from '../../content/schema.ts';
+import {
+  loadOpenTestaments,
+  saveOpenTestaments,
+  type OpenTestaments,
+} from '../../state/reading/readingPositions.ts';
 import { CHAPTER_CLASS_NAME, CITATION_CLASS_NAME, READING_CLASS_NAME } from '../../styles.ts';
 import { BIBLE_EDITION, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL, TESTAMENT_LABEL } from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
@@ -34,12 +39,15 @@ function BookRow({
 
 function TestamentSection({
   onOpenBook,
+  onToggle,
+  open,
   testament,
 }: {
   readonly onOpenBook: (bookId: string) => void;
+  readonly onToggle: () => void;
+  readonly open: boolean;
   readonly testament: BibleTestament;
 }) {
-  const [open, setOpen] = useState(true);
   const books = contentCatalog.bible.books.filter((book) => book.testament === testament);
 
   return (
@@ -48,7 +56,7 @@ function TestamentSection({
         <button
           aria-expanded={open}
           className={`focus-ring flex min-h-11 w-full items-center justify-between gap-4 transition-colors hover:text-accent-current ${CHAPTER_CLASS_NAME}`}
-          onClick={() => setOpen((current) => !current)}
+          onClick={onToggle}
           type="button"
         >
           {TESTAMENT_LABEL[testament]}
@@ -69,6 +77,37 @@ function TestamentSection({
   );
 }
 
+const useOpenTestaments = () => {
+  const [openTestaments, setOpenTestaments] = useState<OpenTestaments | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadOpenTestaments().then((stored) => {
+      if (!cancelled) {
+        setOpenTestaments(stored);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const toggleTestament = (testament: BibleTestament): void => {
+    if (openTestaments === null) {
+      return;
+    }
+
+    const next = { ...openTestaments, [testament]: !openTestaments[testament] };
+
+    setOpenTestaments(next);
+    void saveOpenTestaments(next);
+  };
+
+  return { openTestaments, toggleTestament };
+};
+
 export function BibleContents({
   onBack,
   onOpenBook,
@@ -79,6 +118,7 @@ export function BibleContents({
   readonly onOpenSettings: () => void;
 }) {
   const headingRef = useHeadingFocus(BIBLE_TITLE);
+  const { openTestaments, toggleTestament } = useOpenTestaments();
 
   return (
     <ReaderSurface onBack={onBack} onOpenSettings={onOpenSettings}>
@@ -89,9 +129,17 @@ export function BibleContents({
         tight
         title={BIBLE_TITLE}
       />
-      {Object.values(BibleTestament).map((testament) => (
-        <TestamentSection key={testament} onOpenBook={onOpenBook} testament={testament} />
-      ))}
+      {openTestaments === null
+        ? null
+        : Object.values(BibleTestament).map((testament) => (
+            <TestamentSection
+              key={testament}
+              onOpenBook={onOpenBook}
+              onToggle={() => toggleTestament(testament)}
+              open={openTestaments[testament]}
+              testament={testament}
+            />
+          ))}
       <ReaderColophon source={contentCatalog.bible.source} />
     </ReaderSurface>
   );

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
 import {
   CatalogLookupError,
@@ -8,7 +8,12 @@ import {
   type ResolvedMystery,
 } from '../../content/catalog.ts';
 import type { MysteryReflection } from '../../content/schema.ts';
-import type { Preferences } from '../../state/preferences/model.ts';
+import {
+  READING_SPEED_MAXIMUM,
+  READING_SPEED_MINIMUM,
+  READING_SPEED_STEP,
+  type Preferences,
+} from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import type { BibleVerseLocation } from '../library/model.ts';
 import type { ReferenceTarget } from '../references/referenceCatalog.ts';
@@ -31,6 +36,16 @@ import {
   type Progression,
   type StepAnchorPoint,
 } from './progression.ts';
+import {
+  useNotesCollision,
+  type NotesCollision,
+  type NotesCollisionRefs,
+} from './useNotesCollision.ts';
+import {
+  usePendantOverhang,
+  type PendantOverhang,
+  type PendantOverhangRefs,
+} from './usePendantOverhang.ts';
 import { usePrayerFit, type FitRefs, type FitResult } from './usePrayerFit.ts';
 import { useGuidedPlayback, type GuidedPlayback } from './useGuidedPlayback.ts';
 
@@ -210,14 +225,19 @@ export type PrayerFocusProps = {
   readonly onOpenSettings: () => void;
 };
 
-export type PrayerFocusRefs = FitRefs & {
-  readonly heading: RefObject<HTMLHeadingElement | null>;
-};
+export type PrayerFocusRefs = FitRefs &
+  NotesCollisionRefs &
+  PendantOverhangRefs & {
+    readonly heading: RefObject<HTMLHeadingElement | null>;
+  };
 
 const usePrayerFocusRefs = (): PrayerFocusRefs => ({
   artwork: useRef<HTMLDivElement>(null),
+  drape: useRef<HTMLDivElement>(null),
   heading: useRef<HTMLHeadingElement>(null),
+  notes: useRef<HTMLDivElement>(null),
   reading: useRef<HTMLElement>(null),
+  scripture: useRef<HTMLParagraphElement>(null),
   stage: useRef<HTMLElement>(null),
   surface: useRef<HTMLDivElement>(null),
 });
@@ -329,10 +349,14 @@ type PrayerPlaybackRequest = {
   readonly fruit: MysteryFruit | null;
   readonly playing: boolean;
   readonly progression: Progression;
+  readonly read: Pick<Preferences, 'readDecadeOfferings' | 'readGuidance' | 'readMysteryFruits'>;
   readonly readingSpeed: number;
   readonly setIndex: (index: number) => void;
   readonly setPlaying: (playing: boolean) => void;
 };
+
+const readKeyOf = (read: PrayerPlaybackRequest['read']): string =>
+  [read.readGuidance, read.readDecadeOfferings, read.readMysteryFruits].map(String).join(':');
 
 const usePrayerPlayback = ({
   display,
@@ -340,19 +364,21 @@ const usePrayerPlayback = ({
   fruit,
   playing,
   progression,
+  read,
   readingSpeed,
   setIndex,
   setPlaying,
 }: PrayerPlaybackRequest): GuidedPlayback =>
   useGuidedPlayback({
     announcement: display.step.archetype === StepArchetype.MysteryAnnouncement,
-    fruitText: fruit === null ? '' : `Fruit of the Mystery. ${fruit.text}.`,
+    fruitText:
+      fruit === null || !read.readMysteryFruits ? '' : `Fruit of the Mystery. ${fruit.text}.`,
     guidanceText:
-      fit.showGuidance && display.step.guidance !== undefined
+      fit.showGuidance && read.readGuidance && display.step.guidance !== undefined
         ? `Guidance. ${display.step.guidance.text} ${contentCatalog.sourceById(display.step.guidance.sourceId).work}.`
         : '',
     offeringText:
-      display.offering?.text === undefined
+      display.offering?.text === undefined || !read.readDecadeOfferings
         ? ''
         : `${offeringLabelOf(display.offering)}. ${display.offering.text}`,
     isLastStep: isAtEnd(progression),
@@ -360,7 +386,7 @@ const usePrayerPlayback = ({
     onPlayingChange: setPlaying,
     playing,
     readingSpeed,
-    stepKey: `${display.fitKey}:${String(fit.showGuidance)}`,
+    stepKey: `${display.fitKey}:${String(fit.showGuidance)}:${readKeyOf(read)}`,
     text: display.showScriptureReading ? bodyFor(display.step) : '',
   });
 
@@ -393,12 +419,110 @@ export type PrayerFocusSession = {
   readonly drape: DrapeProps;
   readonly fit: FitResult;
   readonly fruit: MysteryFruit | null;
+  readonly notesCollision: NotesCollision;
+  readonly pendantOverhang: PendantOverhang;
   readonly onOpenArtwork: (artworkId: string) => void;
   readonly onOpenBibleVerse: (bookId: string, verse: BibleVerseLocation) => void;
   readonly onOpenReference: (target: ReferenceTarget) => void;
   readonly playback: GuidedPlayback;
   readonly preferences: Preferences;
   readonly refs: PrayerFocusRefs;
+};
+
+enum PrayerKey {
+  Space = ' ',
+  Enter = 'Enter',
+  Plus = '+',
+  Equals = '=',
+  Minus = '-',
+  Underscore = '_',
+}
+
+const KEYBOARD_EXEMPT_TARGET_SELECTOR =
+  'a, button, input, select, textarea, [contenteditable], dialog[open]';
+const CURRENT_WORD_SELECTOR = '[data-playback-word="current"]';
+const ACTIVE_NOTE_SELECTOR = '[data-playback-active="true"]';
+
+const steppedReadingSpeed = (readingSpeed: number, direction: 1 | -1): number =>
+  Number(
+    Math.min(
+      READING_SPEED_MAXIMUM,
+      Math.max(READING_SPEED_MINIMUM, readingSpeed + direction * READING_SPEED_STEP),
+    ).toFixed(2),
+  );
+
+type KeyboardRequest = {
+  readonly controls: ControlsBundle;
+  readonly readingSpeed: number;
+  readonly setReadingSpeed: (readingSpeed: number) => void;
+};
+
+const keyActionsOf = ({
+  controls,
+  readingSpeed,
+  setReadingSpeed,
+}: KeyboardRequest): Readonly<Record<PrayerKey, () => void>> => ({
+  [PrayerKey.Space]: controls.actions.onTogglePlayback,
+  [PrayerKey.Enter]: controls.actions.onForward,
+  [PrayerKey.Plus]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, 1)),
+  [PrayerKey.Equals]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, 1)),
+  [PrayerKey.Minus]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, -1)),
+  [PrayerKey.Underscore]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, -1)),
+});
+
+const isPrayerKey = (key: string): key is PrayerKey =>
+  Object.values<string>(PrayerKey).includes(key);
+
+const usePrayerKeyboard = (request: KeyboardRequest): void => {
+  useEffect(() => {
+    const actions = keyActionsOf(request);
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (
+        event.defaultPrevented ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        !isPrayerKey(event.key) ||
+        (event.target instanceof Element &&
+          event.target.closest(KEYBOARD_EXEMPT_TARGET_SELECTOR) !== null)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      actions[event.key]();
+    };
+
+    globalThis.addEventListener('keydown', onKeyDown);
+    return () => globalThis.removeEventListener('keydown', onKeyDown);
+  }, [request]);
+};
+
+const useFollowPlaybackWord = (
+  refs: Pick<PrayerFocusRefs, 'notes' | 'reading'>,
+  playback: Pick<GuidedPlayback, 'activePhase' | 'activeWordIndex' | 'engaged'>,
+): void => {
+  const { notes, reading } = refs;
+
+  useEffect(() => {
+    if (!playback.engaged) {
+      return;
+    }
+
+    const current = reading.current?.querySelector(CURRENT_WORD_SELECTOR);
+
+    current?.scrollIntoView({ block: 'nearest' });
+  }, [playback.activeWordIndex, playback.engaged, reading]);
+
+  useEffect(() => {
+    if (!playback.engaged) {
+      return;
+    }
+
+    const line = notes.current?.querySelector(ACTIVE_NOTE_SELECTOR);
+
+    line?.scrollIntoView({ block: 'nearest' });
+  }, [notes, playback.activePhase, playback.engaged]);
 };
 
 const pausedHandlersOf = (props: PrayerFocusProps, playback: Pick<GuidedPlayback, 'pause'>) => ({
@@ -416,8 +540,22 @@ const pausedHandlersOf = (props: PrayerFocusProps, playback: Pick<GuidedPlayback
   },
 });
 
+type DrapeLayout = {
+  readonly notesCollision: NotesCollision;
+  readonly pendantOverhang: PendantOverhang;
+};
+
+const useDrapeLayout = (
+  geometry: DrapeGeometry,
+  key: string,
+  refs: PrayerFocusRefs,
+): DrapeLayout => ({
+  notesCollision: useNotesCollision(geometry, key, refs),
+  pendantOverhang: usePendantOverhang(geometry, key, refs),
+});
+
 export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSession => {
-  const { preferences } = usePreferences();
+  const { preferences, setReadingSpeed } = usePreferences();
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const refs = usePrayerFocusRefs();
@@ -439,20 +577,25 @@ export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSessi
     fruit: repeatsDecadeGuidance(display.step) ? null : fruit,
     playing,
     progression: plan.progression,
+    read: preferences,
     readingSpeed: preferences.readingSpeed,
     setIndex,
     setPlaying,
   });
   const request = viewModelRequestOf(props, plan.progression, setIndex, playback);
+  const controls = controlsOf(request, playback);
 
   usePrayerFocusReset(display.fitKey, refs);
+  usePrayerKeyboard({ controls, readingSpeed: preferences.readingSpeed, setReadingSpeed });
+  useFollowPlaybackWord(refs, playback);
 
   return {
-    controls: controlsOf(request, playback),
+    controls,
     display,
     drape: drapeOf(plan.geometry, request),
     fit,
     fruit,
+    ...useDrapeLayout(plan.geometry, display.fitKey, refs),
     ...pausedHandlersOf(props, playback),
     playback,
     preferences,

@@ -70,9 +70,12 @@ export type Preferences = {
   readonly readingSpeed: number;
   readonly beadMaterial: BeadMaterial;
   readonly showGuidance: boolean;
+  readonly readGuidance: boolean;
   readonly showDecadeOfferings: boolean;
+  readonly readDecadeOfferings: boolean;
   readonly showDropCaps: boolean;
   readonly showMysteryFruits: boolean;
+  readonly readMysteryFruits: boolean;
   readonly showScriptureReadings: boolean;
   readonly includeFatimaPrayer: boolean;
   readonly confirmExternalLinks: boolean;
@@ -90,9 +93,12 @@ export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   readingSpeed: ReadingSpeed.Steady,
   beadMaterial: BeadMaterial.Wood,
   showGuidance: true,
+  readGuidance: true,
   showDecadeOfferings: true,
+  readDecadeOfferings: true,
   showDropCaps: true,
   showMysteryFruits: true,
+  readMysteryFruits: true,
   showScriptureReadings: true,
   includeFatimaPrayer: true,
   confirmExternalLinks: true,
@@ -114,9 +120,12 @@ export enum PreferencesActionType {
   SetReadingSpeed = 'set-reading-speed',
   SetBeadMaterial = 'set-bead-material',
   SetShowGuidance = 'set-show-guidance',
+  SetReadGuidance = 'set-read-guidance',
   SetShowDecadeOfferings = 'set-show-decade-offerings',
+  SetReadDecadeOfferings = 'set-read-decade-offerings',
   SetShowDropCaps = 'set-show-drop-caps',
   SetShowMysteryFruits = 'set-show-mystery-fruits',
+  SetReadMysteryFruits = 'set-read-mystery-fruits',
   SetShowScriptureReadings = 'set-show-scripture-readings',
   SetIncludeFatimaPrayer = 'set-include-fatima-prayer',
   SetConfirmExternalLinks = 'set-confirm-external-links',
@@ -141,14 +150,23 @@ export type PreferencesAction =
   | { readonly type: PreferencesActionType.SetReadingSpeed; readonly readingSpeed: number }
   | { readonly type: PreferencesActionType.SetBeadMaterial; readonly beadMaterial: BeadMaterial }
   | { readonly type: PreferencesActionType.SetShowGuidance; readonly showGuidance: boolean }
+  | { readonly type: PreferencesActionType.SetReadGuidance; readonly readGuidance: boolean }
   | {
       readonly type: PreferencesActionType.SetShowDecadeOfferings;
       readonly showDecadeOfferings: boolean;
+    }
+  | {
+      readonly type: PreferencesActionType.SetReadDecadeOfferings;
+      readonly readDecadeOfferings: boolean;
     }
   | { readonly type: PreferencesActionType.SetShowDropCaps; readonly showDropCaps: boolean }
   | {
       readonly type: PreferencesActionType.SetShowMysteryFruits;
       readonly showMysteryFruits: boolean;
+    }
+  | {
+      readonly type: PreferencesActionType.SetReadMysteryFruits;
+      readonly readMysteryFruits: boolean;
     }
   | {
       readonly type: PreferencesActionType.SetShowScriptureReadings;
@@ -233,10 +251,29 @@ const parsedReaderPreferencesFrom = (
   showRedLetter: optionalBooleanFrom(raw, 'showRedLetter', DEFAULT_PREFERENCES.showRedLetter),
 });
 
+type PlaybackNotePreferenceKey = 'readGuidance' | 'readDecadeOfferings' | 'readMysteryFruits';
+
+const parsedPlaybackNotePreferencesFrom = (
+  raw: Record<string, unknown>,
+): Pick<ParsedPreferences, PlaybackNotePreferenceKey> => ({
+  readGuidance: optionalBooleanFrom(raw, 'readGuidance', DEFAULT_PREFERENCES.readGuidance),
+  readDecadeOfferings: optionalBooleanFrom(
+    raw,
+    'readDecadeOfferings',
+    DEFAULT_PREFERENCES.readDecadeOfferings,
+  ),
+  readMysteryFruits: optionalBooleanFrom(
+    raw,
+    'readMysteryFruits',
+    DEFAULT_PREFERENCES.readMysteryFruits,
+  ),
+});
+
 const parsedPreferencesFrom = (raw: Record<string, unknown>): ParsedPreferences => ({
   theme: memberFrom(Object.values(Theme), raw['theme']),
   textScale: memberFrom(Object.values(TextScale), raw['textScale']),
   ...parsedReaderPreferencesFrom(raw),
+  ...parsedPlaybackNotePreferencesFrom(raw),
   openingDuration: storedOr(raw['openingDuration'], DEFAULT_PREFERENCES.openingDuration, (value) =>
     memberFrom(Object.values(OpeningDuration), value),
   ),
@@ -303,14 +340,41 @@ type ReadingPreferencesAction = Extract<
   {
     readonly type:
       | PreferencesActionType.SetShowGuidance
+      | PreferencesActionType.SetReadGuidance
       | PreferencesActionType.SetShowDecadeOfferings
+      | PreferencesActionType.SetReadDecadeOfferings
       | PreferencesActionType.SetShowDropCaps
       | PreferencesActionType.SetShowMysteryFruits
+      | PreferencesActionType.SetReadMysteryFruits
       | PreferencesActionType.SetShowScriptureReadings
       | PreferencesActionType.SetShowRedLetter
       | PreferencesActionType.SetIncludeFatimaPrayer;
   }
 >;
+
+type PlaybackNotePreferencesAction = Extract<
+  ReadingPreferencesAction,
+  {
+    readonly type:
+      | PreferencesActionType.SetReadGuidance
+      | PreferencesActionType.SetReadDecadeOfferings
+      | PreferencesActionType.SetReadMysteryFruits;
+  }
+>;
+
+const reducePlaybackNotePreference = (
+  state: Preferences,
+  action: PlaybackNotePreferencesAction,
+): Preferences => {
+  switch (action.type) {
+    case PreferencesActionType.SetReadGuidance:
+      return { ...state, readGuidance: action.readGuidance };
+    case PreferencesActionType.SetReadDecadeOfferings:
+      return { ...state, readDecadeOfferings: action.readDecadeOfferings };
+    case PreferencesActionType.SetReadMysteryFruits:
+      return { ...state, readMysteryFruits: action.readMysteryFruits };
+  }
+};
 
 const reduceReadingPreference = (
   state: Preferences,
@@ -331,6 +395,8 @@ const reduceReadingPreference = (
       return { ...state, showRedLetter: action.showRedLetter };
     case PreferencesActionType.SetIncludeFatimaPrayer:
       return { ...state, includeFatimaPrayer: action.includeFatimaPrayer };
+    default:
+      return reducePlaybackNotePreference(state, action);
   }
 };
 

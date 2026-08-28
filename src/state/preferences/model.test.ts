@@ -37,9 +37,12 @@ describe('parsePreferences', () => {
       readingSpeed: ReadingSpeed.Brisk,
       beadMaterial: BeadMaterial.Pearl,
       showGuidance: false,
+      readGuidance: false,
       showDecadeOfferings: false,
+      readDecadeOfferings: false,
       showDropCaps: false,
       showMysteryFruits: false,
+      readMysteryFruits: false,
       showScriptureReadings: false,
       includeFatimaPrayer: false,
       confirmExternalLinks: false,
@@ -78,7 +81,10 @@ describe('parsePreferences legacy records', () => {
     expect(parsed.readerGround).toBe(ReaderGround.Dark);
     expect(parsed.showRedLetter).toBe(false);
     expect(parsed.showGuidance).toBe(true);
+    expect(parsed.readGuidance).toBe(true);
     expect(parsed.showDecadeOfferings).toBe(true);
+    expect(parsed.readDecadeOfferings).toBe(true);
+    expect(parsed.readMysteryFruits).toBe(true);
     expect(parsed.showDropCaps).toBe(true);
     expect(parsed.showMysteryFruits).toBe(true);
     expect(parsed.showScriptureReadings).toBe(true);

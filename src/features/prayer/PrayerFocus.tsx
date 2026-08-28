@@ -1,6 +1,8 @@
 import { useState, useSyncExternalStore, type CSSProperties, type RefObject } from 'react';
 import { contentCatalog } from '../../content/catalog.ts';
 import type { MysteryReflection, ScriptureRedSpan } from '../../content/schema.ts';
+import { Chevron } from '../../components/icons/Chevron.tsx';
+import { ChevronDirection } from '../../components/icons/model.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import {
@@ -23,7 +25,7 @@ import {
   rosaryTextReferenceTarget,
   type ReferenceTarget,
 } from '../references/referenceCatalog.ts';
-import { activeTargetOf, DrapeAlignment, PENDANT_BEAD_COUNT, type DrapeGeometry } from './drape.ts';
+import { activeTargetOf, DrapeAlignment, type DrapeGeometry } from './drape.ts';
 import { guidedText, redMarkOf, scriptureRedOf, type RedMark } from './guidedText.tsx';
 import {
   bodyFor,
@@ -39,10 +41,11 @@ import {
 import { StepArchetype, type PrayerStep } from './progression.ts';
 import { RosaryDrape } from './RosaryDrape.tsx';
 import { GuidedPlaybackPhase } from './playbackSequence.ts';
+import { loopBandBottomOf, type NotesCollision } from './useNotesCollision.ts';
+import { pendantLeftOf, type PendantOverhang } from './usePendantOverhang.ts';
 import { SCROLL_FALLBACK_MAXIMUM_HEIGHT } from './usePrayerFit.ts';
 import type { GuidedPlayback } from './useGuidedPlayback.ts';
 
-const HEADING_CLEARANCE_RADII = 2.2;
 const ARTWORK_MINIMUM_HEIGHT = 200;
 const STAGE_MAXIMUM_HEIGHT = 896;
 const LANDSCAPE_STAGE_MINIMUM_HEIGHT = 516;
@@ -56,24 +59,21 @@ const NOTE_BODY_ON_ART_CLASS_NAME = CITATION_CLASS_NAME + ' min-w-0 text-on-art-
 const DROP_CAP_CLASS_NAME =
   'first-letter:float-left first-letter:mt-1 first-letter:mr-2 first-letter:font-display first-letter:text-[3.5em] first-letter:leading-[0.78] first-letter:font-medium first-letter:text-accent spread:first-letter:text-[3.75em] spread:first-letter:leading-[0.76]';
 
+type OverhangStyle = CSSProperties & {
+  readonly '--pendant-overhang-width': string;
+};
+
+const overhangStyleOf = (overhang: PendantOverhang): OverhangStyle => ({
+  '--pendant-overhang-width': String(overhang.width) + 'px',
+});
+
 type StageStyle = CSSProperties & {
   readonly '--drape-aspect': string;
   readonly '--prayer-stage-maximum-height': string;
   readonly '--prayer-stage-minimum-height': string;
   readonly '--prayer-artwork-minimum-height': string;
-  readonly '--drape-pendant-size': string;
+  readonly '--drape-pendant-left': string;
   readonly '--prayer-landscape-minimum-height': string;
-};
-
-const loopBandBottomOf = (geometry: DrapeGeometry): number => {
-  const midline = geometry.viewBox.x + geometry.viewBox.width / 2;
-
-  return geometry.beads
-    .filter((bead) => bead.beadIndex >= PENDANT_BEAD_COUNT && bead.center.x < midline)
-    .reduce(
-      (lowest, bead) => Math.max(lowest, bead.center.y + bead.radius * HEADING_CLEARANCE_RADII),
-      geometry.viewBox.y,
-    );
 };
 
 const stageStyleOf = (geometry: DrapeGeometry): StageStyle => ({
@@ -81,7 +81,7 @@ const stageStyleOf = (geometry: DrapeGeometry): StageStyle => ({
   '--prayer-stage-maximum-height': String(STAGE_MAXIMUM_HEIGHT) + 'px',
   '--prayer-stage-minimum-height': String(SCROLL_FALLBACK_MAXIMUM_HEIGHT) + 'px',
   '--prayer-artwork-minimum-height': String(ARTWORK_MINIMUM_HEIGHT) + 'px',
-  '--drape-pendant-size': String((2 * geometry.crucifix.radius) / geometry.viewBox.width),
+  '--drape-pendant-left': String(pendantLeftOf(geometry)),
   '--prayer-landscape-minimum-height': String(LANDSCAPE_STAGE_MINIMUM_HEIGHT) + 'px',
 });
 
@@ -115,9 +115,15 @@ function PrayerHeading({
   );
 }
 
-function Drape(props: DrapeProps) {
+function Drape({
+  drapeRef,
+  ...props
+}: DrapeProps & { readonly drapeRef: RefObject<HTMLDivElement | null> }) {
   return (
-    <div className="drape-relief pointer-events-none absolute inset-x-0 -top-2 z-30 aspect-(--drape-aspect) landscape:top-0.5">
+    <div
+      ref={drapeRef}
+      className="drape-relief pointer-events-none absolute inset-x-0 -top-2 z-30 aspect-(--drape-aspect) landscape:top-0.5"
+    >
       <div className="pointer-events-none size-full">
         <RosaryDrape
           alignment={DrapeAlignment.TailRight}
@@ -156,8 +162,11 @@ type ArtworkPageProps = {
   readonly artwork: PrayerFocusSession['display']['artwork'];
   readonly artworkRef: RefObject<HTMLDivElement | null>;
   readonly drape: DrapeProps;
+  readonly drapeRef: RefObject<HTMLDivElement | null>;
   readonly onOpenArtwork: (artworkId: string) => void;
   readonly notes: AuxiliaryPlaybackNotesProps;
+  readonly notesCollision: NotesCollision;
+  readonly notesRef: RefObject<HTMLDivElement | null>;
   readonly showArtwork: boolean;
   readonly source: string;
 };
@@ -179,18 +188,79 @@ function ReadingNotes({
   );
 }
 
-function ArtworkNotes(props: AuxiliaryPlaybackNotesProps) {
+type CollapsedNotesStyle = CSSProperties & {
+  readonly '--notes-collapsed-height': string;
+};
+
+const collapsedNotesStyleOf = (collision: NotesCollision): CollapsedNotesStyle => ({
+  '--notes-collapsed-height': String(collision.collapsedHeight) + 'px',
+});
+
+const scrolledToEnd = (element: HTMLElement): boolean =>
+  element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
+
+function CollapsedNotesBox({
+  collision,
+  notesRef,
+  ...props
+}: AuxiliaryPlaybackNotesProps & {
+  readonly collision: NotesCollision;
+  readonly notesRef: RefObject<HTMLDivElement | null>;
+}) {
+  const [atEnd, setAtEnd] = useState(false);
+
+  return (
+    <div className="relative max-w-full min-w-0">
+      <div
+        ref={notesRef}
+        className={classNames(
+          ON_ART_NOTE_CLASS_NAME,
+          'scroll-region max-h-(--notes-collapsed-height) overflow-y-auto',
+        )}
+        onScroll={(event) => setAtEnd(scrolledToEnd(event.currentTarget))}
+        style={collapsedNotesStyleOf(collision)}
+      >
+        <AuxiliaryPlaybackNotes {...props} onArt />
+      </div>
+      <Chevron
+        className="pointer-events-none absolute right-1.5 bottom-1.5 size-4 text-on-art-muted"
+        direction={atEnd ? ChevronDirection.Up : ChevronDirection.Down}
+      />
+    </div>
+  );
+}
+
+function ArtworkNotes({
+  collision,
+  notesRef,
+  ...props
+}: AuxiliaryPlaybackNotesProps & {
+  readonly collision: NotesCollision;
+  readonly notesRef: RefObject<HTMLDivElement | null>;
+}) {
   const landscape = useLandscape();
+  const single = auxiliaryNoteCountOf(props) === 1;
+  const collapsed = collision.collides && !single;
 
   if (landscape || !hasAuxiliaryNotes(props)) {
     return null;
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10 flex px-4 sm:px-6">
-      <div className={ON_ART_NOTE_CLASS_NAME}>
-        <AuxiliaryPlaybackNotes {...props} onArt />
-      </div>
+    <div
+      className={classNames(
+        collision.collides && single && 'invisible',
+        collapsed ? 'z-40' : 'z-10',
+        'absolute inset-x-0 bottom-0 flex pl-4 pr-[max(1rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))] sm:pl-6 sm:pr-[max(1.5rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))]',
+      )}
+    >
+      {collapsed ? (
+        <CollapsedNotesBox {...props} collision={collision} notesRef={notesRef} />
+      ) : (
+        <div ref={notesRef} className={ON_ART_NOTE_CLASS_NAME}>
+          <AuxiliaryPlaybackNotes {...props} onArt />
+        </div>
+      )}
     </div>
   );
 }
@@ -199,7 +269,10 @@ function ArtworkPage({
   artwork,
   artworkRef,
   drape,
+  drapeRef,
   notes,
+  notesCollision,
+  notesRef,
   onOpenArtwork,
   showArtwork,
   source,
@@ -207,7 +280,7 @@ function ArtworkPage({
   return (
     <figure
       aria-label="Devotional artwork"
-      className="relative isolate col-start-1 row-start-2 m-0 flex min-h-0 min-w-0 flex-col landscape:col-start-2 landscape:row-start-1 landscape:row-span-2 landscape:border-l landscape:border-hairline landscape:p-4 lg:p-6"
+      className="relative isolate z-20 col-start-1 row-start-2 m-0 flex min-h-0 min-w-0 flex-col p-(--artwork-inset) [--artwork-inset:0px] @container landscape:col-start-2 landscape:row-start-1 landscape:row-span-2 landscape:border-l landscape:border-hairline landscape:[--artwork-inset:1rem] lg:[--artwork-inset:1.5rem]"
       data-layout-region="artwork"
     >
       <div
@@ -228,14 +301,16 @@ function ArtworkPage({
             src={source}
             width={artwork.width}
           />
-          {showArtwork ? <ArtworkNotes {...notes} /> : null}
+          {showArtwork ? (
+            <ArtworkNotes {...notes} collision={notesCollision} notesRef={notesRef} />
+          ) : null}
         </div>
 
         <ArtworkCredit artwork={artwork} onOpenArtwork={onOpenArtwork} />
       </div>
 
       {showArtwork ? null : <DrapeBandSizer geometry={drape.geometry} />}
-      <Drape {...drape} />
+      <Drape {...drape} drapeRef={drapeRef} />
     </figure>
   );
 }
@@ -436,7 +511,9 @@ type ReadingPageProps = {
   readonly offering: MysteryReflection | null;
   readonly onOpenBibleVerse: (bookId: string, verse: BibleVerseLocation) => void;
   readonly onOpenReference: (target: ReferenceTarget) => void;
+  readonly pendantOverhang: PendantOverhang;
   readonly readingRef: RefObject<HTMLElement | null>;
+  readonly scriptureRef: RefObject<HTMLParagraphElement | null>;
   readonly showArtwork: boolean;
   readonly showDropCaps: boolean;
   readonly showGuidance: boolean;
@@ -449,6 +526,7 @@ type PrayerBodyProps = {
   readonly guidedPlayback: GuidedPlayback;
   readonly onOpenBibleVerse: (bookId: string, verse: BibleVerseLocation) => void;
   readonly onOpenReference: (target: ReferenceTarget) => void;
+  readonly scriptureRef: RefObject<HTMLParagraphElement | null>;
   readonly showDropCaps: boolean;
   readonly showScriptureReading: boolean;
   readonly step: PrayerStep;
@@ -478,12 +556,16 @@ const useLandscape = (): boolean =>
     () => false,
   );
 
-const hasAuxiliaryNotes = ({
-  offering,
-  showGuidance,
-  step,
-}: Pick<AuxiliaryPlaybackNotesProps, 'offering' | 'showGuidance' | 'step'>): boolean =>
-  (showGuidance && step.guidance !== undefined) || offering !== null;
+type AuxiliaryNoteSelection = Pick<
+  AuxiliaryPlaybackNotesProps,
+  'offering' | 'showGuidance' | 'step'
+>;
+
+const auxiliaryNoteCountOf = ({ offering, showGuidance, step }: AuxiliaryNoteSelection): number =>
+  Number(showGuidance && step.guidance !== undefined) + Number(offering !== null);
+
+const hasAuxiliaryNotes = (selection: AuxiliaryNoteSelection): boolean =>
+  auxiliaryNoteCountOf(selection) > 0;
 
 function AuxiliaryPlaybackNotes({
   guidedPlayback,
@@ -572,24 +654,44 @@ function ScriptureText({
   guidedPlayback,
   mark,
   red,
+  scriptureRef,
   showDropCaps,
   step,
-}: Pick<PrayerBodyProps, 'dense' | 'guidedPlayback' | 'showDropCaps' | 'step'> & {
+}: Pick<PrayerBodyProps, 'dense' | 'guidedPlayback' | 'scriptureRef' | 'showDropCaps' | 'step'> & {
   readonly mark: RedMark;
   readonly red: readonly ScriptureRedSpan[];
 }) {
   return (
     <p
+      ref={scriptureRef}
       className={classNames(
-        SCRIPTURE_CLASS_NAME + ' max-w-prose text-pretty',
+        SCRIPTURE_CLASS_NAME + ' max-w-prose text-pretty pr-(--pendant-overhang-width)',
         showDropCaps && !dense && DROP_CAP_CLASS_NAME,
       )}
     >
-      <span
-        aria-hidden="true"
-        className="float-right aspect-square w-[calc(var(--drape-pendant-size)*100%)] [shape-outside:circle(50%)] landscape:hidden"
-      />
       {guidedText(bodyFor(step), guidedPlayback, red, mark)}
+    </p>
+  );
+}
+
+function SourceLine({
+  dense,
+  onOpenBibleVerse,
+  onOpenReference,
+  step,
+}: Pick<PrayerBodyProps, 'dense' | 'onOpenBibleVerse' | 'onOpenReference' | 'step'>) {
+  return (
+    <p
+      className={classNames(
+        CITATION_CLASS_NAME + ' text-muted italic landscape:mt-auto',
+        dense ? 'pt-0' : 'landscape:pt-0 spread:pt-2',
+      )}
+    >
+      <SourceCitation
+        onOpenBibleVerse={onOpenBibleVerse}
+        onOpenReference={onOpenReference}
+        step={step}
+      />
     </p>
   );
 }
@@ -599,6 +701,7 @@ function PrayerBody({
   guidedPlayback,
   onOpenBibleVerse,
   onOpenReference,
+  scriptureRef,
   showDropCaps,
   showScriptureReading,
   step,
@@ -619,6 +722,7 @@ function PrayerBody({
         guidedPlayback={guidedPlayback}
         mark={redMarkOf(noticeOpen, () => setNoticeOpen((current) => !current))}
         red={red}
+        scriptureRef={scriptureRef}
         showDropCaps={showDropCaps}
         step={step}
       />
@@ -628,18 +732,12 @@ function PrayerBody({
           redLetter={contentCatalog.bible.redLetter}
         />
       ) : null}
-      <p
-        className={classNames(
-          CITATION_CLASS_NAME + ' text-muted italic landscape:mt-auto',
-          dense ? 'pt-0' : 'landscape:pt-0 spread:pt-2',
-        )}
-      >
-        <SourceCitation
-          onOpenBibleVerse={onOpenBibleVerse}
-          onOpenReference={onOpenReference}
-          step={step}
-        />
-      </p>
+      <SourceLine
+        dense={dense}
+        onOpenBibleVerse={onOpenBibleVerse}
+        onOpenReference={onOpenReference}
+        step={step}
+      />
     </>
   );
 }
@@ -659,7 +757,12 @@ function ReadingFruit({
   const notesInline = !showArtwork || landscape;
 
   return (
-    <div className={classNames('flex w-full', notesInline ? 'justify-start' : 'justify-center')}>
+    <div
+      className={classNames(
+        'flex w-full pr-(--pendant-overhang-width)',
+        notesInline ? 'justify-start' : 'justify-center',
+      )}
+    >
       <FruitLine
         fruit={fruit}
         illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Fruit}
@@ -683,6 +786,7 @@ function ReadingPage(props: ReadingPageProps) {
         !props.showArtwork && 'pr-14 sm:pr-16 landscape:pr-6 spread:pr-8',
       )}
       data-layout-region="reading"
+      style={overhangStyleOf(props.pendantOverhang)}
     >
       <ReadingNotes
         guidedPlayback={props.guidedPlayback}
@@ -705,6 +809,7 @@ function ReadingPage(props: ReadingPageProps) {
         key={noticeKeyOf(props.step)}
         onOpenBibleVerse={props.onOpenBibleVerse}
         onOpenReference={props.onOpenReference}
+        scriptureRef={props.scriptureRef}
         showDropCaps={props.showDropCaps}
         showScriptureReading={props.showScriptureReading}
         step={props.step}
@@ -725,7 +830,9 @@ function PrayerReadingPage({ session }: { readonly session: PrayerFocusSession }
       offering={display.offering}
       onOpenBibleVerse={onOpenBibleVerse}
       onOpenReference={onOpenReference}
+      pendantOverhang={session.pendantOverhang}
       readingRef={refs.reading}
+      scriptureRef={refs.scripture}
       showArtwork={fit.showArtwork}
       showDropCaps={preferences.showDropCaps}
       showGuidance={fit.showGuidance}
@@ -759,6 +866,7 @@ function PrayerBook({ session }: { readonly session: PrayerFocusSession }) {
         artwork={display.artwork}
         artworkRef={refs.artwork}
         drape={drape}
+        drapeRef={refs.drape}
         notes={{
           guidedPlayback: session.playback,
           offering: display.offering,
@@ -766,6 +874,8 @@ function PrayerBook({ session }: { readonly session: PrayerFocusSession }) {
           showGuidance: fit.showGuidance,
           step: display.step,
         }}
+        notesCollision={session.notesCollision}
+        notesRef={refs.notes}
         onOpenArtwork={onOpenArtwork}
         showArtwork={fit.showArtwork}
         source={display.source}
