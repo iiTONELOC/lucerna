@@ -1,10 +1,9 @@
-import { isRecord, type UnknownRecord } from '../../src/shared/guards.ts';
+import { recordFrom } from '../../src/content/schema.ts';
+import { CodedError } from '../../src/shared/codedError.ts';
 
 export enum ContentBuildErrorCode {
   InvalidField = 'invalid-field',
-  InvalidSplashRecord = 'invalid-splash-record',
   InvalidSourceRange = 'invalid-source-range',
-  InvalidSplashDatabase = 'invalid-splash-database',
   InvalidLibraryDatabase = 'invalid-library-database',
   DuplicateReference = 'duplicate-reference',
   MissingSource = 'missing-source',
@@ -37,8 +36,6 @@ const ERROR_MESSAGE: Readonly<Record<ContentBuildErrorCode, ErrorMessageDefiniti
     message: 'Invalid splash verse source range',
   },
   [ContentBuildErrorCode.InvalidLibraryDatabase]: { message: 'Invalid library database' },
-  [ContentBuildErrorCode.InvalidSplashDatabase]: { message: 'Invalid splash verse database' },
-  [ContentBuildErrorCode.InvalidSplashRecord]: { message: 'Invalid splash verse record' },
   [ContentBuildErrorCode.InvalidVerse]: {
     fallback: UNKNOWN_SOURCE_CONTEXT,
     message: 'Invalid scripture verse in ',
@@ -73,48 +70,20 @@ const errorMessage = (code: ContentBuildErrorCode, context?: string): string => 
   return `${definition.message}${context ?? definition.fallback}`;
 };
 
-export class ContentBuildError extends Error {
-  override readonly name = 'ContentBuildError';
-
-  constructor(
-    readonly code: ContentBuildErrorCode,
-    context?: string,
-  ) {
-    super(errorMessage(code, context));
+export class ContentBuildError extends CodedError<ContentBuildErrorCode> {
+  constructor(code: ContentBuildErrorCode, context?: string) {
+    super('ContentBuildError', code, errorMessage(code, context));
   }
 }
+
+export const buildFailure =
+  (code: ContentBuildErrorCode) =>
+  (context?: string): never => {
+    throw new ContentBuildError(code, context);
+  };
 
 export const readJsonFile = (path: string, repositoryRoot: URL): Promise<unknown> =>
   Bun.file(new URL(path, repositoryRoot)).json();
 
-export const recordFrom = (
-  value: unknown,
-  code: ContentBuildErrorCode,
-  context?: string,
-): UnknownRecord => {
-  if (!isRecord(value)) {
-    throw new ContentBuildError(code, context);
-  }
-
-  return value;
-};
-
-export const requiredString = (record: UnknownRecord, field: string): string => {
-  const value = record[field];
-
-  if (typeof value !== 'string' || value.length === 0) {
-    throw new ContentBuildError(ContentBuildErrorCode.InvalidField, field);
-  }
-
-  return value;
-};
-
-export const requiredPositiveInteger = (record: UnknownRecord, field: string): number => {
-  const value = record[field];
-
-  if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
-    throw new ContentBuildError(ContentBuildErrorCode.InvalidField, field);
-  }
-
-  return value;
-};
+export const sourceRecordOf = (sources: unknown, sourceId: string) =>
+  recordFrom(recordFrom(sources, 'sources')[sourceId], `sources.${sourceId}`);

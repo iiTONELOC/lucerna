@@ -1,5 +1,6 @@
 import type { ResolvedMystery, ResolvedMysterySet } from '../../content/catalog.ts';
 import type { GuidanceStatement, RosaryGuidance } from '../../content/schema.ts';
+import { CodedError } from '../../shared/codedError.ts';
 
 export enum PrayerId {
   SignOfTheCross = 'sign-of-the-cross',
@@ -40,7 +41,6 @@ export enum ProgressionErrorCode {
   EmptyMysterySet = 'empty-mystery-set',
   MissingGuidancePlaceholder = 'missing-guidance-placeholder',
   StepIndexOutOfRange = 'step-index-out-of-range',
-  BeadIndexOutOfRange = 'bead-index-out-of-range',
   AnchorNotFound = 'anchor-not-found',
 }
 
@@ -50,15 +50,12 @@ const PROGRESSION_ERROR_MESSAGE: Readonly<Record<ProgressionErrorCode, string>> 
   [ProgressionErrorCode.MissingGuidancePlaceholder]:
     'Decade Hail Mary guidance must carry the mystery placeholder',
   [ProgressionErrorCode.StepIndexOutOfRange]: 'Step index is out of range',
-  [ProgressionErrorCode.BeadIndexOutOfRange]: 'Bead index is out of range',
   [ProgressionErrorCode.AnchorNotFound]: 'Step anchor does not belong to the progression',
 };
 
-export class ProgressionError extends Error {
-  override readonly name = 'ProgressionError';
-
-  constructor(readonly code: ProgressionErrorCode) {
-    super(PROGRESSION_ERROR_MESSAGE[code]);
+export class ProgressionError extends CodedError<ProgressionErrorCode> {
+  constructor(code: ProgressionErrorCode) {
+    super('ProgressionError', code, PROGRESSION_ERROR_MESSAGE[code]);
   }
 }
 
@@ -126,10 +123,6 @@ export type Progression = {
   readonly stepIndexByBead: readonly number[];
   readonly index: number;
 };
-
-export const DEFAULT_ROSARY_OPTIONS: RosaryOptions = Object.freeze({
-  includeFatimaPrayer: true,
-});
 
 const DECADE_HAIL_MARY_COUNT = 10;
 const MYSTERY_PLACEHOLDER = '{mystery}';
@@ -442,19 +435,6 @@ export const isAtStart = (progression: Progression): boolean => progression.inde
 
 export const isAtEnd = (progression: Progression): boolean =>
   progression.index === progression.steps.length - 1;
-
-export const beadIndexOf = (step: PrayerStep): number | undefined =>
-  step.anchor.kind === StepAnchor.Bead ? step.anchor.beadIndex : undefined;
-
-export const stepIndexForBead = (progression: Progression, beadIndex: number): number => {
-  const stepIndex = progression.stepIndexByBead[beadIndex];
-
-  if (stepIndex === undefined) {
-    throw new ProgressionError(ProgressionErrorCode.BeadIndexOutOfRange);
-  }
-
-  return stepIndex;
-};
 
 const chainAnchorsMatch = (left: ChainAnchor, right: StepAnchorPoint): boolean =>
   right.kind === left.kind &&

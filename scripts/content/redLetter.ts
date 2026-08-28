@@ -1,5 +1,9 @@
-import type { BibleRedLetter, ScriptureRedSpan } from '../../src/content/schema.ts';
-import { ContentBuildError, ContentBuildErrorCode, recordFrom } from './records.ts';
+import {
+  recordFrom,
+  type BibleRedLetter,
+  type ScriptureRedSpan,
+} from '../../src/content/schema.ts';
+import { buildFailure, ContentBuildErrorCode } from './records.ts';
 
 export const RED_LETTER_DATABASE = 'data/db/red-letter.json';
 export const BIBLE_SOURCE_ID = 'douay-rheims-challoner';
@@ -9,9 +13,7 @@ export type RedLetterEntry = 'all' | readonly string[];
 export const bibleBookIdentifierFrom = (name: string): string =>
   name.toLowerCase().replaceAll(' ', '-');
 
-export const redLetterError = (context: string): never => {
-  throw new ContentBuildError(ContentBuildErrorCode.InvalidRedLetter, context);
-};
+export const redLetterError = buildFailure(ContentBuildErrorCode.InvalidRedLetter);
 
 const redLetterEntryFrom = (value: unknown, context: string): RedLetterEntry => {
   if (value === 'all') {
@@ -66,7 +68,7 @@ const noticeFrom = (value: unknown): string => {
 };
 
 export const redLetterMarkingFrom = (value: unknown): BibleRedLetter => {
-  const database = recordFrom(value, ContentBuildErrorCode.InvalidRedLetter, RED_LETTER_DATABASE);
+  const database = recordFrom(value, RED_LETTER_DATABASE);
 
   return {
     notice: noticeFrom(database['notice']),
@@ -76,21 +78,17 @@ export const redLetterMarkingFrom = (value: unknown): BibleRedLetter => {
 };
 
 export const redLetterBooksFrom = (value: unknown): RedLetterBooks => {
-  const database = recordFrom(value, ContentBuildErrorCode.InvalidRedLetter, RED_LETTER_DATABASE);
+  const database = recordFrom(value, RED_LETTER_DATABASE);
 
   if (database['sourceId'] !== BIBLE_SOURCE_ID) {
     return redLetterError('sourceId');
   }
 
   const books = new Map<string, ReadonlyMap<string, RedLetterEntry>>();
-  const bookRecords = recordFrom(
-    database['books'],
-    ContentBuildErrorCode.InvalidRedLetter,
-    'books',
-  );
+  const bookRecords = recordFrom(database['books'], `${RED_LETTER_DATABASE}.books`);
 
   for (const [bookId, entries] of Object.entries(bookRecords)) {
-    const entryRecords = recordFrom(entries, ContentBuildErrorCode.InvalidRedLetter, bookId);
+    const entryRecords = recordFrom(entries, `${RED_LETTER_DATABASE}.books.${bookId}`);
     const bookEntries = new Map<string, RedLetterEntry>();
 
     for (const [reference, entry] of Object.entries(entryRecords)) {

@@ -1,6 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
-import { MarkGlue } from '../../components/marks/MarkGlue.tsx';
-import { tailStartOf } from '../../shared/text.ts';
+import { GluedTail, MarkGlue } from '../../components/marks/MarkGlue.tsx';
 import { RedLetterMark } from '../../components/marks/Marks.tsx';
 import type { ScriptureRedSpan } from '../../content/schema.ts';
 import { classNames } from '../../shared/classNames.ts';
@@ -33,17 +32,10 @@ const redTextNodes = (text: string, red: readonly ScriptureRedSpan[], mark: RedM
       nodes.push(text.slice(cursor, span.start));
     }
 
-    const body = text.slice(span.start, span.end);
-    const tailStart = tailStartOf(body);
-
     nodes.push(
-      <span className="text-christ" key={span.start}>
-        {body.slice(0, tailStart)}
-      </span>,
-      <MarkGlue key={`${String(span.start)}-mark`}>
-        <span className="text-christ">{body.slice(tailStart)}</span>
+      <GluedTail className="text-christ" key={span.start} text={text.slice(span.start, span.end)}>
         {mark(span.start)}
-      </MarkGlue>,
+      </GluedTail>,
     );
     cursor = span.end;
   }

@@ -1,4 +1,5 @@
 import splashVerses from '../../generated/splash-verses.json';
+import { randomIndex } from '../../shared/random.ts';
 
 export type SplashVerse = {
   readonly reference: string;
@@ -11,13 +12,6 @@ export type SplashIndex = (length: number) => number;
 
 const EMPTY_VERSES_ERROR = 'Splash verses must not be empty';
 const OPENING_VERSES: readonly SplashVerse[] = splashVerses;
-const UINT32_RANGE = 2 ** 32;
-
-export const randomSplashIndex: SplashIndex = (length) => {
-  const [randomValue = 0] = crypto.getRandomValues(new Uint32Array(1));
-
-  return Math.floor((randomValue / UINT32_RANGE) * length);
-};
 
 export const selectSplashVerse = (
   verses: readonly SplashVerse[],
@@ -37,5 +31,4 @@ export const selectSplashVerse = (
   return verse;
 };
 
-export const selectOpeningVerse = (): SplashVerse =>
-  selectSplashVerse(OPENING_VERSES, randomSplashIndex);
+export const selectOpeningVerse = (): SplashVerse => selectSplashVerse(OPENING_VERSES, randomIndex);

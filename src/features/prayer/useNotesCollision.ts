@@ -1,5 +1,5 @@
-import { useLayoutEffect, useState, type RefObject } from 'react';
-
+import { useCallback, type RefObject } from 'react';
+import { useResizeMeasure, type Measurement } from '../../shared/useResizeMeasure.ts';
 import { PENDANT_BEAD_COUNT, type DrapeGeometry } from './drape.ts';
 
 const HEADING_CLEARANCE_RADII = 2.2;
@@ -84,43 +84,26 @@ const collisionOf = (
   return collides ? { collides, collapsedHeight: collapsedHeightOf(box) } : NO_COLLISION;
 };
 
-const sameCollision = (a: NotesCollision, b: NotesCollision): boolean =>
-  a.collides === b.collides && a.collapsedHeight === b.collapsedHeight;
+const COLLISION_MEASUREMENT: Measurement<NotesCollision> = {
+  initial: NO_COLLISION,
+  same: (previous, next) =>
+    previous.collides === next.collides && previous.collapsedHeight === next.collapsedHeight,
+};
 
 export const useNotesCollision = (
   geometry: DrapeGeometry,
   key: string,
   refs: NotesCollisionRefs,
 ): NotesCollision => {
-  const [collision, setCollision] = useState(NO_COLLISION);
   const { artwork, drape, notes } = refs;
+  const measure = useCallback((): NotesCollision => {
+    const drapeElement = drape.current;
+    const notesElement = notes.current;
 
-  useLayoutEffect(() => {
-    const measure = (): void => {
-      const drapeElement = drape.current;
-      const notesElement = notes.current;
-      const next =
-        drapeElement === null || notesElement === null
-          ? NO_COLLISION
-          : collisionOf(drapeElement, notesElement, geometry);
+    return drapeElement === null || notesElement === null
+      ? NO_COLLISION
+      : collisionOf(drapeElement, notesElement, geometry);
+  }, [drape, geometry, notes]);
 
-      setCollision((previous) => (sameCollision(previous, next) ? previous : next));
-    };
-
-    measure();
-
-    const artworkElement = artwork.current;
-
-    if (artworkElement === null || typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(artworkElement);
-
-    return () => observer.disconnect();
-  }, [artwork, drape, geometry, key, notes]);
-
-  return collision;
+  return useResizeMeasure(artwork, measure, COLLISION_MEASUREMENT, key)[0];
 };

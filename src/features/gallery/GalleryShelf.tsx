@@ -1,16 +1,15 @@
 import { resolveArtAsset } from '../../assets/art.ts';
 import type { ResolvedArtwork } from '../../content/catalog.ts';
-import { TrackEdgeControls } from '../../components/TrackEdgeControls.tsx';
-import { useHorizontalTrack } from '../../shared/useHorizontalTrack.ts';
-import { CITATION_CLASS_NAME, HORIZONTAL_TRACK_CLASS_NAME } from '../../styles.ts';
+import { Shelf } from '../../components/layout.tsx';
+import { CITATION_CLASS_NAME } from '../../styles.ts';
 
-const TRACK_CLASS_NAME = `${HORIZONTAL_TRACK_CLASS_NAME} list-none items-start gap-4`;
 const CAPTION_CLASS_NAME = `wrap-break-word ${CITATION_CLASS_NAME}`;
 
 type ArtworkButtonRegistrar = (artworkId: string, button: HTMLButtonElement | null) => void;
 
 type GalleryShelfProps = {
   readonly artworks: readonly ResolvedArtwork[];
+  readonly heading: string | null;
   readonly label: string;
   readonly onOpenArtwork: (artworkId: string) => void;
   readonly registerButton: ArtworkButtonRegistrar;
@@ -61,27 +60,21 @@ function GalleryArtworkCard({ artwork, onOpenArtwork, registerButton }: GalleryA
 
 export function GalleryShelf({
   artworks,
+  heading,
   label,
   onOpenArtwork,
   registerButton,
 }: GalleryShelfProps) {
-  const { edges, handlers, scrollByPage, trackRef } =
-    useHorizontalTrack<HTMLUListElement>(artworks);
-
   return (
-    <div className="@container/gallery group relative flex min-w-0 flex-col">
-      <ul aria-label={label} className={TRACK_CLASS_NAME} ref={trackRef} {...handlers}>
-        {artworks.map((artwork) => (
-          <GalleryArtworkCard
-            artwork={artwork}
-            key={artwork.id}
-            onOpenArtwork={onOpenArtwork}
-            registerButton={registerButton}
-          />
-        ))}
-      </ul>
-
-      <TrackEdgeControls edges={edges} onStep={scrollByPage} />
-    </div>
+    <Shelf items={artworks} label={label} {...(heading === null ? {} : { heading })}>
+      {artworks.map((artwork) => (
+        <GalleryArtworkCard
+          artwork={artwork}
+          key={artwork.id}
+          onOpenArtwork={onOpenArtwork}
+          registerButton={registerButton}
+        />
+      ))}
+    </Shelf>
   );
 }

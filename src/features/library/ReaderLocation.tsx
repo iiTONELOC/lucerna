@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useEscape } from '../../shared/useEscape.ts';
 import { SUBTITLE_CLASS_NAME } from '../../styles.ts';
+import { currentJumpOf, type ReaderJump } from './model.ts';
 import { scrollToBlock, useTopmostBlockIndex, type TopmostTracker } from './useReadingPosition.ts';
 
-export type ReaderJump = {
-  readonly blockIndex: number;
-  readonly label: string;
-  readonly part?: boolean;
-};
-
-export const READER_JUMP_BUTTON_CLASS_NAME = `min-h-11 min-w-9 text-center text-muted transition-colors hover:text-accent-current focus-ring ${SUBTITLE_CLASS_NAME}`;
+const READER_JUMP_BUTTON_CLASS_NAME = `min-h-11 min-w-9 text-center text-muted transition-colors hover:text-accent-current focus-ring ${SUBTITLE_CLASS_NAME}`;
 
 const READER_JUMP_ROW_CLASS_NAME = `min-h-11 w-full text-left font-semibold text-secondary transition-colors hover:text-accent-current focus-ring ${SUBTITLE_CLASS_NAME}`;
 
@@ -64,11 +59,35 @@ const useDismiss = (
   }, [close, containerRef, open]);
 };
 
-const currentJumpOf = (jumps: readonly ReaderJump[], blockIndex: number): ReaderJump | undefined =>
-  jumps.reduce<ReaderJump | undefined>(
-    (current, jump) => (jump.blockIndex <= blockIndex ? jump : current),
-    undefined,
-  );
+export function JumpButtons({
+  ariaLabelOf,
+  articleRef,
+  current,
+  jumps,
+  onJumped,
+}: {
+  readonly ariaLabelOf?: (jump: ReaderJump) => string;
+  readonly articleRef: RefObject<HTMLElement | null>;
+  readonly current?: ReaderJump | undefined;
+  readonly jumps: readonly ReaderJump[];
+  readonly onJumped?: () => void;
+}) {
+  return jumps.map((jump) => (
+    <button
+      aria-label={ariaLabelOf?.(jump)}
+      className={jump.part === true ? READER_JUMP_ROW_CLASS_NAME : READER_JUMP_BUTTON_CLASS_NAME}
+      data-current={jump.blockIndex === current?.blockIndex ? 'true' : 'false'}
+      key={jump.blockIndex}
+      onClick={() => {
+        scrollToBlock(articleRef, jump.blockIndex);
+        onJumped?.();
+      }}
+      type="button"
+    >
+      {jump.label}
+    </button>
+  ));
+}
 
 function JumpPanel({
   articleRef,
@@ -82,7 +101,6 @@ function JumpPanel({
   readonly onJumped: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
-  const current = currentJumpOf(jumps, blockIndex);
 
   useEffect(() => {
     const panel = panelRef.current;
@@ -99,22 +117,12 @@ function JumpPanel({
       ref={panelRef}
     >
       <div className="flex flex-wrap justify-start gap-x-1">
-        {jumps.map((jump) => (
-          <button
-            key={jump.blockIndex}
-            className={
-              jump.part === true ? READER_JUMP_ROW_CLASS_NAME : READER_JUMP_BUTTON_CLASS_NAME
-            }
-            data-current={jump.blockIndex === current?.blockIndex ? 'true' : 'false'}
-            onClick={() => {
-              scrollToBlock(articleRef, jump.blockIndex);
-              onJumped();
-            }}
-            type="button"
-          >
-            {jump.label}
-          </button>
-        ))}
+        <JumpButtons
+          articleRef={articleRef}
+          current={currentJumpOf(jumps, blockIndex)}
+          jumps={jumps}
+          onJumped={onJumped}
+        />
       </div>
     </div>
   );

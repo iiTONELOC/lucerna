@@ -1,17 +1,10 @@
 import { contentCatalog, type ResolvedLibraryWork } from '../../content/catalog.ts';
 import { LibraryCategory } from '../../content/schema.ts';
-import { TrackEdgeControls } from '../../components/TrackEdgeControls.tsx';
-import { useHorizontalTrack } from '../../shared/useHorizontalTrack.ts';
-import {
-  CITATION_CLASS_NAME,
-  EYEBROW_CLASS_NAME,
-  HORIZONTAL_TRACK_CLASS_NAME,
-  TITLE_CLASS_NAME,
-} from '../../styles.ts';
+import { Shelf, ViewHeader } from '../../components/layout.tsx';
+import { CITATION_CLASS_NAME, NAV_CLASS_NAME } from '../../styles.ts';
 import { BIBLE_EDITION, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL } from './model.ts';
 
 const LIBRARY_TITLE_ID = 'library-title';
-const TRACK_CLASS_NAME = `${HORIZONTAL_TRACK_CLASS_NAME} list-none items-start gap-4`;
 
 type LibraryViewProps = {
   readonly onOpenBible: () => void;
@@ -20,12 +13,12 @@ type LibraryViewProps = {
 
 function LibraryHeader() {
   return (
-    <header className="flex flex-col gap-2 pt-2">
-      <p className={EYEBROW_CLASS_NAME}>Texts for prayer and study</p>
-      <h1 className={TITLE_CLASS_NAME} id={LIBRARY_TITLE_ID}>
-        The Library
-      </h1>
-    </header>
+    <ViewHeader
+      className="gap-2 pt-2"
+      eyebrow="Texts for prayer and study"
+      id={LIBRARY_TITLE_ID}
+      title="The Library"
+    />
   );
 }
 
@@ -46,9 +39,7 @@ function ShelfCard({
         type="button"
       >
         <span aria-hidden="true" className="h-1 w-10 shrink-0 rounded-full bg-accent" />
-        <span className="font-display text-nav leading-nav font-medium text-foreground">
-          {title}
-        </span>
+        <span className={`${NAV_CLASS_NAME} font-medium text-foreground`}>{title}</span>
         <span className={`small-caps mt-auto ${CITATION_CLASS_NAME} text-muted`}>{detail}</span>
       </button>
     </li>
@@ -72,22 +63,15 @@ type LibraryShelfProps = {
 };
 
 function LibraryShelf({ label, onOpenBible, onOpenWork, works }: LibraryShelfProps) {
-  const { edges, handlers, scrollByPage, trackRef } = useHorizontalTrack<HTMLUListElement>(works);
-
   return (
-    <section className="@container/library group relative flex min-w-0 flex-col gap-3">
-      <h2 className={`${TITLE_CLASS_NAME} border-b border-hairline pb-2`}>{label}</h2>
-      <ul aria-label={label} className={TRACK_CLASS_NAME} ref={trackRef} {...handlers}>
-        {onOpenBible === undefined ? null : (
-          <ShelfCard detail={BIBLE_EDITION} onOpen={onOpenBible} title={BIBLE_TITLE} />
-        )}
-        {works.map((work) => (
-          <WorkCard key={work.id} onOpenWork={onOpenWork} work={work} />
-        ))}
-      </ul>
-
-      <TrackEdgeControls edges={edges} onStep={scrollByPage} />
-    </section>
+    <Shelf heading={label} items={works} label={label}>
+      {onOpenBible === undefined ? null : (
+        <ShelfCard detail={BIBLE_EDITION} onOpen={onOpenBible} title={BIBLE_TITLE} />
+      )}
+      {works.map((work) => (
+        <WorkCard key={work.id} onOpenWork={onOpenWork} work={work} />
+      ))}
+    </Shelf>
   );
 }
 

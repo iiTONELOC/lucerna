@@ -1,10 +1,11 @@
-import { access } from 'fs/promises';
-import { fileURLToPath } from 'url';
-
 import {
+  arrayFrom,
   DEVOTIONAL_SCHEMA_VERSION,
   devotionalContentFrom,
   guidanceStatementsOf,
+  positiveIntegerFrom,
+  recordFrom,
+  stringFrom,
   type Artwork,
   type DevotionalContent,
   type DevotionalSource,
@@ -15,14 +16,7 @@ import {
   type Prayer,
   type SourceReference,
 } from '../../src/content/schema.ts';
-import {
-  ContentBuildError,
-  ContentBuildErrorCode,
-  readJsonFile,
-  recordFrom,
-  requiredPositiveInteger,
-  requiredString,
-} from './records.ts';
+import { buildFailure, ContentBuildErrorCode, readJsonFile, sourceRecordOf } from './records.ts';
 import {
   RED_LETTER_DATABASE,
   bibleBookIdentifierFrom,
@@ -33,6 +27,7 @@ import { reflectionBlockIndexOf, reflectionTextFrom } from './reflections.ts';
 import {
   extractPassageContent,
   SCRIPTURE_SOURCE_DIRECTORY,
+  sourceBookOf,
   type ScriptureRange,
   validateScriptureRange,
 } from './scripture.ts';
@@ -55,17 +50,7 @@ type RelationshipContext = {
   readonly sources: ReadonlyMap<string, DevotionalSource>;
 };
 
-const fail = (context: string): never => {
-  throw new ContentBuildError(ContentBuildErrorCode.InvalidField, context);
-};
-
-const arrayFrom = (value: unknown, context: string): readonly unknown[] => {
-  if (!Array.isArray(value)) {
-    return fail(context);
-  }
-
-  return value;
-};
+const fail = buildFailure(ContentBuildErrorCode.InvalidField);
 
 const uniqueMap = <RecordType extends { readonly id: string }>(
   records: readonly RecordType[],
@@ -88,23 +73,10 @@ const requireSource = (
   sourceId: string,
 ): DevotionalSource => requireId(sources, sourceId, 'source');
 
-const sourceEntriesFrom = (value: unknown): readonly JsonRecord[] => {
-  const sources = recordFrom(value, ContentBuildErrorCode.InvalidField, 'sources');
-
-  return Object.entries(sources)
+const sourceEntriesFrom = (value: unknown): readonly JsonRecord[] =>
+  Object.entries(recordFrom(value, 'sources'))
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([id, source]) => ({
-      id,
-      ...recordFrom(source, ContentBuildErrorCode.InvalidField, `source ${id}`),
-    }));
-};
-
-const sourceHeaderFrom = (source: string): string | undefined =>
-  source
-    .split(/\r?\n/u)
-    .find((line) => line.startsWith(String.raw`\h `))
-    ?.slice(3)
-    .trim();
+    .map(([id, source]) => ({ id, ...recordFrom(source, `sources.${id}`) }));
 
 const sourceFilesForBooks = async (
   books: ReadonlySet<string>,
@@ -114,7 +86,7 @@ const sourceFilesForBooks = async (
   const filenames: string[] = [];
 
   for await (const filename of new Bun.Glob('*.sfm').scan({
-    cwd: fileURLToPath(sourceDirectory),
+    cwd: sourceDirectory.pathname,
     onlyFiles: true,
   })) {
     filenames.push(filename);
@@ -125,7 +97,7 @@ const sourceFilesForBooks = async (
 
   for (const filename of filenames) {
     const source = await Bun.file(new URL(filename, sourceDirectory)).text();
-    const book = sourceHeaderFrom(source);
+    const book = sourceBookOf(source);
 
     if (book === undefined || !books.has(book)) {
       continue;
@@ -145,18 +117,19 @@ const sourceFilesForBooks = async (
   return sourceFiles;
 };
 
-const scriptureBook = (scripture: JsonRecord): string => requiredString(scripture, 'book');
+const scriptureBook = (scripture: JsonRecord): string => stringFrom(scripture, 'book', 'scripture');
+
+const mysterySetPath = (setIndex: number): string => `rosary.mysterySets[${setIndex}]`;
+
+const mysteryPath = (setIndex: number, index: number): string =>
+  `${mysterySetPath(setIndex)}.mysteries[${index}]`;
 
 const mysteryRecordsFrom = (rosary: JsonRecord): readonly JsonRecord[] =>
-  arrayFrom(rosary.mysterySets, 'mystery sets').flatMap((value, setIndex) => {
-    const mysterySet = recordFrom(
-      value,
-      ContentBuildErrorCode.InvalidField,
-      `mystery set ${setIndex}`,
-    );
+  arrayFrom(rosary.mysterySets, 'rosary.mysterySets').flatMap((value, setIndex) => {
+    const mysterySet = recordFrom(value, mysterySetPath(setIndex));
 
-    return arrayFrom(mysterySet.mysteries, `mysteries ${setIndex}`).map((mystery, index) =>
-      recordFrom(mystery, ContentBuildErrorCode.InvalidField, `mystery ${setIndex}.${index}`),
+    return arrayFrom(mysterySet.mysteries, `${mysterySetPath(setIndex)}.mysteries`).map(
+      (mystery, index) => recordFrom(mystery, mysteryPath(setIndex, index)),
     );
   });
 
@@ -175,9 +148,8 @@ const reflectionSourceLoaderFrom = (
       return cached;
     }
 
-    const records = recordFrom(sources, ContentBuildErrorCode.MissingSource, sourceId);
-    const source = recordFrom(records[sourceId], ContentBuildErrorCode.MissingSource, sourceId);
-    const loaded = Bun.file(new URL(requiredString(source, 'path'), repositoryRoot)).text();
+    const path = stringFrom(sourceRecordOf(sources, sourceId), 'path', `sources.${sourceId}`);
+    const loaded = Bun.file(new URL(path, repositoryRoot)).text();
 
     cache.set(sourceId, loaded);
     return loaded;
@@ -189,19 +161,15 @@ const enrichReflection = async (
   loadReflectionSource: ReflectionSourceLoader,
   library: LibraryContent,
 ): Promise<JsonRecord> => {
-  const reflection = recordFrom(
-    mystery['reflection'],
-    ContentBuildErrorCode.InvalidField,
-    'reflection',
-  );
+  const reflection = recordFrom(mystery['reflection'], 'reflection');
 
-  if (requiredString(reflection, 'status') !== 'mapped') {
+  if (stringFrom(reflection, 'status', 'reflection') !== 'mapped') {
     return reflection;
   }
 
-  const sourceId = requiredString(reflection, 'sourceId');
+  const sourceId = stringFrom(reflection, 'sourceId', 'reflection');
   const text = reflectionTextFrom(
-    requiredString(reflection, 'sectionId'),
+    stringFrom(reflection, 'sectionId', 'reflection'),
     await loadReflectionSource(sourceId),
   );
 
@@ -230,18 +198,14 @@ const enrichMystery = async (
     redLetter,
   }: MysteryEnrichmentContext,
 ): Promise<JsonRecord> => {
-  const scripture = recordFrom(
-    mystery['scripture'],
-    ContentBuildErrorCode.InvalidField,
-    'scripture',
-  );
+  const scripture = recordFrom(mystery['scripture'], 'scripture');
   const book = scriptureBook(scripture);
   const range: ScriptureRange = {
-    reference: requiredString(scripture, 'reference'),
+    reference: stringFrom(scripture, 'reference', 'scripture'),
     book,
-    chapter: requiredPositiveInteger(scripture, 'chapter'),
-    verseStart: requiredPositiveInteger(scripture, 'verseStart'),
-    verseEnd: requiredPositiveInteger(scripture, 'verseEnd'),
+    chapter: positiveIntegerFrom(scripture, 'chapter', 'scripture'),
+    verseStart: positiveIntegerFrom(scripture, 'verseStart', 'scripture'),
+    verseEnd: positiveIntegerFrom(scripture, 'verseEnd', 'scripture'),
     sourceFile: requireId(sourceFiles, book, 'scripture book'),
   };
 
@@ -269,31 +233,27 @@ const enrichRosary = async (
   library: LibraryContent,
   repositoryRoot: URL,
 ): Promise<JsonRecord> => {
-  const rosary = recordFrom(value, ContentBuildErrorCode.InvalidField, 'rosary');
+  const rosary = recordFrom(value, 'rosary');
   const mysteries = mysteryRecordsFrom(rosary);
   const books = new Set(
-    mysteries.map((mystery) =>
-      scriptureBook(
-        recordFrom(mystery['scripture'], ContentBuildErrorCode.InvalidField, 'scripture'),
-      ),
-    ),
+    mysteries.map((mystery) => scriptureBook(recordFrom(mystery['scripture'], 'scripture'))),
   );
   const sourceFiles = await sourceFilesForBooks(books, repositoryRoot);
   const loadReflectionSource = reflectionSourceLoaderFrom(sources, repositoryRoot);
   const redLetter = redLetterBooksFrom(await readJsonFile(RED_LETTER_DATABASE, repositoryRoot));
   const mysterySets = await Promise.all(
-    arrayFrom(rosary.mysterySets, 'mystery sets').map(async (value, setIndex) => {
-      const mysterySet = recordFrom(
-        value,
-        ContentBuildErrorCode.InvalidField,
-        `mystery set ${setIndex}`,
-      );
+    arrayFrom(rosary.mysterySets, 'rosary.mysterySets').map(async (value, setIndex) => {
+      const mysterySet = recordFrom(value, mysterySetPath(setIndex));
       const enrichedMysteries = await Promise.all(
-        arrayFrom(mysterySet.mysteries, `mysteries ${setIndex}`).map((mystery, index) =>
-          enrichMystery(
-            recordFrom(mystery, ContentBuildErrorCode.InvalidField, `mystery ${setIndex}.${index}`),
-            { sourceFiles, loadReflectionSource, library, repositoryRoot, redLetter },
-          ),
+        arrayFrom(mysterySet.mysteries, `${mysterySetPath(setIndex)}.mysteries`).map(
+          (mystery, index) =>
+            enrichMystery(recordFrom(mystery, mysteryPath(setIndex, index)), {
+              sourceFiles,
+              loadReflectionSource,
+              library,
+              repositoryRoot,
+              redLetter,
+            }),
         ),
       );
 
@@ -340,7 +300,7 @@ const validateFiles = async (content: DevotionalContent, repositoryRoot: URL): P
         fail(`source path ${source.path}`);
       }
 
-      await access(new URL(source.path, repositoryRoot));
+      await Bun.file(new URL(source.path, repositoryRoot)).stat();
     }
   }
 

@@ -1,4 +1,4 @@
-import { isRecord } from '../../shared/guards.ts';
+import { isRecord, type UnknownRecord } from '../../shared/guards.ts';
 
 export enum Theme {
   EternalLight = 'dark',
@@ -82,6 +82,8 @@ export type Preferences = {
   readonly updateChecks: UpdateChecks;
 };
 
+export type PreferenceKey = keyof Preferences;
+
 export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   theme: Theme.EternalLight,
   textScale: TextScale.Standard,
@@ -110,92 +112,28 @@ const defaultBeadMaterialFor = (theme: Theme): BeadMaterial =>
 
 export enum PreferencesActionType {
   Hydrate = 'hydrate',
-  SetTheme = 'set-theme',
-  SetTextScale = 'set-text-scale',
-  SetReaderFace = 'set-reader-face',
-  SetReaderTextScale = 'set-reader-text-scale',
-  SetReaderGround = 'set-reader-ground',
-  SetShowRedLetter = 'set-show-red-letter',
-  SetOpeningDuration = 'set-opening-duration',
-  SetReadingSpeed = 'set-reading-speed',
-  SetBeadMaterial = 'set-bead-material',
-  SetShowGuidance = 'set-show-guidance',
-  SetReadGuidance = 'set-read-guidance',
-  SetShowDecadeOfferings = 'set-show-decade-offerings',
-  SetReadDecadeOfferings = 'set-read-decade-offerings',
-  SetShowDropCaps = 'set-show-drop-caps',
-  SetShowMysteryFruits = 'set-show-mystery-fruits',
-  SetReadMysteryFruits = 'set-read-mystery-fruits',
-  SetShowScriptureReadings = 'set-show-scripture-readings',
-  SetIncludeFatimaPrayer = 'set-include-fatima-prayer',
-  SetConfirmExternalLinks = 'set-confirm-external-links',
-  SetUpdateChecks = 'set-update-checks',
+  Set = 'set',
 }
+
+export type SetPreferenceAction<Key extends PreferenceKey = PreferenceKey> = {
+  readonly type: PreferencesActionType.Set;
+  readonly key: Key;
+  readonly value: Preferences[Key];
+};
 
 export type PreferencesAction =
   | { readonly type: PreferencesActionType.Hydrate; readonly preferences: unknown }
-  | { readonly type: PreferencesActionType.SetTheme; readonly theme: Theme }
-  | { readonly type: PreferencesActionType.SetTextScale; readonly textScale: TextScale }
-  | { readonly type: PreferencesActionType.SetReaderFace; readonly readerFace: ReaderFace }
-  | {
-      readonly type: PreferencesActionType.SetReaderTextScale;
-      readonly readerTextScale: TextScale;
-    }
-  | { readonly type: PreferencesActionType.SetReaderGround; readonly readerGround: ReaderGround }
-  | { readonly type: PreferencesActionType.SetShowRedLetter; readonly showRedLetter: boolean }
-  | {
-      readonly type: PreferencesActionType.SetOpeningDuration;
-      readonly openingDuration: OpeningDuration;
-    }
-  | { readonly type: PreferencesActionType.SetReadingSpeed; readonly readingSpeed: number }
-  | { readonly type: PreferencesActionType.SetBeadMaterial; readonly beadMaterial: BeadMaterial }
-  | { readonly type: PreferencesActionType.SetShowGuidance; readonly showGuidance: boolean }
-  | { readonly type: PreferencesActionType.SetReadGuidance; readonly readGuidance: boolean }
-  | {
-      readonly type: PreferencesActionType.SetShowDecadeOfferings;
-      readonly showDecadeOfferings: boolean;
-    }
-  | {
-      readonly type: PreferencesActionType.SetReadDecadeOfferings;
-      readonly readDecadeOfferings: boolean;
-    }
-  | { readonly type: PreferencesActionType.SetShowDropCaps; readonly showDropCaps: boolean }
-  | {
-      readonly type: PreferencesActionType.SetShowMysteryFruits;
-      readonly showMysteryFruits: boolean;
-    }
-  | {
-      readonly type: PreferencesActionType.SetReadMysteryFruits;
-      readonly readMysteryFruits: boolean;
-    }
-  | {
-      readonly type: PreferencesActionType.SetShowScriptureReadings;
-      readonly showScriptureReadings: boolean;
-    }
-  | {
-      readonly type: PreferencesActionType.SetIncludeFatimaPrayer;
-      readonly includeFatimaPrayer: boolean;
-    }
-  | {
-      readonly type: PreferencesActionType.SetConfirmExternalLinks;
-      readonly confirmExternalLinks: boolean;
-    }
-  | { readonly type: PreferencesActionType.SetUpdateChecks; readonly updateChecks: UpdateChecks };
+  | SetPreferenceAction;
 
-const memberFrom = <Member extends string>(
-  members: readonly Member[],
-  value: unknown,
-): Member | null => {
-  for (const member of members) {
-    if (value === member) {
-      return member;
-    }
-  }
+type PreferenceParser<Value> = (value: unknown) => Value | null;
 
-  return null;
-};
+const memberOf =
+  <Member extends string>(members: readonly Member[]): PreferenceParser<Member> =>
+  (value) =>
+    members.find((member) => member === value) ?? null;
 
-const booleanFrom = (value: unknown): boolean | null => (typeof value === 'boolean' ? value : null);
+const booleanFrom: PreferenceParser<boolean> = (value) =>
+  typeof value === 'boolean' ? value : null;
 
 const LEGACY_READING_SPEEDS: Readonly<Record<string, number>> = Object.freeze({
   unhurried: ReadingSpeed.Unhurried,
@@ -203,7 +141,7 @@ const LEGACY_READING_SPEEDS: Readonly<Record<string, number>> = Object.freeze({
   brisk: ReadingSpeed.Brisk,
 });
 
-const readingSpeedFrom = (value: unknown): number | null => {
+const readingSpeedFrom: PreferenceParser<number> = (value) => {
   const legacy = typeof value === 'string' ? LEGACY_READING_SPEEDS[value] : value;
 
   if (
@@ -218,99 +156,56 @@ const readingSpeedFrom = (value: unknown): number | null => {
   return Number((Math.round(legacy / READING_SPEED_STEP) * READING_SPEED_STEP).toFixed(2));
 };
 
-const storedOr = <Value>(
-  stored: unknown,
-  fallback: Value,
-  parse: (value: unknown) => Value | null,
-): Value | null => (stored === undefined ? fallback : parse(stored));
+const optional =
+  <Key extends PreferenceKey>(
+    key: Key,
+    parse: PreferenceParser<Preferences[Key]>,
+  ): PreferenceParser<Preferences[Key]> =>
+  (value) =>
+    value === undefined ? DEFAULT_PREFERENCES[key] : parse(value);
 
 type ParsedPreferences = {
-  readonly [Key in keyof Preferences]: Preferences[Key] | null;
+  readonly [Key in PreferenceKey]: Preferences[Key] | null;
 };
 
-const optionalBooleanFrom = (
-  raw: Record<string, unknown>,
-  key: keyof Preferences,
-  fallback: boolean,
-): boolean | null => storedOr(raw[key], fallback, booleanFrom);
+const textScaleFrom = memberOf(Object.values(TextScale));
 
-type ReaderPreferenceKey = 'readerFace' | 'readerTextScale' | 'readerGround' | 'showRedLetter';
-
-const parsedReaderPreferencesFrom = (
-  raw: Record<string, unknown>,
-): Pick<ParsedPreferences, ReaderPreferenceKey> => ({
-  readerFace: storedOr(raw['readerFace'], DEFAULT_PREFERENCES.readerFace, (value) =>
-    memberFrom(Object.values(ReaderFace), value),
-  ),
-  readerTextScale: storedOr(raw['readerTextScale'], DEFAULT_PREFERENCES.readerTextScale, (value) =>
-    memberFrom(Object.values(TextScale), value),
-  ),
-  readerGround: storedOr(raw['readerGround'], DEFAULT_PREFERENCES.readerGround, (value) =>
-    memberFrom(Object.values(ReaderGround), value),
-  ),
-  showRedLetter: optionalBooleanFrom(raw, 'showRedLetter', DEFAULT_PREFERENCES.showRedLetter),
-});
-
-type PlaybackNotePreferenceKey = 'readGuidance' | 'readDecadeOfferings' | 'readMysteryFruits';
-
-const parsedPlaybackNotePreferencesFrom = (
-  raw: Record<string, unknown>,
-): Pick<ParsedPreferences, PlaybackNotePreferenceKey> => ({
-  readGuidance: optionalBooleanFrom(raw, 'readGuidance', DEFAULT_PREFERENCES.readGuidance),
-  readDecadeOfferings: optionalBooleanFrom(
-    raw,
-    'readDecadeOfferings',
-    DEFAULT_PREFERENCES.readDecadeOfferings,
-  ),
-  readMysteryFruits: optionalBooleanFrom(
-    raw,
-    'readMysteryFruits',
-    DEFAULT_PREFERENCES.readMysteryFruits,
-  ),
-});
-
-const parsedPreferencesFrom = (raw: Record<string, unknown>): ParsedPreferences => ({
-  theme: memberFrom(Object.values(Theme), raw['theme']),
-  textScale: memberFrom(Object.values(TextScale), raw['textScale']),
-  ...parsedReaderPreferencesFrom(raw),
-  ...parsedPlaybackNotePreferencesFrom(raw),
-  openingDuration: storedOr(raw['openingDuration'], DEFAULT_PREFERENCES.openingDuration, (value) =>
-    memberFrom(Object.values(OpeningDuration), value),
-  ),
-  readingSpeed: storedOr(raw['readingSpeed'], DEFAULT_PREFERENCES.readingSpeed, readingSpeedFrom),
-  beadMaterial: storedOr(raw['beadMaterial'], DEFAULT_PREFERENCES.beadMaterial, (value) =>
-    memberFrom(Object.values(BeadMaterial), value),
-  ),
-  showGuidance: optionalBooleanFrom(raw, 'showGuidance', DEFAULT_PREFERENCES.showGuidance),
-  showDecadeOfferings: optionalBooleanFrom(
-    raw,
-    'showDecadeOfferings',
-    DEFAULT_PREFERENCES.showDecadeOfferings,
-  ),
-  showDropCaps: optionalBooleanFrom(raw, 'showDropCaps', DEFAULT_PREFERENCES.showDropCaps),
-  showMysteryFruits: optionalBooleanFrom(
-    raw,
-    'showMysteryFruits',
-    DEFAULT_PREFERENCES.showMysteryFruits,
-  ),
-  showScriptureReadings: optionalBooleanFrom(
-    raw,
+const parsedPreferencesFrom = (raw: UnknownRecord): ParsedPreferences => ({
+  theme: memberOf(Object.values(Theme))(raw['theme']),
+  textScale: textScaleFrom(raw['textScale']),
+  readerFace: optional('readerFace', memberOf(Object.values(ReaderFace)))(raw['readerFace']),
+  readerTextScale: optional('readerTextScale', textScaleFrom)(raw['readerTextScale']),
+  readerGround: optional(
+    'readerGround',
+    memberOf(Object.values(ReaderGround)),
+  )(raw['readerGround']),
+  showRedLetter: optional('showRedLetter', booleanFrom)(raw['showRedLetter']),
+  openingDuration: optional(
+    'openingDuration',
+    memberOf(Object.values(OpeningDuration)),
+  )(raw['openingDuration']),
+  readingSpeed: optional('readingSpeed', readingSpeedFrom)(raw['readingSpeed']),
+  beadMaterial: optional(
+    'beadMaterial',
+    memberOf(Object.values(BeadMaterial)),
+  )(raw['beadMaterial']),
+  showGuidance: optional('showGuidance', booleanFrom)(raw['showGuidance']),
+  readGuidance: optional('readGuidance', booleanFrom)(raw['readGuidance']),
+  showDecadeOfferings: optional('showDecadeOfferings', booleanFrom)(raw['showDecadeOfferings']),
+  readDecadeOfferings: optional('readDecadeOfferings', booleanFrom)(raw['readDecadeOfferings']),
+  showDropCaps: optional('showDropCaps', booleanFrom)(raw['showDropCaps']),
+  showMysteryFruits: optional('showMysteryFruits', booleanFrom)(raw['showMysteryFruits']),
+  readMysteryFruits: optional('readMysteryFruits', booleanFrom)(raw['readMysteryFruits']),
+  showScriptureReadings: optional(
     'showScriptureReadings',
-    DEFAULT_PREFERENCES.showScriptureReadings,
-  ),
-  includeFatimaPrayer: optionalBooleanFrom(
-    raw,
-    'includeFatimaPrayer',
-    DEFAULT_PREFERENCES.includeFatimaPrayer,
-  ),
-  confirmExternalLinks: optionalBooleanFrom(
-    raw,
-    'confirmExternalLinks',
-    DEFAULT_PREFERENCES.confirmExternalLinks,
-  ),
-  updateChecks: storedOr(raw['updateChecks'], DEFAULT_PREFERENCES.updateChecks, (value) =>
-    memberFrom(Object.values(UpdateChecks), value),
-  ),
+    booleanFrom,
+  )(raw['showScriptureReadings']),
+  includeFatimaPrayer: optional('includeFatimaPrayer', booleanFrom)(raw['includeFatimaPrayer']),
+  confirmExternalLinks: optional('confirmExternalLinks', booleanFrom)(raw['confirmExternalLinks']),
+  updateChecks: optional(
+    'updateChecks',
+    memberOf(Object.values(UpdateChecks)),
+  )(raw['updateChecks']),
 });
 
 const isCompletePreferences = (preferences: ParsedPreferences): preferences is Preferences =>
@@ -325,123 +220,14 @@ export const parsePreferences = (raw: unknown): Preferences => {
   return isCompletePreferences(preferences) ? preferences : DEFAULT_PREFERENCES;
 };
 
-type DirectPreferencesAction = Exclude<
-  PreferencesAction,
-  {
-    readonly type:
-      | PreferencesActionType.Hydrate
-      | PreferencesActionType.SetConfirmExternalLinks
-      | PreferencesActionType.SetTheme;
-  }
->;
-
-type ReadingPreferencesAction = Extract<
-  DirectPreferencesAction,
-  {
-    readonly type:
-      | PreferencesActionType.SetShowGuidance
-      | PreferencesActionType.SetReadGuidance
-      | PreferencesActionType.SetShowDecadeOfferings
-      | PreferencesActionType.SetReadDecadeOfferings
-      | PreferencesActionType.SetShowDropCaps
-      | PreferencesActionType.SetShowMysteryFruits
-      | PreferencesActionType.SetReadMysteryFruits
-      | PreferencesActionType.SetShowScriptureReadings
-      | PreferencesActionType.SetShowRedLetter
-      | PreferencesActionType.SetIncludeFatimaPrayer;
-  }
->;
-
-type PlaybackNotePreferencesAction = Extract<
-  ReadingPreferencesAction,
-  {
-    readonly type:
-      | PreferencesActionType.SetReadGuidance
-      | PreferencesActionType.SetReadDecadeOfferings
-      | PreferencesActionType.SetReadMysteryFruits;
-  }
->;
-
-const reducePlaybackNotePreference = (
-  state: Preferences,
-  action: PlaybackNotePreferencesAction,
-): Preferences => {
-  switch (action.type) {
-    case PreferencesActionType.SetReadGuidance:
-      return { ...state, readGuidance: action.readGuidance };
-    case PreferencesActionType.SetReadDecadeOfferings:
-      return { ...state, readDecadeOfferings: action.readDecadeOfferings };
-    case PreferencesActionType.SetReadMysteryFruits:
-      return { ...state, readMysteryFruits: action.readMysteryFruits };
-  }
-};
-
-const reduceReadingPreference = (
-  state: Preferences,
-  action: ReadingPreferencesAction,
-): Preferences => {
-  switch (action.type) {
-    case PreferencesActionType.SetShowGuidance:
-      return { ...state, showGuidance: action.showGuidance };
-    case PreferencesActionType.SetShowDecadeOfferings:
-      return { ...state, showDecadeOfferings: action.showDecadeOfferings };
-    case PreferencesActionType.SetShowDropCaps:
-      return { ...state, showDropCaps: action.showDropCaps };
-    case PreferencesActionType.SetShowMysteryFruits:
-      return { ...state, showMysteryFruits: action.showMysteryFruits };
-    case PreferencesActionType.SetShowScriptureReadings:
-      return { ...state, showScriptureReadings: action.showScriptureReadings };
-    case PreferencesActionType.SetShowRedLetter:
-      return { ...state, showRedLetter: action.showRedLetter };
-    case PreferencesActionType.SetIncludeFatimaPrayer:
-      return { ...state, includeFatimaPrayer: action.includeFatimaPrayer };
-    default:
-      return reducePlaybackNotePreference(state, action);
-  }
-};
-
-const reduceDirectPreference = (
-  state: Preferences,
-  action: DirectPreferencesAction,
-): Preferences => {
-  switch (action.type) {
-    case PreferencesActionType.SetTextScale:
-      return { ...state, textScale: action.textScale };
-    case PreferencesActionType.SetReaderFace:
-      return { ...state, readerFace: action.readerFace };
-    case PreferencesActionType.SetReaderTextScale:
-      return { ...state, readerTextScale: action.readerTextScale };
-    case PreferencesActionType.SetReaderGround:
-      return { ...state, readerGround: action.readerGround };
-    case PreferencesActionType.SetOpeningDuration:
-      return { ...state, openingDuration: action.openingDuration };
-    case PreferencesActionType.SetReadingSpeed:
-      return { ...state, readingSpeed: action.readingSpeed };
-    case PreferencesActionType.SetBeadMaterial:
-      return { ...state, beadMaterial: action.beadMaterial };
-    case PreferencesActionType.SetUpdateChecks:
-      return { ...state, updateChecks: action.updateChecks };
-    default:
-      return reduceReadingPreference(state, action);
-  }
-};
-
 export const preferencesReducer = (state: Preferences, action: PreferencesAction): Preferences => {
   if (action.type === PreferencesActionType.Hydrate) {
     return parsePreferences(action.preferences);
   }
 
-  if (action.type === PreferencesActionType.SetTheme) {
-    return {
-      ...state,
-      theme: action.theme,
-      beadMaterial: defaultBeadMaterialFor(action.theme),
-    };
-  }
+  const next: Preferences = { ...state, [action.key]: action.value };
 
-  if (action.type === PreferencesActionType.SetConfirmExternalLinks) {
-    return { ...state, confirmExternalLinks: action.confirmExternalLinks };
-  }
-
-  return reduceDirectPreference(state, action);
+  return action.key === 'theme'
+    ? { ...next, beadMaterial: defaultBeadMaterialFor(next.theme) }
+    : next;
 };

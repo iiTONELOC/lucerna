@@ -1,15 +1,7 @@
-const installImageModules = import.meta.glob('./install/*.avif', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-}) as Record<string, string>;
+import { assetResolverFor } from './resolve.ts';
 
-export function resolveInstallAsset(file: string): string {
-  const assetUrl = installImageModules[`./install/${file}`];
-
-  if (assetUrl === undefined) {
-    throw new Error(`Missing install asset: ${file}`);
-  }
-
-  return assetUrl;
-}
+export const resolveInstallAsset = assetResolverFor(
+  import.meta.glob<string>('./install/*.avif', { eager: true, query: '?url', import: 'default' }),
+  './install/',
+  'install',
+);

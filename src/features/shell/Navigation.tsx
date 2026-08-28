@@ -1,30 +1,18 @@
 import type { ReactNode } from 'react';
 import lucernaMark from '../../assets/brand/lucerna-mark.svg';
+import { Chevron } from '../../components/icons/Chevron.tsx';
+import { ChevronDirection } from '../../components/icons/model.ts';
 import { SettingsGlyph } from '../../components/icons/SettingsGlyph.tsx';
+import { classNames } from '../../shared/classNames.ts';
+import { capitalize } from '../../shared/text.ts';
 import { Theme } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { BODY_CLASS_NAME } from '../../styles.ts';
-import { ApplicationView, applicationViewLabel } from './model.ts';
+import { ApplicationView } from './model.ts';
 
 const MARK_BACKDROP_CLASS_NAME = 'rounded-xl';
 
 const RAIL_ICON_SIZE_CLASS_NAME = 'size-5';
-
-function ExpandGlyph({ expanded }: { readonly expanded: boolean }) {
-  const points = expanded ? '14 6 8 12 14 18' : '10 6 16 12 10 18';
-
-  return (
-    <svg aria-hidden="true" className={RAIL_ICON_SIZE_CLASS_NAME} fill="none" viewBox="0 0 24 24">
-      <polyline
-        points={points}
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-      />
-    </svg>
-  );
-}
 
 const VIEW_ICONS: Readonly<Record<ApplicationView, ReactNode>> = {
   [ApplicationView.Rosary]: (
@@ -81,8 +69,54 @@ const PRIMARY_NAVIGATION_VIEWS: readonly ApplicationView[] = [
 const SELECTED_ITEM_CLASS_NAME = 'bg-accent/10 text-foreground';
 const RESTING_ITEM_CLASS_NAME = 'text-muted hover:bg-foreground/5 hover:text-foreground';
 
-const itemStateClassName = (selected: boolean): string =>
-  selected ? SELECTED_ITEM_CLASS_NAME : RESTING_ITEM_CLASS_NAME;
+const QUICK_NAV_ITEM_CLASS_NAME =
+  'focus-ring flex size-11 items-center justify-center rounded-md transition-colors';
+
+const RAIL_ITEM_CLASS_NAME =
+  'focus-ring flex min-h-9 items-center gap-3 rounded-md px-3 py-2 transition-colors pointer-coarse:min-h-11';
+
+const railItemClassName = (expanded: boolean): string =>
+  classNames(RAIL_ITEM_CLASS_NAME, !expanded && 'justify-center');
+
+type NavItemProps = {
+  readonly ariaExpanded?: boolean;
+  readonly className: string;
+  readonly icon: ReactNode;
+  readonly label: string;
+  readonly onSelect: () => void;
+  readonly selected?: boolean;
+  readonly text?: string;
+};
+
+function NavItem({
+  ariaExpanded,
+  className,
+  icon,
+  label,
+  onSelect,
+  selected = false,
+  text,
+}: NavItemProps) {
+  const named = text === label ? undefined : label;
+
+  return (
+    <button
+      aria-current={selected ? 'page' : undefined}
+      aria-expanded={ariaExpanded}
+      aria-label={named}
+      className={classNames(
+        className,
+        selected ? SELECTED_ITEM_CLASS_NAME : RESTING_ITEM_CLASS_NAME,
+      )}
+      onClick={onSelect}
+      title={named}
+      type="button"
+    >
+      {icon}
+      {text === undefined ? null : <span className={BODY_CLASS_NAME}>{text}</span>}
+    </button>
+  );
+}
 
 function LanternButton({
   className,
@@ -115,48 +149,63 @@ export function LanternTrigger({ onGoHome }: LanternTriggerProps) {
   return <LanternButton className="size-10" onGoHome={onGoHome} />;
 }
 
+type ViewNavigationProps = {
+  readonly activeView: ApplicationView;
+  readonly itemClassName: string;
+  readonly onSelectView: (view: ApplicationView) => void;
+  readonly showLabels: boolean;
+  readonly views: readonly ApplicationView[];
+};
+
+function ViewItems({
+  activeView,
+  itemClassName,
+  onSelectView,
+  showLabels,
+  views,
+}: ViewNavigationProps) {
+  return views.map((view) => {
+    const label = capitalize(view);
+
+    return (
+      <NavItem
+        className={itemClassName}
+        icon={VIEW_ICONS[view]}
+        key={view}
+        label={label}
+        onSelect={() => onSelectView(view)}
+        selected={activeView === view}
+        {...(showLabels ? { text: label } : {})}
+      />
+    );
+  });
+}
+
 type MobileQuickNavProps = {
   readonly activeView: ApplicationView;
   readonly onOpenSettings: () => void;
   readonly onSelectView: (view: ApplicationView) => void;
 };
 
-const QUICK_NAV_ITEM_CLASS_NAME =
-  'focus-ring flex size-11 items-center justify-center rounded-md transition-colors';
-
 export function MobileQuickNav({ activeView, onOpenSettings, onSelectView }: MobileQuickNavProps) {
   return (
     <nav aria-label="Primary" className="flex items-center gap-1">
-      {PRIMARY_NAVIGATION_VIEWS.map((view) => {
-        const selected = activeView === view;
-        const label = applicationViewLabel(view);
-
-        return (
-          <button
-            aria-current={selected ? 'page' : undefined}
-            aria-label={label}
-            className={`${QUICK_NAV_ITEM_CLASS_NAME} ${itemStateClassName(selected)}`}
-            key={view}
-            onClick={() => onSelectView(view)}
-            title={label}
-            type="button"
-          >
-            {VIEW_ICONS[view]}
-          </button>
-        );
-      })}
+      <ViewItems
+        activeView={activeView}
+        itemClassName={QUICK_NAV_ITEM_CLASS_NAME}
+        onSelectView={onSelectView}
+        showLabels={false}
+        views={PRIMARY_NAVIGATION_VIEWS}
+      />
 
       <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-hairline" />
 
-      <button
-        aria-label="Settings"
-        className={`${QUICK_NAV_ITEM_CLASS_NAME} ${RESTING_ITEM_CLASS_NAME}`}
-        onClick={onOpenSettings}
-        title="Settings"
-        type="button"
-      >
-        <SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />
-      </button>
+      <NavItem
+        className={QUICK_NAV_ITEM_CLASS_NAME}
+        icon={<SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />}
+        label="Settings"
+        onSelect={onOpenSettings}
+      />
     </nav>
   );
 }
@@ -169,128 +218,6 @@ type DesktopRailProps = {
   readonly onSelectView: (view: ApplicationView) => void;
   readonly onToggleExpanded: () => void;
 };
-
-const RAIL_ITEM_CLASS_NAME =
-  'focus-ring flex min-h-9 items-center gap-3 rounded-md px-3 py-2 transition-colors pointer-coarse:min-h-11';
-
-const railItemClassName = (expanded: boolean, selected: boolean): string =>
-  `${RAIL_ITEM_CLASS_NAME} ${expanded ? '' : 'justify-center'} ${itemStateClassName(selected)}`;
-
-function RailLabel({
-  children,
-  expanded,
-}: {
-  readonly children: string;
-  readonly expanded: boolean;
-}) {
-  return expanded ? <span className={BODY_CLASS_NAME}>{children}</span> : null;
-}
-
-type RailViewItemProps = {
-  readonly activeView: ApplicationView;
-  readonly expanded: boolean;
-  readonly onSelectView: (view: ApplicationView) => void;
-  readonly view: ApplicationView;
-};
-
-function RailViewItem({ activeView, expanded, onSelectView, view }: RailViewItemProps) {
-  const selected = activeView === view;
-  const label = applicationViewLabel(view);
-
-  return (
-    <button
-      aria-current={selected ? 'page' : undefined}
-      aria-label={expanded ? undefined : label}
-      className={railItemClassName(expanded, selected)}
-      onClick={() => onSelectView(view)}
-      title={expanded ? undefined : label}
-      type="button"
-    >
-      {VIEW_ICONS[view]}
-      <RailLabel expanded={expanded}>{label}</RailLabel>
-    </button>
-  );
-}
-
-type DesktopViewNavigationProps = Pick<
-  DesktopRailProps,
-  'activeView' | 'expanded' | 'onSelectView'
->;
-
-function DesktopViewNavigation({ activeView, expanded, onSelectView }: DesktopViewNavigationProps) {
-  return (
-    <nav aria-label="Primary" className="mt-4 flex flex-col gap-1">
-      {PRIMARY_NAVIGATION_VIEWS.map((view) => (
-        <RailViewItem
-          activeView={activeView}
-          expanded={expanded}
-          key={view}
-          onSelectView={onSelectView}
-          view={view}
-        />
-      ))}
-    </nav>
-  );
-}
-
-type DesktopRailActionsProps = Pick<
-  DesktopRailProps,
-  'activeView' | 'expanded' | 'onOpenSettings' | 'onSelectView' | 'onToggleExpanded'
->;
-
-function DesktopExpandAction({
-  expanded,
-  onToggleExpanded,
-}: Pick<DesktopRailProps, 'expanded' | 'onToggleExpanded'>) {
-  const label = expanded ? 'Collapse navigation' : 'Expand navigation';
-
-  return (
-    <button
-      aria-expanded={expanded}
-      aria-label={label}
-      className={railItemClassName(expanded, false)}
-      onClick={onToggleExpanded}
-      title={label}
-      type="button"
-    >
-      <ExpandGlyph expanded={expanded} />
-      <RailLabel expanded={expanded}>Collapse</RailLabel>
-    </button>
-  );
-}
-
-function DesktopSettingsAction({
-  expanded,
-  onOpenSettings,
-}: Pick<DesktopRailProps, 'expanded' | 'onOpenSettings'>) {
-  return (
-    <button
-      aria-label={expanded ? undefined : 'Settings'}
-      className={railItemClassName(expanded, false)}
-      onClick={onOpenSettings}
-      title={expanded ? undefined : 'Settings'}
-      type="button"
-    >
-      <SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />
-      <RailLabel expanded={expanded}>Settings</RailLabel>
-    </button>
-  );
-}
-
-function DesktopRailActions(props: DesktopRailActionsProps) {
-  return (
-    <div className="mt-auto flex flex-col gap-1">
-      <DesktopExpandAction expanded={props.expanded} onToggleExpanded={props.onToggleExpanded} />
-      <RailViewItem
-        activeView={props.activeView}
-        expanded={props.expanded}
-        onSelectView={props.onSelectView}
-        view={ApplicationView.References}
-      />
-      <DesktopSettingsAction expanded={props.expanded} onOpenSettings={props.onOpenSettings} />
-    </div>
-  );
-}
 
 export function DesktopRail({
   activeView,
@@ -306,12 +233,16 @@ export function DesktopRail({
     >
       <LanternButton className="size-12" onGoHome={onGoHome} />
 
-      <DesktopViewNavigation
-        activeView={activeView}
-        expanded={expanded}
-        onSelectView={onSelectView}
-      />
-      <DesktopRailActions
+      <nav aria-label="Primary" className="mt-4 flex flex-col gap-1">
+        <ViewItems
+          activeView={activeView}
+          itemClassName={railItemClassName(expanded)}
+          onSelectView={onSelectView}
+          showLabels={expanded}
+          views={PRIMARY_NAVIGATION_VIEWS}
+        />
+      </nav>
+      <RailActions
         activeView={activeView}
         expanded={expanded}
         onOpenSettings={onOpenSettings}
@@ -319,5 +250,47 @@ export function DesktopRail({
         onToggleExpanded={onToggleExpanded}
       />
     </aside>
+  );
+}
+
+function RailActions({
+  activeView,
+  expanded,
+  onOpenSettings,
+  onSelectView,
+  onToggleExpanded,
+}: Omit<DesktopRailProps, 'onGoHome'>) {
+  const itemClassName = railItemClassName(expanded);
+
+  return (
+    <div className="mt-auto flex flex-col gap-1">
+      <NavItem
+        ariaExpanded={expanded}
+        className={itemClassName}
+        icon={
+          <Chevron
+            className={RAIL_ICON_SIZE_CLASS_NAME}
+            direction={expanded ? ChevronDirection.Left : ChevronDirection.Right}
+          />
+        }
+        label={expanded ? 'Collapse navigation' : 'Expand navigation'}
+        onSelect={onToggleExpanded}
+        {...(expanded ? { text: 'Collapse' } : {})}
+      />
+      <ViewItems
+        activeView={activeView}
+        itemClassName={itemClassName}
+        onSelectView={onSelectView}
+        showLabels={expanded}
+        views={[ApplicationView.References]}
+      />
+      <NavItem
+        className={itemClassName}
+        icon={<SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />}
+        label="Settings"
+        onSelect={onOpenSettings}
+        {...(expanded ? { text: 'Settings' } : {})}
+      />
+    </div>
   );
 }

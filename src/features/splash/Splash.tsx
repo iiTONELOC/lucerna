@@ -3,7 +3,12 @@ import { COPYRIGHT_NOTICE } from '../../appMetadata.ts';
 import lucernaMark from '../../assets/brand/lucerna-mark.svg';
 import { OpeningDuration } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { ACCENT_BUTTON_CLASS_NAME, MARK_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
+import {
+  ACCENT_BUTTON_CLASS_NAME,
+  MARK_CLASS_NAME,
+  SUBTITLE_CLASS_NAME,
+  UNDERLINE_LINK_CLASS_NAME,
+} from '../../styles.ts';
 import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 import { useInstalled } from '../install/useInstalled.ts';
 import { selectOpeningVerse, type SplashVerse } from './splashModel.ts';
@@ -17,7 +22,7 @@ type SplashProps = {
 
 type DismissProps = Pick<SplashProps, 'applicationReady' | 'onDismiss'>;
 
-const INSTALL_LINK_CLASS_NAME = `min-h-11 text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent focus-ring ${SUBTITLE_CLASS_NAME}`;
+const INSTALL_LINK_CLASS_NAME = `min-h-11 ${UNDERLINE_LINK_CLASS_NAME} ${SUBTITLE_CLASS_NAME}`;
 
 const automaticHoldMilliseconds = (openingDuration: OpeningDuration): number | null =>
   openingDuration === OpeningDuration.Manual
@@ -55,9 +60,7 @@ function OpeningVerse({ verse }: { readonly verse: SplashVerse }) {
         {verse.text}
       </blockquote>
       <figcaption className="flex flex-col gap-2">
-        <p className="small-caps text-subtitle leading-subtitle tracking-subtitle text-accent-current">
-          {verse.reference}
-        </p>
+        <p className={`${SUBTITLE_CLASS_NAME} text-accent-current`}>{verse.reference}</p>
         <cite className="text-citation leading-citation text-muted">{verse.sourceLabel}</cite>
       </figcaption>
     </figure>
@@ -91,10 +94,7 @@ export function Splash({ applicationReady, onDismiss, onOpenInstallGuide }: Spla
       >
         <h1 className={`shrink-0 ${MARK_CLASS_NAME} text-accent`} id={SPLASH_TITLE_ID}>
           <span className="mr-[-0.125em]">Lucerna</span>
-          <sup
-            aria-hidden="true"
-            className="align-super font-display text-subtitle leading-subtitle tracking-subtitle"
-          >
+          <sup aria-hidden="true" className={`align-super ${SUBTITLE_CLASS_NAME}`}>
             ™
           </sup>
         </h1>

@@ -173,8 +173,9 @@ describe('preferencesReducer', () => {
   test('changes one preference without changing the others', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetOpeningDuration,
-        openingDuration: OpeningDuration.Manual,
+        type: PreferencesActionType.Set,
+        key: 'openingDuration',
+        value: OpeningDuration.Manual,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, openingDuration: OpeningDuration.Manual });
   });
@@ -182,8 +183,9 @@ describe('preferencesReducer', () => {
   test('changes the guided reading speed without changing the other preferences', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetReadingSpeed,
-        readingSpeed: ReadingSpeed.Unhurried,
+        type: PreferencesActionType.Set,
+        key: 'readingSpeed',
+        value: ReadingSpeed.Unhurried,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, readingSpeed: ReadingSpeed.Unhurried });
   });
@@ -191,8 +193,9 @@ describe('preferencesReducer', () => {
   test('turns the Fatima prayer off without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetIncludeFatimaPrayer,
-        includeFatimaPrayer: false,
+        type: PreferencesActionType.Set,
+        key: 'includeFatimaPrayer',
+        value: false,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, includeFatimaPrayer: false });
   });
@@ -200,17 +203,21 @@ describe('preferencesReducer', () => {
   test('turns drop caps off without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetShowDropCaps,
-        showDropCaps: false,
+        type: PreferencesActionType.Set,
+        key: 'showDropCaps',
+        value: false,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, showDropCaps: false });
   });
+});
 
+describe('preferencesReducer general controls', () => {
   test('turns external link confirmation off without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetConfirmExternalLinks,
-        confirmExternalLinks: false,
+        type: PreferencesActionType.Set,
+        key: 'confirmExternalLinks',
+        value: false,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, confirmExternalLinks: false });
   });
@@ -220,8 +227,9 @@ describe('preferencesReducer display controls', () => {
   test('turns mystery fruits off without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetShowMysteryFruits,
-        showMysteryFruits: false,
+        type: PreferencesActionType.Set,
+        key: 'showMysteryFruits',
+        value: false,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, showMysteryFruits: false });
   });
@@ -229,8 +237,9 @@ describe('preferencesReducer display controls', () => {
   test('turns scripture readings off without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetShowScriptureReadings,
-        showScriptureReadings: false,
+        type: PreferencesActionType.Set,
+        key: 'showScriptureReadings',
+        value: false,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, showScriptureReadings: false });
   });
@@ -238,8 +247,9 @@ describe('preferencesReducer display controls', () => {
   test('changes the bead material without disturbing the rest', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetBeadMaterial,
-        beadMaterial: BeadMaterial.Obsidian,
+        type: PreferencesActionType.Set,
+        key: 'beadMaterial',
+        value: BeadMaterial.Obsidian,
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, beadMaterial: BeadMaterial.Obsidian });
   });
@@ -249,8 +259,9 @@ describe('preferencesReducer theme defaults', () => {
   test('selects obsidian by default when Parchment is selected', () => {
     expect(
       preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.SetTheme,
-        theme: Theme.Parchment,
+        type: PreferencesActionType.Set,
+        key: 'theme',
+        value: Theme.Parchment,
       }),
     ).toEqual({
       ...DEFAULT_PREFERENCES,
@@ -261,14 +272,16 @@ describe('preferencesReducer theme defaults', () => {
 
   test('allows the Parchment bead material to be changed after theme selection', () => {
     const parchment = preferencesReducer(DEFAULT_PREFERENCES, {
-      type: PreferencesActionType.SetTheme,
-      theme: Theme.Parchment,
+      type: PreferencesActionType.Set,
+      key: 'theme',
+      value: Theme.Parchment,
     });
 
     expect(
       preferencesReducer(parchment, {
-        type: PreferencesActionType.SetBeadMaterial,
-        beadMaterial: BeadMaterial.Rose,
+        type: PreferencesActionType.Set,
+        key: 'beadMaterial',
+        value: BeadMaterial.Rose,
       }),
     ).toEqual({ ...parchment, beadMaterial: BeadMaterial.Rose });
   });

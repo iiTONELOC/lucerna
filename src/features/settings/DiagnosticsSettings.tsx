@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { clearErrorDiagnostics, lastErrorDiagnostics } from '../../components/error/diagnostics.ts';
+import { DiagnosticDetails } from '../../components/error/DiagnosticDetails.tsx';
 import { ErrorReportActions } from '../../components/error/ErrorReportActions.tsx';
-import { Chevron } from '../../components/icons/Chevron.tsx';
-import { ChevronDirection } from '../../components/icons/model.ts';
 import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, INLINE_LINK_CLASS_NAME } from '../../styles.ts';
 
 const DIAGNOSTICS_TITLE_ID = 'settings-diagnostics-title';
@@ -16,22 +15,7 @@ function RetainedReport({
 }) {
   return (
     <>
-      <details className="group mt-3 rounded-md border border-hairline bg-background p-3">
-        <summary
-          className={`focus-ring flex cursor-pointer list-none items-center gap-2 ${CITATION_CLASS_NAME} text-secondary [&::-webkit-details-marker]:hidden`}
-        >
-          <Chevron
-            className="size-4 shrink-0 transition-transform group-open:rotate-90"
-            direction={ChevronDirection.Right}
-          />
-          Last error report
-        </summary>
-        <pre
-          className={`scroll-region mt-3 max-h-56 overflow-x-hidden overflow-y-auto wrap-anywhere whitespace-pre-wrap text-muted ${CITATION_CLASS_NAME}`}
-        >
-          {diagnostics}
-        </pre>
-      </details>
+      <DiagnosticDetails className="mt-3" details={diagnostics} summary="Last error report" />
       <div className="mt-3 flex flex-wrap items-center gap-4">
         <ErrorReportActions diagnostics={diagnostics} />
         <button className={INLINE_LINK_CLASS_NAME} onClick={onClear} type="button">

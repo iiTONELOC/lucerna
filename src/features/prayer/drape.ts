@@ -1,3 +1,4 @@
+import { CodedError } from '../../shared/codedError.ts';
 import {
   PrayerId,
   StepAnchor,
@@ -40,11 +41,9 @@ const DRAPE_ERROR_MESSAGE: Readonly<Record<DrapeErrorCode, string>> = {
   [DrapeErrorCode.EmptyPath]: 'Path must carry at least two points',
 };
 
-export class DrapeError extends Error {
-  override readonly name = 'DrapeError';
-
-  constructor(readonly code: DrapeErrorCode) {
-    super(DRAPE_ERROR_MESSAGE[code]);
+export class DrapeError extends CodedError<DrapeErrorCode> {
+  constructor(code: DrapeErrorCode) {
+    super('DrapeError', code, DRAPE_ERROR_MESSAGE[code]);
   }
 }
 

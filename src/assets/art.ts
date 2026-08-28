@@ -1,21 +1,17 @@
-const artImageModules = import.meta.glob("./art/*.avif", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
+import { assetResolverFor } from './resolve.ts';
 
-export function resolveArtAsset(file: string): string {
-  const filename = file.split("/").pop();
+const resolveArtFile = assetResolverFor(
+  import.meta.glob<string>('./art/*.avif', { eager: true, query: '?url', import: 'default' }),
+  './art/',
+  'art',
+);
 
-  if (!filename) {
+export const resolveArtAsset = (file: string): string => {
+  const filename = file.split('/').pop();
+
+  if (filename === undefined || filename.length === 0) {
     throw new Error(`Invalid art asset path: ${file}`);
   }
 
-  const assetUrl = artImageModules[`./art/${filename}`];
-
-  if (!assetUrl) {
-    throw new Error(`Missing art asset: ${file}`);
-  }
-
-  return assetUrl;
-}
+  return resolveArtFile(filename);
+};

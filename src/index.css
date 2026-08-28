@@ -108,7 +108,6 @@
   --color-rose-bud: #c87d90;
   --font-lucerna: 'EB Garamond', Georgia, serif;
   --font-display: var(--font-lucerna);
-  --font-mark: var(--font-lucerna);
   --font-reading: var(--reader-face, var(--font-lucerna));
   --spacing-safe-top: env(safe-area-inset-top);
   --spacing-safe-right: env(safe-area-inset-right);
@@ -144,6 +143,20 @@
   }
 }
 
+@utility art-scrim-ground {
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 44%,
+      color-mix(in srgb, var(--theme-background) 80%, transparent) 100%
+    ),
+    color-mix(in srgb, var(--theme-background) 34%, transparent);
+
+  @media (forced-colors: active) {
+    background: Canvas;
+  }
+}
+
 @utility drape-relief {
   filter: drop-shadow(0 1px 1px var(--theme-on-art-scrim))
     drop-shadow(0 3px 7px var(--theme-on-art-scrim))
@@ -151,6 +164,14 @@
 
   @media (forced-colors: active) {
     filter: none;
+  }
+}
+
+@utility edge-lit {
+  box-shadow: inset 0 1px 0 var(--theme-edge-light);
+
+  @media (forced-colors: active) {
+    box-shadow: none;
   }
 }
 
@@ -245,7 +266,6 @@
     --chain-shadow: #211e1a;
     --chain-fill: #7b766e;
     --chain-light: #c7c2b9;
-    --drape-shadow: color-mix(in srgb, var(--theme-background) 92%, transparent);
     --rule-lit-width: 2px;
     --rule-lit-inset: 0.5rem;
     background-color: var(--theme-background);
@@ -319,7 +339,10 @@
     --bead-active-mid: #f2db91;
     --bead-active-edge: #d5b86f;
     --bead-active-glow: #7d5f18;
-    --drape-shadow: color-mix(in srgb, var(--theme-foreground) 42%, transparent);
+  }
+
+  [data-bead-material] {
+    --bead-specular: #ffffff;
   }
 
   [data-bead-material='wood'] {
@@ -327,7 +350,6 @@
     --bead-light: #9a7350;
     --bead-dark: #3f2a18;
     --bead-chain: #7a6248;
-    --bead-specular: #ffffff;
     --bead-specular-opacity: 0.4;
   }
 
@@ -336,7 +358,6 @@
     --bead-light: #ffffff;
     --bead-dark: #b8ae9c;
     --bead-chain: #cbc3b2;
-    --bead-specular: #ffffff;
     --bead-specular-opacity: 0.85;
   }
 
@@ -345,7 +366,6 @@
     --bead-light: #4a423b;
     --bead-dark: #0c0a09;
     --bead-chain: #5a5048;
-    --bead-specular: #ffffff;
     --bead-specular-opacity: 0.8;
   }
 
@@ -354,7 +374,6 @@
     --bead-light: #c87d90;
     --bead-dark: #6e3344;
     --bead-chain: #9a7a82;
-    --bead-specular: #ffffff;
     --bead-specular-opacity: 0.6;
   }
 
@@ -399,7 +418,6 @@
       --chain-shadow: CanvasText;
       --chain-fill: CanvasText;
       --chain-light: Highlight;
-      --drape-shadow: transparent;
     }
   }
 }

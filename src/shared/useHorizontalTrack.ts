@@ -1,12 +1,11 @@
 import {
   useCallback,
-  useEffect,
   useRef,
-  useState,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from 'react';
+import { useResizeMeasure, type Measurement } from './useResizeMeasure.ts';
 
 const DRAG_THRESHOLD_PIXELS = 6;
 const EDGE_TOLERANCE_PIXELS = 1;
@@ -127,42 +126,30 @@ const useDragHandlers = <ElementType extends HTMLElement>() => {
   };
 };
 
+const EDGES_MEASUREMENT: Measurement<TrackEdges> = {
+  initial: { atStart: true, atEnd: true },
+  same: (previous, next) => previous.atStart === next.atStart && previous.atEnd === next.atEnd,
+};
+
 const useTrackEdges = <ElementType extends HTMLElement>(
   trackRef: RefObject<ElementType | null>,
   items: readonly unknown[],
 ) => {
-  const [edges, setEdges] = useState<TrackEdges>({ atStart: true, atEnd: true });
-
-  const syncEdges = useCallback((): void => {
+  const measure = useCallback((): TrackEdges => {
     const track = trackRef.current;
 
     if (track === null) {
-      return;
+      return EDGES_MEASUREMENT.initial;
     }
 
     const furthest = track.scrollWidth - track.clientWidth;
 
-    setEdges({
+    return {
       atStart: track.scrollLeft <= EDGE_TOLERANCE_PIXELS,
       atEnd: track.scrollLeft >= furthest - EDGE_TOLERANCE_PIXELS,
-    });
+    };
   }, [trackRef]);
-
-  useEffect(() => {
-    const track = trackRef.current;
-
-    syncEdges();
-
-    if (track === null || typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(syncEdges);
-
-    observer.observe(track);
-
-    return () => observer.disconnect();
-  }, [items, syncEdges, trackRef]);
+  const [edges, syncEdges] = useResizeMeasure(trackRef, measure, EDGES_MEASUREMENT, items);
 
   return { edges, syncEdges };
 };

@@ -1,6 +1,7 @@
 import generatedBibleIndex from '../generated/bible/douay-rheims/index.json' with { type: 'json' };
 import generatedContent from '../generated/devotional-content.json' with { type: 'json' };
 import generatedLibrary from '../generated/library-content.json' with { type: 'json' };
+import { CodedError } from '../shared/codedError.ts';
 import {
   bibleIndexFrom,
   devotionalContentFrom,
@@ -41,15 +42,13 @@ const lookupErrorMessage = (
   return `Missing ${recordType} ${id}`;
 };
 
-export class CatalogLookupError extends Error {
-  override readonly name = 'CatalogLookupError';
-
+export class CatalogLookupError extends CodedError<CatalogLookupErrorCode> {
   constructor(
-    readonly code: CatalogLookupErrorCode,
+    code: CatalogLookupErrorCode,
     readonly recordType: CatalogRecordType,
     readonly id: string,
   ) {
-    super(lookupErrorMessage(code, recordType, id));
+    super('CatalogLookupError', code, lookupErrorMessage(code, recordType, id));
   }
 }
 

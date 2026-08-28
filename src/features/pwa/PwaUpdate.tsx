@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { ACCENT_BUTTON_CLASS_NAME, BODY_CLASS_NAME, EYEBROW_CLASS_NAME } from '../../styles.ts';
+import {
+  ACCENT_BUTTON_CLASS_NAME,
+  BODY_CLASS_NAME,
+  EYEBROW_CLASS_NAME,
+  QUIET_BUTTON_CLASS_NAME,
+} from '../../styles.ts';
 import { applyServiceWorkerUpdate, registerServiceWorker } from './registration.ts';
 
 const UPDATE_NOTICE_ID = 'pwa-update-notice';
@@ -49,11 +54,7 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
         >
           Update now
         </button>
-        <button
-          className="focus-ring min-h-11 px-4 font-display text-subtitle leading-subtitle text-muted transition-colors hover:text-foreground"
-          onClick={onDismiss}
-          type="button"
-        >
+        <button className={`${QUIET_BUTTON_CLASS_NAME} px-4`} onClick={onDismiss} type="button">
           Later
         </button>
       </div>

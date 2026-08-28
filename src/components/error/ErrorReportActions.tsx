@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ACCENT_BUTTON_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
+import { ACCENT_BUTTON_CLASS_NAME, QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 import { diagnosticEmailHref, persistErrorDiagnostics } from './diagnostics.ts';
 
 enum CopyStatus {
@@ -30,7 +30,7 @@ export function ErrorReportActions({ diagnostics }: { readonly diagnostics: stri
         Email diagnostics
       </a>
       <button
-        className={`focus-ring min-h-11 px-4 text-muted transition-colors hover:text-foreground ${SUBTITLE_CLASS_NAME}`}
+        className={`${QUIET_BUTTON_CLASS_NAME} px-4`}
         onClick={() => void copyDiagnostics()}
         type="button"
       >

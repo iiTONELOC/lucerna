@@ -8,6 +8,21 @@ export const LIBRARY_CATEGORY_LABEL: Readonly<Record<LibraryCategory, string>> =
 export const BIBLE_TITLE = 'The Holy Bible';
 export const BIBLE_EDITION = 'Douay-Rheims Version';
 
+export type ReaderJump = {
+  readonly blockIndex: number;
+  readonly label: string;
+  readonly part?: boolean;
+};
+
+export const currentJumpOf = (
+  jumps: readonly ReaderJump[],
+  blockIndex: number,
+): ReaderJump | undefined =>
+  jumps.reduce<ReaderJump | undefined>(
+    (current, jump) => (jump.blockIndex <= blockIndex ? jump : current),
+    undefined,
+  );
+
 export type BibleVerseLocation = {
   readonly chapter: number;
   readonly verse: number;

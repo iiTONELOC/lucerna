@@ -1,5 +1,6 @@
 import { resolveInstallAsset } from '../../assets/install.ts';
 import { BackButton } from '../../components/buttons/BackButton.tsx';
+import { FocusPage, ViewHeader } from '../../components/layout.tsx';
 import {
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
@@ -75,30 +76,24 @@ function InstallSectionView({ section }: { readonly section: InstallSection }) {
 
 export function InstallGuide({ onBack }: { readonly onBack: () => void }) {
   return (
-    <main
-      aria-labelledby={INSTALL_TITLE_ID}
-      className="scroll-region h-dvh overflow-x-hidden overflow-y-auto bg-background pt-safe-top text-foreground"
-    >
+    <FocusPage labelledBy={INSTALL_TITLE_ID}>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pt-5 pb-[60dvh] sm:px-6 lg:px-8 lg:pt-10">
         <BackButton onBack={onBack} />
-        <header>
-          <p className={EYEBROW_CLASS_NAME}>Keep Lucerna on your device</p>
-          <h1 className={`${TITLE_CLASS_NAME} pt-1`} id={INSTALL_TITLE_ID}>
-            How to add Lucerna to your device
-          </h1>
-          <p className={`max-w-prose pt-3 ${SCRIPTURE_CLASS_NAME}`}>
-            Lucerna works in a browser. Add it to your device and it opens like any other
-            application.
-          </p>
-          <div className="pt-4">
+        <ViewHeader
+          eyebrow="Keep Lucerna on your device"
+          id={INSTALL_TITLE_ID}
+          lede="Lucerna works in a browser. Add it to your device and it opens like any other application."
+          title="How to add Lucerna to your device"
+        >
+          <div className="pt-2">
             <InstallSectionLinks />
           </div>
-        </header>
+        </ViewHeader>
 
         {INSTALL_SECTIONS.map((section) => (
           <InstallSectionView key={section.id} section={section} />
         ))}
       </div>
-    </main>
+    </FocusPage>
   );
 }

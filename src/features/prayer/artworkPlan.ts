@@ -4,6 +4,7 @@ import {
   contentCatalog,
   type ResolvedArtwork,
 } from '../../content/catalog.ts';
+import { randomIndex } from '../../shared/random.ts';
 import {
   currentStep,
   PrayerId,
@@ -11,14 +12,6 @@ import {
   type PrayerStep,
   type Progression,
 } from './progression.ts';
-
-const UINT32_RANGE = 2 ** 32;
-
-const randomIndex = (length: number): number => {
-  const [randomValue = 0] = crypto.getRandomValues(new Uint32Array(1));
-
-  return Math.floor((randomValue / UINT32_RANGE) * length);
-};
 
 const shuffled = <Value>(values: readonly Value[]): Value[] => {
   const result = [...values];

@@ -14,9 +14,9 @@ import {
   SUBTITLE_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
-import { LIBRARY_CATEGORY_LABEL } from './model.ts';
+import { currentJumpOf, LIBRARY_CATEGORY_LABEL, type ReaderJump } from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
-import { ReaderLocationControl, type ReaderJump } from './ReaderLocation.tsx';
+import { ReaderLocationControl } from './ReaderLocation.tsx';
 import { ReaderColophon, ReaderSurface } from './ReaderSurface.tsx';
 import { useHeadingFocus } from './useHeadingFocus.ts';
 import { blockIndexPropsOf, useReadingPosition, useTopmostTracker } from './useReadingPosition.ts';
@@ -103,27 +103,6 @@ const sectionJumpsFrom = (work: ResolvedLibraryWork): readonly ReaderJump[] =>
     return [];
   });
 
-const workLocationOf = (work: ResolvedLibraryWork, blockIndex: number): string => {
-  let label = work.title;
-
-  for (const [index, block] of work.blocks.entries()) {
-    if (index > blockIndex) {
-      break;
-    }
-
-    if (isShortChapter(block)) {
-      label = block.short;
-    } else if (
-      block.kind === LibraryBlockKind.Heading &&
-      block.level === LibraryHeadingLevel.Part
-    ) {
-      label = block.text;
-    }
-  }
-
-  return label;
-};
-
 export function ReaderFocus({
   initialBlockIndex,
   onBack,
@@ -151,7 +130,7 @@ export function ReaderFocus({
             articleRef={articleRef}
             headingRef={headingRef}
             jumps={jumps}
-            labelOf={(blockIndex) => workLocationOf(work, blockIndex)}
+            labelOf={(blockIndex) => currentJumpOf(jumps, blockIndex)?.label ?? work.title}
             tracker={tracker}
           />
         )

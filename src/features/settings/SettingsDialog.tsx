@@ -1,4 +1,9 @@
-import { BODY_CLASS_NAME, CITATION_CLASS_NAME, EYEBROW_CLASS_NAME } from '../../styles.ts';
+import {
+  BODY_CLASS_NAME,
+  CITATION_CLASS_NAME,
+  EYEBROW_CLASS_NAME,
+  NAV_CLASS_NAME,
+} from '../../styles.ts';
 import {
   useEffect,
   useRef,
@@ -21,12 +26,16 @@ import {
   ReadingSpeed,
   TextScale,
   UpdateChecks,
+  type PreferenceKey,
+  type Preferences,
 } from '../../state/preferences/model.ts';
+import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
 import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
+import { useDialogOpen, useReturnFocus } from '../../shared/focus.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { SettingsScope, SettingsTab } from './model.ts';
-import { AboutSettings } from './AboutSettings.tsx';
+import { AboutSettings, type AboutSettingsProps } from './AboutSettings.tsx';
 import { DiagnosticsSettings } from './DiagnosticsSettings.tsx';
 
 const SETTINGS_TITLE_ID = 'settings-title';
@@ -48,12 +57,6 @@ const READER_FACE_LABEL: Readonly<Record<ReaderFace, string>> = {
   [ReaderFace.Garamond]: 'Garamond',
   [ReaderFace.Sans]: 'Sans serif',
 };
-const READER_GROUND_LABEL: Readonly<Record<ReaderGround, string>> = {
-  [ReaderGround.Dark]: 'Dark',
-  [ReaderGround.Parchment]: 'Parchment',
-};
-
-const TEXT_CHOICE_CLASS_NAME = `min-h-11 border-b border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-pressed:border-accent aria-pressed:text-accent-current focus-ring`;
 const TAB_CLASS_NAME = `min-h-11 border-b-2 border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-selected:border-accent aria-selected:text-accent-current focus-ring`;
 
 const SETTINGS_TAB_LABEL: Readonly<Record<SettingsTab, string>> = {
@@ -131,12 +134,6 @@ function SwitchChoice({ label, description, value, onChange }: SwitchChoiceProps
     </label>
   );
 }
-
-type SettingsDialogRefs = {
-  readonly dialogRef: RefObject<HTMLDialogElement | null>;
-  readonly headingRef: RefObject<HTMLHeadingElement | null>;
-  readonly returnFocusRef: RefObject<HTMLElement | null>;
-};
 
 type CardDrag = {
   readonly pointerId: number;
@@ -240,32 +237,19 @@ function ResizeHandle({ handleProps }: { readonly handleProps: object }) {
   );
 }
 
-function useSettingsDialog(open: boolean): SettingsDialogRefs {
+function useSettingsDialog(open: boolean) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const returnFocusRef = useRef<HTMLElement>(null);
+  const returnFocus = useReturnFocus();
 
   useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (dialog === null) {
-      return;
+    if (open) {
+      returnFocus.remember();
     }
+  }, [open, returnFocus]);
+  useDialogOpen(dialogRef, open, false, () => headingRef.current?.focus());
 
-    if (open && !dialog.open) {
-      const activeElement = document.activeElement;
-      returnFocusRef.current = activeElement instanceof HTMLElement ? activeElement : null;
-      dialog.show();
-      headingRef.current?.focus();
-      return;
-    }
-
-    if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [open]);
-
-  return { dialogRef, headingRef, returnFocusRef };
+  return { dialogRef, headingRef, returnFocus };
 }
 
 function SettingsHeader({
@@ -280,7 +264,7 @@ function SettingsHeader({
   return (
     <header className="flex shrink-0 items-center gap-4 border-b border-hairline px-5 lg:px-8">
       <h2
-        className="font-display text-nav leading-nav font-medium focus:outline-none"
+        className={`${NAV_CLASS_NAME} font-medium focus:outline-none`}
         id={SETTINGS_TITLE_ID}
         ref={headingRef}
         tabIndex={-1}
@@ -345,65 +329,75 @@ function TextScaleGroup({
 }
 
 function TextScaleSettings() {
-  const { preferences, setTextScale } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
 
-  return <TextScaleGroup onChange={setTextScale} value={preferences.textScale} />;
+  return (
+    <TextScaleGroup
+      onChange={(textScale) => setPreference('textScale', textScale)}
+      value={preferences.textScale}
+    />
+  );
+}
+
+type EnumPreferenceKey = 'openingDuration' | 'readerFace' | 'readerGround' | 'updateChecks';
+
+function PreferenceChoices<Key extends EnumPreferenceKey>({
+  label,
+  labelOf,
+  preferenceKey,
+  values,
+}: {
+  readonly label: string;
+  readonly labelOf: (value: Preferences[Key]) => string;
+  readonly preferenceKey: Key;
+  readonly values: readonly Preferences[Key][];
+}) {
+  const { preferences, setPreference } = usePreferences();
+
+  return (
+    <ChoiceGroup
+      label={label}
+      labelOf={labelOf}
+      onSelect={(value) => setPreference(preferenceKey, value)}
+      selected={preferences[preferenceKey]}
+      values={values}
+    />
+  );
 }
 
 function ReaderFaceSettings() {
-  const { preferences, setReaderFace } = usePreferences();
-
   return (
     <SettingsGroup legend="Typeface">
-      <div className="flex flex-wrap gap-x-5">
-        {Object.values(ReaderFace).map((readerFace) => (
-          <button
-            aria-pressed={preferences.readerFace === readerFace}
-            className={TEXT_CHOICE_CLASS_NAME}
-            key={readerFace}
-            onClick={() => setReaderFace(readerFace)}
-            type="button"
-          >
-            {READER_FACE_LABEL[readerFace]}
-          </button>
-        ))}
-      </div>
+      <PreferenceChoices
+        label="Typeface"
+        labelOf={(readerFace) => READER_FACE_LABEL[readerFace]}
+        preferenceKey="readerFace"
+        values={Object.values(ReaderFace)}
+      />
     </SettingsGroup>
   );
 }
 
 function ReaderGroundSettings() {
-  const { preferences, setReaderGround } = usePreferences();
-
   return (
     <SettingsGroup legend="Page">
-      <div className="flex flex-wrap gap-x-5">
-        {Object.values(ReaderGround).map((readerGround) => (
-          <button
-            aria-pressed={preferences.readerGround === readerGround}
-            className={TEXT_CHOICE_CLASS_NAME}
-            key={readerGround}
-            onClick={() => setReaderGround(readerGround)}
-            type="button"
-          >
-            {READER_GROUND_LABEL[readerGround]}
-          </button>
-        ))}
-      </div>
+      <PreferenceChoices
+        label="Page"
+        labelOf={(readerGround) => enumLabel(ReaderGround, readerGround)}
+        preferenceKey="readerGround"
+        values={Object.values(ReaderGround)}
+      />
     </SettingsGroup>
   );
 }
 
 function RedLetterSettings() {
-  const { preferences, setShowRedLetter } = usePreferences();
-
   return (
     <SettingsGroup legend="Scripture">
-      <SwitchChoice
+      <PreferenceSwitch
         description="Show the words of Christ in red in the Bible and the mystery readings."
         label="Words of Christ in red"
-        onChange={setShowRedLetter}
-        value={preferences.showRedLetter}
+        preferenceKey="showRedLetter"
       />
       <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
         <RedLetterNoticeText notice={contentCatalog.bible.redLetter.notice} />
@@ -413,11 +407,14 @@ function RedLetterSettings() {
 }
 
 function ReaderSettings() {
-  const { preferences, setReaderTextScale } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
 
   return (
     <div>
-      <TextScaleGroup onChange={setReaderTextScale} value={preferences.readerTextScale} />
+      <TextScaleGroup
+        onChange={(textScale) => setPreference('readerTextScale', textScale)}
+        value={preferences.readerTextScale}
+      />
       <ReaderFaceSettings />
       <ReaderGroundSettings />
       <RedLetterSettings />
@@ -426,50 +423,34 @@ function ReaderSettings() {
 }
 
 function OpeningScreenSettings() {
-  const { preferences, setOpeningDuration } = usePreferences();
-
   return (
     <SettingsGroup legend="Opening screen">
-      <div className="flex flex-wrap gap-x-5">
-        {Object.values(OpeningDuration).map((openingDuration) => (
-          <button
-            aria-pressed={preferences.openingDuration === openingDuration}
-            className={TEXT_CHOICE_CLASS_NAME}
-            key={openingDuration}
-            onClick={() => setOpeningDuration(openingDuration)}
-            type="button"
-          >
-            {openingDurationLabel(openingDuration)}
-          </button>
-        ))}
-      </div>
+      <PreferenceChoices
+        label="Opening screen"
+        labelOf={openingDurationLabel}
+        preferenceKey="openingDuration"
+        values={Object.values(OpeningDuration)}
+      />
     </SettingsGroup>
   );
 }
 
 function ReadingSpeedPresets() {
-  const { preferences, setReadingSpeed } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
 
   return (
-    <fieldset className="flex min-w-0 flex-wrap gap-x-5 border-0 p-0">
-      <legend className="sr-only">Reading speed presets</legend>
-      {READING_SPEED_PRESETS.map((readingSpeed) => (
-        <button
-          aria-pressed={preferences.readingSpeed === readingSpeed}
-          className={TEXT_CHOICE_CLASS_NAME}
-          key={readingSpeed}
-          onClick={() => setReadingSpeed(readingSpeed)}
-          type="button"
-        >
-          {ReadingSpeed[readingSpeed]}
-        </button>
-      ))}
-    </fieldset>
+    <ChoiceGroup
+      label="Reading speed presets"
+      labelOf={(readingSpeed) => enumLabel(ReadingSpeed, readingSpeed)}
+      onSelect={(readingSpeed) => setPreference('readingSpeed', readingSpeed)}
+      selected={preferences.readingSpeed}
+      values={READING_SPEED_PRESETS}
+    />
   );
 }
 
 function ReadingSpeedSlider() {
-  const { preferences, setReadingSpeed } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
 
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 pt-3">
@@ -482,7 +463,7 @@ function ReadingSpeedSlider() {
         className="focus-ring h-11 w-full cursor-pointer accent-accent"
         max={READING_SPEED_MAXIMUM}
         min={READING_SPEED_MINIMUM}
-        onChange={(event) => setReadingSpeed(Number(event.currentTarget.value))}
+        onChange={(event) => setPreference('readingSpeed', Number(event.currentTarget.value))}
         step={READING_SPEED_STEP}
         type="range"
         value={preferences.readingSpeed}
@@ -510,7 +491,7 @@ function GuidedPlaybackSettings() {
 }
 
 function RosaryBeadsSettings() {
-  const { preferences, setBeadMaterial } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
 
   return (
     <SettingsGroup legend="Rosary beads">
@@ -521,7 +502,7 @@ function RosaryBeadsSettings() {
             className="group flex min-h-14 min-w-14 flex-col items-center justify-center gap-2 text-muted transition-colors hover:text-foreground aria-pressed:text-foreground focus-ring"
             data-bead-material={beadMaterial}
             key={beadMaterial}
-            onClick={() => setBeadMaterial(beadMaterial)}
+            onClick={() => setPreference('beadMaterial', beadMaterial)}
             type="button"
           >
             <span
@@ -536,88 +517,90 @@ function RosaryBeadsSettings() {
   );
 }
 
-type DisplayChoice = SwitchChoiceProps & {
-  readonly playback?: Pick<SwitchChoiceProps, 'value' | 'onChange'>;
+type BooleanPreferenceKey = {
+  readonly [Key in PreferenceKey]: Preferences[Key] extends boolean ? Key : never;
+}[PreferenceKey];
+
+type PreferenceSwitchProps = Pick<SwitchChoiceProps, 'description' | 'label'> & {
+  readonly preferenceKey: BooleanPreferenceKey;
+};
+
+function PreferenceSwitch({ description, label, preferenceKey }: PreferenceSwitchProps) {
+  const { preferences, setPreference } = usePreferences();
+
+  return (
+    <SwitchChoice
+      description={description}
+      label={label}
+      onChange={(value) => setPreference(preferenceKey, value)}
+      value={preferences[preferenceKey]}
+    />
+  );
+}
+
+type DisplayChoice = PreferenceSwitchProps & {
+  readonly playbackKey?: BooleanPreferenceKey;
 };
 
 const PLAYBACK_CHOICE_LABEL = 'Read in playback';
 const PLAYBACK_CHOICE_DESCRIPTION = 'Pause to read it during guided prayer.';
 
-function PrayersSettings() {
-  const { preferences, setIncludeFatimaPrayer } = usePreferences();
+const DISPLAY_CHOICES: readonly DisplayChoice[] = [
+  {
+    label: 'Scripture readings',
+    description: 'Show the brief reading with each mystery.',
+    preferenceKey: 'showScriptureReadings',
+  },
+  {
+    label: 'Mystery fruits',
+    description: "Show each mystery's spiritual fruit.",
+    preferenceKey: 'showMysteryFruits',
+    playbackKey: 'readMysteryFruits',
+  },
+  {
+    label: 'Guidance',
+    description: 'Show meditation prompts.',
+    preferenceKey: 'showGuidance',
+    playbackKey: 'readGuidance',
+  },
+  {
+    label: 'Decade offerings',
+    description: "Show St. Louis de Montfort's offering with each mystery.",
+    preferenceKey: 'showDecadeOfferings',
+    playbackKey: 'readDecadeOfferings',
+  },
+  {
+    label: 'Drop caps',
+    description: 'Enlarge the opening letter when space allows.',
+    preferenceKey: 'showDropCaps',
+  },
+];
 
+function PrayersSettings() {
   return (
     <SettingsGroup legend="Prayers">
-      <SwitchChoice
+      <PreferenceSwitch
         description="Include O My Jesus after each decade."
         label="Fatima prayer"
-        onChange={setIncludeFatimaPrayer}
-        value={preferences.includeFatimaPrayer}
+        preferenceKey="includeFatimaPrayer"
       />
     </SettingsGroup>
   );
 }
 
-function useDisplayChoices(): readonly DisplayChoice[] {
-  const {
-    preferences,
-    setReadDecadeOfferings,
-    setReadGuidance,
-    setReadMysteryFruits,
-    setShowDecadeOfferings,
-    setShowDropCaps,
-    setShowGuidance,
-    setShowMysteryFruits,
-    setShowScriptureReadings,
-  } = usePreferences();
-  return [
-    {
-      label: 'Scripture readings',
-      description: 'Show the brief reading with each mystery.',
-      value: preferences.showScriptureReadings,
-      onChange: setShowScriptureReadings,
-    },
-    {
-      label: 'Mystery fruits',
-      description: "Show each mystery's spiritual fruit.",
-      value: preferences.showMysteryFruits,
-      onChange: setShowMysteryFruits,
-      playback: { value: preferences.readMysteryFruits, onChange: setReadMysteryFruits },
-    },
-    {
-      label: 'Guidance',
-      description: 'Show meditation prompts.',
-      value: preferences.showGuidance,
-      onChange: setShowGuidance,
-      playback: { value: preferences.readGuidance, onChange: setReadGuidance },
-    },
-    {
-      label: 'Decade offerings',
-      description: "Show St. Louis de Montfort's offering with each mystery.",
-      value: preferences.showDecadeOfferings,
-      onChange: setShowDecadeOfferings,
-      playback: { value: preferences.readDecadeOfferings, onChange: setReadDecadeOfferings },
-    },
-    {
-      label: 'Drop caps',
-      description: 'Enlarge the opening letter when space allows.',
-      value: preferences.showDropCaps,
-      onChange: setShowDropCaps,
-    },
-  ];
-}
+function DisplayChoiceRow({ playbackKey, ...choice }: DisplayChoice) {
+  const { preferences } = usePreferences();
+  const shown = preferences[choice.preferenceKey];
 
-function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
   return (
     <>
-      <SwitchChoice {...choice} />
-      {playback !== undefined && choice.value ? (
+      <PreferenceSwitch {...choice} />
+      {playbackKey !== undefined && shown ? (
         <div className="pl-6">
-          <SwitchChoice
+          <PreferenceSwitch
             description={PLAYBACK_CHOICE_DESCRIPTION}
             label={PLAYBACK_CHOICE_LABEL}
-            onChange={playback.onChange}
-            value={playback.value}
+            preferenceKey={playbackKey}
           />
         </div>
       ) : null}
@@ -626,35 +609,26 @@ function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
 }
 
 function DisplaySettings() {
-  const choices = useDisplayChoices();
-
   return (
     <SettingsGroup legend="Display">
-      {choices.map((choice) => (
-        <DisplayChoiceRow key={choice.label} {...choice} />
+      {DISPLAY_CHOICES.map((choice) => (
+        <DisplayChoiceRow key={choice.preferenceKey} {...choice} />
       ))}
     </SettingsGroup>
   );
 }
 
 function UpdateSettings() {
-  const { preferences, setUpdateChecks } = usePreferences();
+  const { preferences } = usePreferences();
 
   return (
     <SettingsGroup legend="Updates">
-      <div className="flex flex-wrap gap-x-5">
-        {Object.values(UpdateChecks).map((updateChecks) => (
-          <button
-            aria-pressed={preferences.updateChecks === updateChecks}
-            className={TEXT_CHOICE_CLASS_NAME}
-            key={updateChecks}
-            onClick={() => setUpdateChecks(updateChecks)}
-            type="button"
-          >
-            {UPDATE_CHECKS_LABEL[updateChecks]}
-          </button>
-        ))}
-      </div>
+      <PreferenceChoices
+        label="Updates"
+        labelOf={(updateChecks) => UPDATE_CHECKS_LABEL[updateChecks]}
+        preferenceKey="updateChecks"
+        values={Object.values(UpdateChecks)}
+      />
       <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
         {UPDATE_CHECKS_DESCRIPTION[preferences.updateChecks]}
       </p>
@@ -663,15 +637,12 @@ function UpdateSettings() {
 }
 
 function LinkSettings() {
-  const { preferences, setConfirmExternalLinks } = usePreferences();
-
   return (
     <SettingsGroup legend="External links">
-      <SwitchChoice
+      <PreferenceSwitch
         description="Ask before opening a website outside Lucerna."
         label="Confirm before leaving"
-        onChange={setConfirmExternalLinks}
-        value={preferences.confirmExternalLinks}
+        preferenceKey="confirmExternalLinks"
       />
     </SettingsGroup>
   );
@@ -685,24 +656,16 @@ function SettingsTabs({
   readonly selected: SettingsTab;
 }) {
   return (
-    <div
-      aria-label="Settings sections"
+    <ChoiceGroup
       className="flex shrink-0 flex-wrap gap-x-5 border-b border-hairline px-5 lg:px-8"
-      role="tablist"
-    >
-      {Object.values(SettingsTab).map((tab) => (
-        <button
-          aria-selected={selected === tab}
-          className={TAB_CLASS_NAME}
-          key={tab}
-          onClick={() => onSelect(tab)}
-          role="tab"
-          type="button"
-        >
-          {SETTINGS_TAB_LABEL[tab]}
-        </button>
-      ))}
-    </div>
+      itemClassName={TAB_CLASS_NAME}
+      label="Settings sections"
+      labelOf={(tab) => SETTINGS_TAB_LABEL[tab]}
+      onSelect={onSelect}
+      selected={selected}
+      tabs
+      values={Object.values(SettingsTab)}
+    />
   );
 }
 
@@ -728,6 +691,22 @@ function GeneralTab() {
   );
 }
 
+function AboutTab(props: AboutSettingsProps) {
+  return (
+    <>
+      <AboutSettings {...props} />
+      <DiagnosticsSettings />
+    </>
+  );
+}
+
+const TAB_PANEL: Readonly<Record<SettingsTab, (props: AboutSettingsProps) => ReactNode>> = {
+  [SettingsTab.Rosary]: RosaryTab,
+  [SettingsTab.Library]: ReaderSettings,
+  [SettingsTab.General]: GeneralTab,
+  [SettingsTab.About]: AboutTab,
+};
+
 type SettingsDialogProps = {
   readonly open: boolean;
   readonly scope: SettingsScope;
@@ -737,7 +716,7 @@ type SettingsDialogProps = {
 };
 
 export function SettingsDialog(props: SettingsDialogProps) {
-  const { dialogRef, headingRef, returnFocusRef } = useSettingsDialog(props.open);
+  const { dialogRef, headingRef, returnFocus } = useSettingsDialog(props.open);
   const { cardStyle, handleProps } = useCardResize(dialogRef);
   const [tab, setTab] = useState(defaultTabOf(props.scope));
 
@@ -749,12 +728,7 @@ export function SettingsDialog(props: SettingsDialogProps) {
 
   const handleDialogClose = (): void => {
     props.onClose();
-    const returnFocus = returnFocusRef.current;
-    returnFocusRef.current = null;
-
-    if (returnFocus?.isConnected) {
-      returnFocus.focus();
-    }
+    returnFocus.restore();
   };
 
   return (
@@ -786,32 +760,15 @@ export function SettingsDialog(props: SettingsDialogProps) {
   );
 }
 
-function SettingsBody({
-  onOpenInstallGuide,
-  onOpenReferences,
-  tab,
-}: {
-  readonly onOpenInstallGuide: () => void;
-  readonly onOpenReferences: () => void;
-  readonly tab: SettingsTab;
-}) {
+function SettingsBody({ tab, ...panelProps }: AboutSettingsProps & { readonly tab: SettingsTab }) {
+  const Panel = TAB_PANEL[tab];
+
   return (
     <div
       className="scroll-region min-h-0 flex-1 overflow-y-auto px-5 pt-3 pb-5 lg:px-8 lg:pb-8"
       role="tabpanel"
     >
-      {tab === SettingsTab.Rosary ? <RosaryTab /> : null}
-      {tab === SettingsTab.Library ? <ReaderSettings /> : null}
-      {tab === SettingsTab.General ? <GeneralTab /> : null}
-      {tab === SettingsTab.About ? (
-        <>
-          <AboutSettings
-            onOpenInstallGuide={onOpenInstallGuide}
-            onOpenReferences={onOpenReferences}
-          />
-          <DiagnosticsSettings />
-        </>
-      ) : null}
+      <Panel {...panelProps} />
     </div>
   );
 }

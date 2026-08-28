@@ -1,13 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
+import { ViewHeader } from '../../components/layout.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
 import { scheduledMysterySetId } from '../rosary/schedule.ts';
-import {
-  CITATION_CLASS_NAME,
-  EYEBROW_CLASS_NAME,
-  SCRIPTURE_CLASS_NAME,
-  SUBTITLE_CLASS_NAME,
-  TITLE_CLASS_NAME,
-} from '../../styles.ts';
+import { CITATION_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
 import {
   GALLERY_SORT_LABEL,
   galleryGroupsFor,
@@ -17,7 +13,6 @@ import {
 import { GalleryShelf } from './GalleryShelf.tsx';
 
 const GALLERY_TITLE_ID = 'gallery-title';
-const LEDE_CLASS_NAME = `max-w-prose ${SCRIPTURE_CLASS_NAME}`;
 
 type GalleryViewProps = {
   readonly onFocusRestored: () => void;
@@ -27,13 +22,13 @@ type GalleryViewProps = {
 
 function GalleryHeader() {
   return (
-    <header className="flex flex-col gap-2 pt-2">
-      <p className={EYEBROW_CLASS_NAME}>Art for contemplation</p>
-      <h1 className={TITLE_CLASS_NAME} id={GALLERY_TITLE_ID}>
-        The Lucerna Collection
-      </h1>
-      <p className={LEDE_CLASS_NAME}>Works gathered for prayer and contemplation.</p>
-    </header>
+    <ViewHeader
+      className="gap-2 pt-2"
+      eyebrow="Art for contemplation"
+      id={GALLERY_TITLE_ID}
+      lede="Works gathered for prayer and contemplation."
+      title="The Lucerna Collection"
+    />
   );
 }
 
@@ -42,31 +37,23 @@ type SortControlProps = {
   readonly onSelectSort: (sort: GallerySort) => void;
 };
 
+const SORT_CHOICE_CLASS_NAME = `min-h-11 ${SUBTITLE_CLASS_NAME} text-muted transition-colors hover:text-accent aria-pressed:text-accent-current aria-pressed:underline aria-pressed:decoration-accent-current aria-pressed:underline-offset-8 focus-ring`;
+
 function SortControl({ sort, onSelectSort }: SortControlProps) {
   return (
-    <fieldset className="m-0 min-w-0 border-0 p-0">
-      <legend className="sr-only">View by</legend>
-      <div className="flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-1">
-        <span aria-hidden="true" className={`${CITATION_CLASS_NAME} shrink-0 text-muted italic`}>
-          View by
-        </span>
-        {Object.values(GallerySort).map((candidate) => {
-          const selected = candidate === sort;
-
-          return (
-            <button
-              aria-pressed={selected}
-              className={`min-h-11 ${SUBTITLE_CLASS_NAME} transition-colors focus-ring ${selected ? 'text-accent-current underline decoration-accent-current underline-offset-8' : 'text-muted hover:text-accent'}`}
-              key={candidate}
-              onClick={() => onSelectSort(candidate)}
-              type="button"
-            >
-              {GALLERY_SORT_LABEL[candidate]}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
+    <ChoiceGroup
+      className="flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-1"
+      itemClassName={SORT_CHOICE_CLASS_NAME}
+      label="View by"
+      labelOf={(candidate) => GALLERY_SORT_LABEL[candidate]}
+      onSelect={onSelectSort}
+      selected={sort}
+      values={Object.values(GallerySort)}
+    >
+      <span aria-hidden="true" className={`${CITATION_CLASS_NAME} shrink-0 text-muted italic`}>
+        View by
+      </span>
+    </ChoiceGroup>
   );
 }
 
@@ -80,18 +67,13 @@ type ArtworkButtonRegistrar = (artworkId: string, button: HTMLButtonElement | nu
 
 function GallerySection({ group, onOpenArtwork, registerButton }: GallerySectionProps) {
   return (
-    <section className="flex min-w-0 flex-col gap-3">
-      {group.heading === null ? null : (
-        <h2 className={`${TITLE_CLASS_NAME} border-b border-hairline pb-2`}>{group.heading}</h2>
-      )}
-
-      <GalleryShelf
-        artworks={group.artworks}
-        label={group.heading ?? 'The Lucerna Collection'}
-        onOpenArtwork={onOpenArtwork}
-        registerButton={registerButton}
-      />
-    </section>
+    <GalleryShelf
+      artworks={group.artworks}
+      heading={group.heading}
+      label={group.heading ?? 'The Lucerna Collection'}
+      onOpenArtwork={onOpenArtwork}
+      registerButton={registerButton}
+    />
   );
 }
 

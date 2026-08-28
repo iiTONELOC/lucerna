@@ -10,18 +10,11 @@ import {
 import { PreferencesContext, type PreferencesContextValue } from './context.ts';
 import { applyPreferencesToDocument } from './dom.ts';
 import {
-  type BeadMaterial,
   DEFAULT_PREFERENCES,
-  type OpeningDuration,
   type Preferences,
   type PreferencesAction,
   PreferencesActionType,
   preferencesReducer,
-  type ReaderFace,
-  type ReaderGround,
-  type TextScale,
-  type Theme,
-  type UpdateChecks,
 } from './model.ts';
 import { loadPreferences, savePreferences } from './storage.ts';
 
@@ -66,45 +59,7 @@ const contextValueFrom = (
   dispatch: PreferencesDispatch,
 ): PreferencesContextValue => ({
   preferences,
-  setTheme: (theme: Theme) => dispatch({ type: PreferencesActionType.SetTheme, theme }),
-  setTextScale: (textScale: TextScale) =>
-    dispatch({ type: PreferencesActionType.SetTextScale, textScale }),
-  setReaderFace: (readerFace: ReaderFace) =>
-    dispatch({ type: PreferencesActionType.SetReaderFace, readerFace }),
-  setReaderTextScale: (readerTextScale: TextScale) =>
-    dispatch({ type: PreferencesActionType.SetReaderTextScale, readerTextScale }),
-  setReaderGround: (readerGround: ReaderGround) =>
-    dispatch({ type: PreferencesActionType.SetReaderGround, readerGround }),
-  setShowRedLetter: (showRedLetter: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowRedLetter, showRedLetter }),
-  setOpeningDuration: (openingDuration: OpeningDuration) =>
-    dispatch({ type: PreferencesActionType.SetOpeningDuration, openingDuration }),
-  setReadingSpeed: (readingSpeed: number) =>
-    dispatch({ type: PreferencesActionType.SetReadingSpeed, readingSpeed }),
-  setBeadMaterial: (beadMaterial: BeadMaterial) =>
-    dispatch({ type: PreferencesActionType.SetBeadMaterial, beadMaterial }),
-  setShowGuidance: (showGuidance: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowGuidance, showGuidance }),
-  setReadGuidance: (readGuidance: boolean) =>
-    dispatch({ type: PreferencesActionType.SetReadGuidance, readGuidance }),
-  setShowDecadeOfferings: (showDecadeOfferings: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowDecadeOfferings, showDecadeOfferings }),
-  setReadDecadeOfferings: (readDecadeOfferings: boolean) =>
-    dispatch({ type: PreferencesActionType.SetReadDecadeOfferings, readDecadeOfferings }),
-  setShowDropCaps: (showDropCaps: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowDropCaps, showDropCaps }),
-  setShowMysteryFruits: (showMysteryFruits: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowMysteryFruits, showMysteryFruits }),
-  setReadMysteryFruits: (readMysteryFruits: boolean) =>
-    dispatch({ type: PreferencesActionType.SetReadMysteryFruits, readMysteryFruits }),
-  setShowScriptureReadings: (showScriptureReadings: boolean) =>
-    dispatch({ type: PreferencesActionType.SetShowScriptureReadings, showScriptureReadings }),
-  setIncludeFatimaPrayer: (includeFatimaPrayer: boolean) =>
-    dispatch({ type: PreferencesActionType.SetIncludeFatimaPrayer, includeFatimaPrayer }),
-  setConfirmExternalLinks: (confirmExternalLinks: boolean) =>
-    dispatch({ type: PreferencesActionType.SetConfirmExternalLinks, confirmExternalLinks }),
-  setUpdateChecks: (updateChecks: UpdateChecks) =>
-    dispatch({ type: PreferencesActionType.SetUpdateChecks, updateChecks }),
+  setPreference: (key, value) => dispatch({ type: PreferencesActionType.Set, key, value }),
 });
 
 export function PreferencesProvider({ children }: Readonly<PropsWithChildren>) {

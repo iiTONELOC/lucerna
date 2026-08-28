@@ -10,13 +10,7 @@ import {
   type ChainSpan,
   type DrapeGeometry,
 } from './drape.ts';
-import {
-  createProgression,
-  DEFAULT_ROSARY_OPTIONS,
-  nonBeadAnchorsOf,
-  StepAnchor,
-  StepArchetype,
-} from './progression.ts';
+import { createProgression, nonBeadAnchorsOf, StepAnchor, StepArchetype } from './progression.ts';
 
 const ROSARY_BEAD_COUNT = 59;
 const LOOP_BEAD_COUNT = 54;
@@ -32,11 +26,9 @@ if (mysterySet === undefined) {
   throw new RangeError('Rosary catalog must contain a mystery set');
 }
 
-const progression = createProgression(
-  mysterySet,
-  contentCatalog.rosary.guidance,
-  DEFAULT_ROSARY_OPTIONS,
-);
+const progression = createProgression(mysterySet, contentCatalog.rosary.guidance, {
+  includeFatimaPrayer: true,
+});
 const slots = beadSlotsOf(progression);
 
 const geometry = (): DrapeGeometry => createDrapeGeometry(slots);

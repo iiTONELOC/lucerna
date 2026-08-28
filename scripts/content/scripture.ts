@@ -85,16 +85,15 @@ const cleanVerseText = (value: string): string => {
   return text;
 };
 
-const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<number, string> => {
-  const sourceBook = source
+export const sourceBookOf = (source: string): string | undefined =>
+  source
     .split(/\r?\n/u)
     .find((line) => line.startsWith(BOOK_MARKER))
     ?.slice(BOOK_MARKER.length)
     .trim();
 
-  const expectedSourceBook = sourceBookFor(range.book);
-
-  if (sourceBook !== expectedSourceBook) {
+const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<number, string> => {
+  if (sourceBookOf(source) !== sourceBookFor(range.book)) {
     throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, range.sourceFile);
   }
 

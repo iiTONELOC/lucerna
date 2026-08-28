@@ -5,6 +5,7 @@ import {
   BibleTestament,
   bibleBookFrom,
   bibleIndexFrom,
+  recordFrom,
   type BibleBlock,
   type BibleBook,
   type BibleChapter,
@@ -15,7 +16,7 @@ import {
 } from '../../src/content/schema.ts';
 import { isRecord } from '../../src/shared/guards.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
-import { ContentBuildError, ContentBuildErrorCode, readJsonFile, recordFrom } from './records.ts';
+import { buildFailure, ContentBuildError, ContentBuildErrorCode, readJsonFile } from './records.ts';
 import {
   BIBLE_SOURCE_ID,
   RED_LETTER_DATABASE,
@@ -150,9 +151,7 @@ const NOTE_QUOTATION_ENDS: readonly string[] = [String.raw`\fqa*`, String.raw`\f
 const VERSE_LABEL_START = String.raw`\vp `;
 const VERSE_LABEL_END = String.raw`\vp*`;
 
-const structureError = (context: string): never => {
-  throw new ContentBuildError(ContentBuildErrorCode.InvalidBibleStructure, context);
-};
+const structureError = buildFailure(ContentBuildErrorCode.InvalidBibleStructure);
 
 const normalizeSpace = (value: string): string => value.replace(/\s+/gu, ' ');
 
@@ -650,11 +649,7 @@ export type BibleContent = {
 };
 
 export const buildBibleContent = async (repositoryRoot: URL): Promise<BibleContent> => {
-  const sources = recordFrom(
-    await readJsonFile(SOURCE_DATABASE, repositoryRoot),
-    ContentBuildErrorCode.MissingSource,
-    BIBLE_SOURCE_ID,
-  );
+  const sources = recordFrom(await readJsonFile(SOURCE_DATABASE, repositoryRoot), 'sources');
 
   if (!isRecord(sources[BIBLE_SOURCE_ID])) {
     throw new ContentBuildError(ContentBuildErrorCode.MissingSource, BIBLE_SOURCE_ID);

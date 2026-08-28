@@ -1,12 +1,4 @@
-import {
-  Fragment,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-  type RefObject,
-} from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { loadBibleBook } from '../../content/bibleLoader.ts';
 import { contentCatalog } from '../../content/catalog.ts';
 import { saveLastBibleBook } from '../../state/reading/readingPositions.ts';
@@ -24,31 +16,22 @@ import {
 import {
   APPARATUS_CLASS_NAME,
   CHAPTER_CLASS_NAME,
+  QUIET_BUTTON_CLASS_NAME,
   READING_CLASS_NAME,
   SUBTITLE_CLASS_NAME,
   SUPERSCRIPT_CLASS_NAME,
 } from '../../styles.ts';
-import { MarkGlue } from '../../components/marks/MarkGlue.tsx';
-import { tailStartOf } from '../../shared/text.ts';
+import { GluedTail } from '../../components/marks/MarkGlue.tsx';
 import { NoteMark, RedLetterMark } from '../../components/marks/Marks.tsx';
+import { runText } from '../../components/marks/runText.tsx';
 import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
 import { apparatusReferenceTarget, type ReferenceTarget } from '../references/referenceCatalog.ts';
-import { BIBLE_TITLE, type BibleVerseLocation } from './model.ts';
+import { BIBLE_TITLE, type BibleVerseLocation, type ReaderJump } from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
-import {
-  READER_JUMP_BUTTON_CLASS_NAME,
-  ReaderLocationControl,
-  type ReaderJump,
-} from './ReaderLocation.tsx';
+import { JumpButtons, ReaderLocationControl } from './ReaderLocation.tsx';
 import { ReaderSurface } from './ReaderSurface.tsx';
 import { useHeadingFocus } from './useHeadingFocus.ts';
-import {
-  blockIndexPropsOf,
-  scrollToBlock,
-  useReadingPosition,
-  useTopmostTracker,
-  type TopmostTracker,
-} from './useReadingPosition.ts';
+import { blockIndexPropsOf, useReadingPosition, useTopmostTracker } from './useReadingPosition.ts';
 type NoteEntry = {
   readonly key: string;
   readonly note: BibleNoteRun;
@@ -155,9 +138,6 @@ const runClassNameOf = (run: BibleRun, showRedLetter: boolean): string | undefin
   return run.kind === BibleRunKind.Reference ? 'text-muted italic' : undefined;
 };
 
-const runText = (text: string, className: string | undefined): ReactNode =>
-  className === undefined ? text : <span className={className}>{text}</span>;
-
 function GlueNotes({
   notes,
   onToggleNote,
@@ -212,17 +192,11 @@ function GluedRun({
     return runText(run.text, className);
   }
 
-  const tailStart = tailStartOf(run.text);
-
   return (
-    <>
-      {runText(run.text.slice(0, tailStart), className)}
-      <MarkGlue>
-        {runText(run.text.slice(tailStart), className)}
-        {selfMarked ? <RedLetterMark onToggle={onToggleMarking} open={markingOpen} /> : null}
-        <GlueNotes notes={notes} onToggleNote={onToggleNote} openNotes={openNotes} />
-      </MarkGlue>
-    </>
+    <GluedTail className={className} text={run.text}>
+      {selfMarked ? <RedLetterMark onToggle={onToggleMarking} open={markingOpen} /> : null}
+      <GlueNotes notes={notes} onToggleNote={onToggleNote} openNotes={openNotes} />
+    </GluedTail>
   );
 }
 
@@ -513,17 +487,11 @@ function ChapterNav({
 
   return (
     <nav aria-label="Chapters" className="flex flex-wrap justify-center gap-x-1 pb-8">
-      {jumps.map(({ blockIndex, label }) => (
-        <button
-          aria-label={`Chapter ${label}`}
-          className={READER_JUMP_BUTTON_CLASS_NAME}
-          key={blockIndex}
-          onClick={() => scrollToBlock(articleRef, blockIndex)}
-          type="button"
-        >
-          {label}
-        </button>
-      ))}
+      <JumpButtons
+        ariaLabelOf={(jump) => `Chapter ${jump.label}`}
+        articleRef={articleRef}
+        jumps={jumps}
+      />
     </nav>
   );
 }
@@ -549,8 +517,6 @@ const useBibleBook = (bookId: string): BibleBook | null => {
   return book;
 };
 
-const PAGER_BUTTON_CLASS_NAME = `min-h-11 text-muted transition-colors hover:text-foreground focus-ring ${SUBTITLE_CLASS_NAME}`;
-
 function BookPager({
   book,
   onOpenBook,
@@ -572,7 +538,7 @@ function BookPager({
         <span aria-hidden="true" />
       ) : (
         <button
-          className={`${PAGER_BUTTON_CLASS_NAME} text-left`}
+          className={`${QUIET_BUTTON_CLASS_NAME} text-left`}
           onClick={() => onOpenBook(previous.id)}
           type="button"
         >
@@ -581,7 +547,7 @@ function BookPager({
       )}
       {next === undefined ? null : (
         <button
-          className={`${PAGER_BUTTON_CLASS_NAME} text-right`}
+          className={`${QUIET_BUTTON_CLASS_NAME} text-right`}
           onClick={() => onOpenBook(next.id)}
           type="button"
         >
@@ -590,22 +556,6 @@ function BookPager({
       )}
     </nav>
   );
-}
-
-function BookPosition({
-  articleRef,
-  initialBlockIndex,
-  positionKey,
-  tracker,
-}: {
-  readonly articleRef: RefObject<HTMLElement | null>;
-  readonly initialBlockIndex: number | null;
-  readonly positionKey: string;
-  readonly tracker: TopmostTracker;
-}) {
-  useReadingPosition(positionKey, articleRef, initialBlockIndex, tracker);
-
-  return null;
 }
 
 function BookUnitList({
@@ -650,7 +600,13 @@ function BookBody({
   readonly onOpenSource: (sourceId: string) => void;
 }) {
   const { articleRef, tracker, units } = model;
-  const positionKey = `${contentCatalog.bible.source.id}/${book.id}`;
+
+  useReadingPosition(
+    `${contentCatalog.bible.source.id}/${book.id}`,
+    articleRef,
+    initialBlockIndex,
+    tracker,
+  );
 
   return (
     <>
@@ -662,12 +618,6 @@ function BookBody({
       )}
       <BookUnitList onOpenSource={onOpenSource} units={units} />
       <BookPager book={book} onOpenBook={onOpenBook} />
-      <BookPosition
-        articleRef={articleRef}
-        initialBlockIndex={initialBlockIndex}
-        positionKey={positionKey}
-        tracker={tracker}
-      />
     </>
   );
 }

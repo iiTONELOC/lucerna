@@ -1,14 +1,29 @@
-import { AMBIENT_SCRIM_CLASS_NAME } from '../../styles.ts';
+import { classNames } from '../../shared/classNames.ts';
+import { AmbientScrim } from './model.ts';
 
-export function AmbientGround({ source }: { readonly source: string }) {
+const IMAGE_CLASS_NAME: Readonly<Record<AmbientScrim, string | undefined>> = {
+  [AmbientScrim.Ground]: 'opacity-[0.52]!',
+  [AmbientScrim.Focus]: undefined,
+};
+
+export function AmbientGround({
+  scrim = AmbientScrim.Ground,
+  source,
+}: {
+  readonly scrim?: AmbientScrim;
+  readonly source: string;
+}) {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       <img
         alt=""
-        className="art-ambient absolute inset-0 size-full object-cover opacity-[0.52]!"
+        className={classNames(
+          'art-ambient absolute inset-0 size-full object-cover',
+          IMAGE_CLASS_NAME[scrim],
+        )}
         src={source}
       />
-      <div className={AMBIENT_SCRIM_CLASS_NAME} />
+      <div className={`${scrim} absolute inset-0`} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { useLayoutEffect, useState, type RefObject } from 'react';
-
+import { useCallback, type RefObject } from 'react';
+import { useResizeMeasure, type Measurement } from '../../shared/useResizeMeasure.ts';
 import { CENTERPIECE_RING_SCALE, PENDANT_BEAD_COUNT, type DrapeGeometry } from './drape.ts';
 
 const OVERHANG_GAP_PIXELS = 4;
@@ -54,43 +54,26 @@ const overhangOf = (
   return pendantBottom <= highestTextTop || width <= 0 ? NO_OVERHANG : { width };
 };
 
-const sameOverhang = (a: PendantOverhang, b: PendantOverhang): boolean => a.width === b.width;
+const OVERHANG_MEASUREMENT: Measurement<PendantOverhang> = {
+  initial: NO_OVERHANG,
+  same: (previous, next) => previous.width === next.width,
+};
 
 export const usePendantOverhang = (
   geometry: DrapeGeometry,
   key: string,
   refs: PendantOverhangRefs,
 ): PendantOverhang => {
-  const [overhang, setOverhang] = useState(NO_OVERHANG);
   const { drape, reading, scripture } = refs;
-
-  useLayoutEffect(() => {
-    const measure = (): void => {
-      const drapeElement = drape.current;
-      const readingElement = reading.current;
-      const scriptureElement = scripture.current;
-      const next =
-        drapeElement === null || readingElement === null || scriptureElement === null
-          ? NO_OVERHANG
-          : overhangOf(drapeElement, readingElement, scriptureElement, geometry);
-
-      setOverhang((previous) => (sameOverhang(previous, next) ? previous : next));
-    };
-
-    measure();
-
+  const measure = useCallback((): PendantOverhang => {
+    const drapeElement = drape.current;
+    const readingElement = reading.current;
     const scriptureElement = scripture.current;
 
-    if (scriptureElement === null || typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
+    return drapeElement === null || readingElement === null || scriptureElement === null
+      ? NO_OVERHANG
+      : overhangOf(drapeElement, readingElement, scriptureElement, geometry);
+  }, [drape, geometry, reading, scripture]);
 
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(scriptureElement);
-
-    return () => observer.disconnect();
-  }, [drape, geometry, key, reading, scripture]);
-
-  return overhang;
+  return useResizeMeasure(scripture, measure, OVERHANG_MEASUREMENT, key)[0];
 };

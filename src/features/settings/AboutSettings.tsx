@@ -8,6 +8,7 @@ import {
   COPYRIGHT_NOTICE,
   TRADEMARK_NOTICE,
 } from '../../appMetadata.ts';
+import { DetailList } from '../../components/layout.tsx';
 import { SupportEmailLink } from '../../components/links/SupportEmailLink.tsx';
 import {
   BODY_CLASS_NAME,
@@ -18,26 +19,18 @@ import {
 
 const ABOUT_TITLE_ID = 'settings-about-title';
 
-function AboutTerm({ children }: { readonly children: string }) {
-  return <dt className={EYEBROW_CLASS_NAME}>{children}</dt>;
-}
-
 function ApplicationDetails() {
   return (
-    <dl className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 pt-4">
-      <AboutTerm>Version</AboutTerm>
-      <dd className={`${CITATION_CLASS_NAME} text-secondary`}>{APP_VERSION}</dd>
-      <AboutTerm>Copyright</AboutTerm>
-      <dd className={`${CITATION_CLASS_NAME} text-secondary`}>
-        {COPYRIGHT_NOTICE}. {APPLICATION_LICENSE}
-      </dd>
-      <AboutTerm>License</AboutTerm>
-      <dd className={`${CITATION_CLASS_NAME} text-secondary`}>{APPLICATION_LICENSE_DETAIL}</dd>
-      <AboutTerm>Support</AboutTerm>
-      <dd className={`min-w-0 ${CITATION_CLASS_NAME}`}>
-        <SupportEmailLink />
-      </dd>
-    </dl>
+    <DetailList
+      className="items-baseline pt-4"
+      rows={[
+        ['Version', APP_VERSION],
+        ['Copyright', `${COPYRIGHT_NOTICE}. ${APPLICATION_LICENSE}`],
+        ['License', APPLICATION_LICENSE_DETAIL],
+        ['Support', <SupportEmailLink key="support" />],
+      ]}
+      termClassName={EYEBROW_CLASS_NAME}
+    />
   );
 }
 
@@ -55,7 +48,7 @@ function ApplicationInformation() {
   );
 }
 
-type AboutSettingsProps = {
+export type AboutSettingsProps = {
   readonly onOpenInstallGuide: () => void;
   readonly onOpenReferences: () => void;
 };

@@ -1,3 +1,4 @@
+import { classNames } from '../../shared/classNames.ts';
 import { SettingsGlyph } from '../icons/SettingsGlyph.tsx';
 
 const SETTINGS_BUTTON_CLASS_NAME =
@@ -13,11 +14,7 @@ export function SettingsButton({
   return (
     <button
       aria-label="Settings"
-      className={
-        className === undefined
-          ? SETTINGS_BUTTON_CLASS_NAME
-          : `${SETTINGS_BUTTON_CLASS_NAME} ${className}`
-      }
+      className={classNames(SETTINGS_BUTTON_CLASS_NAME, className)}
       onClick={onOpen}
       title="Settings"
       type="button"

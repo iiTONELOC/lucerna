@@ -8,12 +8,14 @@ import {
   type ResolvedMystery,
 } from '../../content/catalog.ts';
 import type { MysteryReflection } from '../../content/schema.ts';
+import { ORDINAL_WORDS } from '../../shared/ordinals.ts';
 import {
   READING_SPEED_MAXIMUM,
   READING_SPEED_MINIMUM,
   READING_SPEED_STEP,
   type Preferences,
 } from '../../state/preferences/model.ts';
+import type { SetPreference } from '../../state/preferences/context.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import type { BibleVerseLocation } from '../library/model.ts';
 import type { ReferenceTarget } from '../references/referenceCatalog.ts';
@@ -48,8 +50,6 @@ import {
 } from './usePendantOverhang.ts';
 import { usePrayerFit, type FitRefs, type FitResult } from './usePrayerFit.ts';
 import { useGuidedPlayback, type GuidedPlayback } from './useGuidedPlayback.ts';
-
-const ORDINAL_WORD: readonly string[] = ['First', 'Second', 'Third', 'Fourth', 'Fifth'];
 
 export type HeadingProps = {
   readonly rubric: string;
@@ -120,9 +120,7 @@ const setShortName = (mysterySetId: string): string =>
 
 const rubricFor = (mysterySetId: string, step: PrayerStep, opening: boolean): string => {
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
-    return (
-      (ORDINAL_WORD[step.mystery.ordinal - 1] ?? '') + ' ' + setShortName(mysterySetId) + ' Mystery'
-    );
+    return `${ORDINAL_WORDS[step.mystery.ordinal - 1] ?? ''} ${setShortName(mysterySetId)} Mystery`;
   }
 
   if (step.decade !== undefined) {
@@ -454,21 +452,26 @@ const steppedReadingSpeed = (readingSpeed: number, direction: 1 | -1): number =>
 type KeyboardRequest = {
   readonly controls: ControlsBundle;
   readonly readingSpeed: number;
-  readonly setReadingSpeed: (readingSpeed: number) => void;
+  readonly setPreference: SetPreference;
 };
 
 const keyActionsOf = ({
   controls,
   readingSpeed,
-  setReadingSpeed,
-}: KeyboardRequest): Readonly<Record<PrayerKey, () => void>> => ({
-  [PrayerKey.Space]: controls.actions.onTogglePlayback,
-  [PrayerKey.Enter]: controls.actions.onForward,
-  [PrayerKey.Plus]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, 1)),
-  [PrayerKey.Equals]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, 1)),
-  [PrayerKey.Minus]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, -1)),
-  [PrayerKey.Underscore]: () => setReadingSpeed(steppedReadingSpeed(readingSpeed, -1)),
-});
+  setPreference,
+}: KeyboardRequest): Readonly<Record<PrayerKey, () => void>> => {
+  const stepSpeed = (direction: 1 | -1): void =>
+    setPreference('readingSpeed', steppedReadingSpeed(readingSpeed, direction));
+
+  return {
+    [PrayerKey.Space]: controls.actions.onTogglePlayback,
+    [PrayerKey.Enter]: controls.actions.onForward,
+    [PrayerKey.Plus]: () => stepSpeed(1),
+    [PrayerKey.Equals]: () => stepSpeed(1),
+    [PrayerKey.Minus]: () => stepSpeed(-1),
+    [PrayerKey.Underscore]: () => stepSpeed(-1),
+  };
+};
 
 const isPrayerKey = (key: string): key is PrayerKey =>
   Object.values<string>(PrayerKey).includes(key);
@@ -555,7 +558,7 @@ const useDrapeLayout = (
 });
 
 export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSession => {
-  const { preferences, setReadingSpeed } = usePreferences();
+  const { preferences, setPreference } = usePreferences();
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const refs = usePrayerFocusRefs();
@@ -586,7 +589,7 @@ export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSessi
   const controls = controlsOf(request, playback);
 
   usePrayerFocusReset(display.fitKey, refs);
-  usePrayerKeyboard({ controls, readingSpeed: preferences.readingSpeed, setReadingSpeed });
+  usePrayerKeyboard({ controls, readingSpeed: preferences.readingSpeed, setPreference });
   useFollowPlaybackWord(refs, playback);
 
   return {

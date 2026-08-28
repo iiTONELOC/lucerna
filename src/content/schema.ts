@@ -338,7 +338,7 @@ const invalid = (path: string): never => {
   throw new ContentSchemaError(path);
 };
 
-const recordFrom = (value: unknown, path: string): UnknownRecord => {
+export const recordFrom = (value: unknown, path: string): UnknownRecord => {
   if (!isRecord(value)) {
     return invalid(path);
   }
@@ -346,7 +346,7 @@ const recordFrom = (value: unknown, path: string): UnknownRecord => {
   return value;
 };
 
-const arrayFrom = (value: unknown, path: string): readonly unknown[] => {
+export const arrayFrom = (value: unknown, path: string): readonly unknown[] => {
   if (!Array.isArray(value)) {
     return invalid(path);
   }
@@ -354,7 +354,7 @@ const arrayFrom = (value: unknown, path: string): readonly unknown[] => {
   return value;
 };
 
-const stringFrom = (record: UnknownRecord, field: string, path: string): string => {
+export const stringFrom = (record: UnknownRecord, field: string, path: string): string => {
   const value = record[field];
 
   if (typeof value !== 'string' || value.length === 0) {
@@ -382,7 +382,7 @@ const optionalStringFrom = (
   return value;
 };
 
-const positiveIntegerFrom = (record: UnknownRecord, field: string, path: string): number => {
+export const positiveIntegerFrom = (record: UnknownRecord, field: string, path: string): number => {
   const value = record[field];
 
   if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {

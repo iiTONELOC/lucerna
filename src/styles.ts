@@ -21,13 +21,19 @@ export const EYEBROW_CLASS_NAME = `${SUBTITLE_CLASS_NAME} font-semibold text-acc
 
 export const ACCENT_BUTTON_CLASS_NAME = `focus-ring min-h-11 w-fit rounded border border-accent bg-transparent px-5 py-2 ${SUBTITLE_CLASS_NAME} text-accent transition-colors hover:bg-accent hover:text-accent-foreground`;
 
-export const INLINE_LINK_CLASS_NAME = `focus-ring inline-flex min-h-11 w-fit items-center text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent ${CITATION_CLASS_NAME}`;
+export const ACTION_TEXT_CLASS_NAME = `focus-ring min-h-11 transition-colors ${SUBTITLE_CLASS_NAME}`;
+
+export const QUIET_BUTTON_CLASS_NAME = `${ACTION_TEXT_CLASS_NAME} text-muted hover:text-foreground`;
+
+export const UNDERLINE_LINK_CLASS_NAME =
+  'focus-ring text-accent-current underline decoration-hairline underline-offset-4 transition-colors hover:decoration-accent';
+
+export const INLINE_LINK_CLASS_NAME = `inline-flex min-h-11 w-fit items-center ${UNDERLINE_LINK_CLASS_NAME} ${CITATION_CLASS_NAME}`;
+
+export const CONTENT_WIDTH_CLASS_NAME = 'mx-auto w-full max-w-360';
 
 export const HORIZONTAL_TRACK_CLASS_NAME =
   'flex min-w-0 cursor-grab overflow-x-auto overscroll-x-contain px-2 py-1 select-none active:cursor-grabbing scrollbar-none [&::-webkit-scrollbar]:hidden';
-
-export const AMBIENT_SCRIM_CLASS_NAME =
-  'absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_44%,color-mix(in_srgb,var(--theme-background)_80%,transparent)_100%),color-mix(in_srgb,var(--theme-background)_34%,transparent)]';
 
 export const READING_CLASS_NAME = 'font-reading text-reading leading-reading text-secondary';
 

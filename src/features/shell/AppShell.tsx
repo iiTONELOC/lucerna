@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { contentCatalog } from '../../content/catalog.ts';
+import { useReturnFocus } from '../../shared/focus.ts';
+import { CONTENT_WIDTH_CLASS_NAME } from '../../styles.ts';
 import { loadLastBibleBook } from '../../state/reading/readingPositions.ts';
 import { ArtFocus } from '../gallery/ArtFocus.tsx';
 import { GalleryView } from '../gallery/GalleryView.tsx';
@@ -82,18 +84,13 @@ function StandardViewBody({
   );
 }
 
-const CENTERED_VIEWS: ReadonlySet<ApplicationView> = new Set([
-  ApplicationView.Gallery,
-  ApplicationView.Library,
-]);
-
 function StandardView(props: StandardViewProps) {
-  const centered = CENTERED_VIEWS.has(props.activeView);
+  const centered = props.activeView !== ApplicationView.Rosary;
 
   return (
     <div className="relative flex h-full min-h-0 w-full flex-col">
       {centered ? (
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-360 flex-col">
+        <div className={`flex h-full min-h-0 flex-col ${CONTENT_WIDTH_CLASS_NAME}`}>
           <StandardViewBody {...props} />
         </div>
       ) : (
@@ -287,28 +284,16 @@ type ReferenceOverlayState = {
 
 function useReferenceOverlayState(): ReferenceOverlayState {
   const [focusedReference, setFocusedReference] = useState<ReferenceTarget | null>(null);
-  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const returnFocus = useReturnFocus();
 
   useEffect(() => {
-    const returnFocus = returnFocusRef.current;
-
-    if (focusedReference !== null || returnFocus === null) {
-      return;
+    if (focusedReference === null) {
+      returnFocus.restore();
     }
-
-    returnFocusRef.current = null;
-    const frame = requestAnimationFrame(() => {
-      if (returnFocus.isConnected) {
-        returnFocus.focus();
-      }
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [focusedReference]);
+  }, [focusedReference, returnFocus]);
 
   const openReference = (target: ReferenceTarget): void => {
-    const activeElement = document.activeElement;
-    returnFocusRef.current = activeElement instanceof HTMLElement ? activeElement : null;
+    returnFocus.remember();
     setFocusedReference(target);
   };
 

@@ -3,10 +3,8 @@ import { contentCatalog, type ResolvedMysterySet } from '../../content/catalog.t
 import type { RosaryGuidance } from '../../content/schema.ts';
 import {
   advance,
-  beadIndexOf,
   createProgression,
   currentStep,
-  DEFAULT_ROSARY_OPTIONS,
   isAtEnd,
   isAtStart,
   jumpTo,
@@ -20,10 +18,10 @@ import {
   StepArchetype,
   stepAt,
   stepIndexForAnchor,
-  stepIndexForBead,
   type ChainAnchor,
   type PrayerStep,
   type Progression,
+  type RosaryOptions,
 } from './progression.ts';
 
 const TOTAL_STEPS_WITH_FATIMA = 80;
@@ -35,6 +33,7 @@ const LAST_OPENING_HAIL_MARY_BEAD = 3;
 const LAST_BEAD = 58;
 
 const guidance = contentCatalog.rosary.guidance;
+const FULL_ROSARY: RosaryOptions = { includeFatimaPrayer: true };
 
 const mysterySetFixture = (): ResolvedMysterySet => {
   const [mysterySet] = contentCatalog.rosary.mysterySets;
@@ -47,7 +46,7 @@ const mysterySetFixture = (): ResolvedMysterySet => {
 };
 
 const progressionFixture = (): Progression =>
-  createProgression(mysterySetFixture(), guidance, DEFAULT_ROSARY_OPTIONS);
+  createProgression(mysterySetFixture(), guidance, FULL_ROSARY);
 
 const progressionWithoutFatima = (): Progression =>
   createProgression(mysterySetFixture(), guidance, { includeFatimaPrayer: false });
@@ -93,9 +92,9 @@ describe('createProgression', () => {
 
   test('assigns bead indices in prayed order with no gaps', () => {
     const progression = progressionFixture();
-    const beadIndices = progression.steps
-      .map((step) => beadIndexOf(step))
-      .filter((beadIndex) => beadIndex !== undefined);
+    const beadIndices = progression.steps.flatMap((step) =>
+      step.anchor.kind === StepAnchor.Bead ? [step.anchor.beadIndex] : [],
+    );
 
     expect([...new Set(beadIndices)]).toEqual(
       Array.from({ length: TOTAL_BEADS }, (_, index) => index),
@@ -119,9 +118,7 @@ describe('createProgression validation', () => {
   test('rejects a mystery set with no mysteries rather than building a short rosary', () => {
     const emptySet: ResolvedMysterySet = { ...mysterySetFixture(), mysteries: [] };
 
-    expect(() => createProgression(emptySet, guidance, DEFAULT_ROSARY_OPTIONS)).toThrow(
-      ProgressionError,
-    );
+    expect(() => createProgression(emptySet, guidance, FULL_ROSARY)).toThrow(ProgressionError);
   });
 });
 
@@ -148,7 +145,7 @@ describe('silent steps', () => {
   test('refuses to build when the content and the declared silent steps disagree', () => {
     const drifted: RosaryGuidance = { ...guidance, silentSteps: [SilentStepId.ApostlesCreed] };
 
-    expect(() => createProgression(mysterySetFixture(), drifted, DEFAULT_ROSARY_OPTIONS)).toThrow(
+    expect(() => createProgression(mysterySetFixture(), drifted, FULL_ROSARY)).toThrow(
       ProgressionError,
     );
   });
@@ -210,7 +207,7 @@ describe('decade Hail Mary guidance', () => {
       decadeHailMarys: { ...guidance.decadeHailMarys, text: 'Meditate while praying.' },
     };
 
-    expect(() => createProgression(mysterySetFixture(), drifted, DEFAULT_ROSARY_OPTIONS)).toThrow(
+    expect(() => createProgression(mysterySetFixture(), drifted, FULL_ROSARY)).toThrow(
       ProgressionError,
     );
   });
@@ -428,29 +425,22 @@ describe('anchor cycling', () => {
 });
 
 describe('bead navigation', () => {
-  test('round trips every bead to the step that prays it and back', () => {
+  test('maps every bead to the step that prays it', () => {
     const progression = progressionFixture();
 
     for (let beadIndex = 0; beadIndex < TOTAL_BEADS; beadIndex += 1) {
-      const stepIndex = stepIndexForBead(progression, beadIndex);
+      const stepIndex = progression.stepIndexByBead[beadIndex];
+      const anchor = stepIndex === undefined ? undefined : stepAt(progression, stepIndex).anchor;
 
-      expect(beadIndexOf(stepAt(progression, stepIndex))).toBe(beadIndex);
+      expect(anchor).toEqual({ kind: StepAnchor.Bead, beadIndex });
     }
   });
 
-  test('reports no bead for the steps prayed off the beads', () => {
+  test('prays the remaining steps off the beads', () => {
     const progression = progressionFixture();
     const offBead = progression.steps.filter((step) => step.anchor.kind !== StepAnchor.Bead);
 
     expect(offBead).toHaveLength(TOTAL_STEPS_WITH_FATIMA - TOTAL_BEADS - 5);
-    offBead.forEach((step) => expect(beadIndexOf(step)).toBeUndefined());
-  });
-
-  test('rejects a bead index outside the rosary', () => {
-    const progression = progressionFixture();
-
-    expect(() => stepIndexForBead(progression, TOTAL_BEADS)).toThrow(ProgressionError);
-    expect(() => stepIndexForBead(progression, -1)).toThrow(ProgressionError);
   });
 });
 

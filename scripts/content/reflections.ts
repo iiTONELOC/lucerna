@@ -1,23 +1,6 @@
 import { LibraryBlockKind, type LibraryContent } from '../../src/content/schema.ts';
-import { ContentBuildError, ContentBuildErrorCode } from './records.ts';
-
-const DECADE_ORDINALS: readonly string[] = [
-  'First',
-  'Second',
-  'Third',
-  'Fourth',
-  'Fifth',
-  'Sixth',
-  'Seventh',
-  'Eighth',
-  'Ninth',
-  'Tenth',
-  'Eleventh',
-  'Twelfth',
-  'Thirteenth',
-  'Fourteenth',
-  'Fifteenth',
-];
+import { ORDINAL_WORDS } from '../../src/shared/ordinals.ts';
+import { buildFailure, ContentBuildErrorCode } from './records.ts';
 
 const DECADE_OFFSET_BY_SET: Readonly<Record<string, number>> = {
   joyful: 0,
@@ -29,13 +12,12 @@ const FIRST_METHOD_PATTERN = /^first-method\.(?<set>[a-z]+)\.(?<decade>\d)$/;
 const THIRD_METHOD_PATTERN = /^third-method\.summary\.finding-in-the-temple\.(?<point>\d+)$/;
 const FINDING_HEADING = 'The Finding of Jesus in the Temple';
 
-const failReflection = (sectionId: string): never => {
-  throw new ContentBuildError(ContentBuildErrorCode.InvalidField, `reflection ${sectionId}`);
-};
+const failReflection = (sectionId: string): never =>
+  buildFailure(ContentBuildErrorCode.InvalidField)(`reflection ${sectionId}`);
 
 const firstMethodText = (setId: string, decade: number, text: string): string | null => {
   const offset = DECADE_OFFSET_BY_SET[setId];
-  const ordinal = offset === undefined ? undefined : DECADE_ORDINALS[offset + decade - 1];
+  const ordinal = offset === undefined ? undefined : ORDINAL_WORDS[offset + decade - 1];
 
   if (ordinal === undefined) {
     return null;

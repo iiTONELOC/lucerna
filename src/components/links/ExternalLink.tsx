@@ -1,5 +1,13 @@
-import { BODY_CLASS_NAME } from '../../styles.ts';
-import { useEffect, useId, useRef, useState, type ComponentProps, type ReactNode } from 'react';
+import { BODY_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
+import {
+  useId,
+  useRef,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+  type RefObject,
+} from 'react';
+import { useDialogOpen } from '../../shared/focus.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 
 const DIALOG_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center rounded-md border border-hairline px-4 ${BODY_CLASS_NAME} transition-colors focus-ring`;
@@ -9,26 +17,7 @@ type ExternalLinkDialogProps = {
   readonly href: string;
   readonly onClose: () => void;
   readonly open: boolean;
-  readonly triggerRef: React.RefObject<HTMLAnchorElement | null>;
-};
-
-const useDialogVisibility = (
-  dialogRef: React.RefObject<HTMLDialogElement | null>,
-  open: boolean,
-): void => {
-  useEffect(() => {
-    const dialog = dialogRef.current;
-
-    if (dialog === null) {
-      return;
-    }
-
-    if (open && !dialog.open) {
-      dialog.showModal();
-    } else if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [dialogRef, open]);
+  readonly triggerRef: RefObject<HTMLAnchorElement | null>;
 };
 
 function ExternalLinkDialogActions({
@@ -38,14 +27,14 @@ function ExternalLinkDialogActions({
   return (
     <div className="mt-5 flex justify-end gap-3">
       <button
-        className={DIALOG_ACTION_CLASS_NAME + ' text-secondary hover:text-foreground'}
+        className={`${DIALOG_ACTION_CLASS_NAME} text-secondary hover:text-foreground`}
         onClick={onClose}
         type="button"
       >
         Stay here
       </button>
       <a
-        className={DIALOG_ACTION_CLASS_NAME + ' border-accent text-accent-current'}
+        className={`${DIALOG_ACTION_CLASS_NAME} border-accent text-accent-current`}
         href={href}
         onClick={onClose}
         rel="noreferrer"
@@ -65,12 +54,12 @@ function ExternalLinkDialog({
   triggerRef,
 }: ExternalLinkDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  useDialogVisibility(dialogRef, open);
+  useDialogOpen(dialogRef, open, true);
 
   return (
     <dialog
       aria-describedby={descriptionId}
-      aria-labelledby={descriptionId + '-title'}
+      aria-labelledby={`${descriptionId}-title`}
       className="surface-chrome m-auto max-w-md rounded-xl border border-hairline p-0 text-foreground backdrop:bg-background/80"
       onCancel={(event) => {
         event.preventDefault();
@@ -83,10 +72,7 @@ function ExternalLinkDialog({
       ref={dialogRef}
     >
       <div className="p-5 sm:p-6">
-        <h2
-          className="font-display text-title leading-title font-medium"
-          id={descriptionId + '-title'}
-        >
+        <h2 className={TITLE_CLASS_NAME} id={`${descriptionId}-title`}>
           Open an external website?
         </h2>
         <p className={`pt-3 ${BODY_CLASS_NAME} text-secondary`} id={descriptionId}>

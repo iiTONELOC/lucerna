@@ -7,10 +7,9 @@ import {
   ContentBuildError,
   ContentBuildErrorCode,
   readJsonFile,
-  recordFrom,
-  requiredPositiveInteger,
-  requiredString,
+  sourceRecordOf,
 } from './content/records.ts';
+import { arrayFrom, positiveIntegerFrom, recordFrom, stringFrom } from '../src/content/schema.ts';
 import {
   extractPassage,
   scriptureBookFromReference,
@@ -36,35 +35,32 @@ const GENERATED_LIBRARY_CONTENT = 'src/generated/library-content.json';
 const GENERATED_BIBLE_DIRECTORY = 'src/generated/bible/douay-rheims/';
 const GENERATED_BIBLE_INDEX = 'src/generated/bible/douay-rheims/index.json';
 
-const parseSplashVerse = (value: unknown): SplashVerseRecord => {
-  const record = recordFrom(value, ContentBuildErrorCode.InvalidSplashRecord);
-  const reference = requiredString(record, 'reference');
+const parseSplashVerse = (value: unknown, index: number): SplashVerseRecord => {
+  const path = `openingSplashVerses[${index}]`;
+  const record = recordFrom(value, path);
+  const reference = stringFrom(record, 'reference', path);
   const range: ScriptureRange = {
     reference,
     book: scriptureBookFromReference(reference),
-    chapter: requiredPositiveInteger(record, 'chapter'),
-    verseStart: requiredPositiveInteger(record, 'verseStart'),
-    verseEnd: requiredPositiveInteger(record, 'verseEnd'),
-    sourceFile: requiredString(record, 'sourceFile'),
+    chapter: positiveIntegerFrom(record, 'chapter', path),
+    verseStart: positiveIntegerFrom(record, 'verseStart', path),
+    verseEnd: positiveIntegerFrom(record, 'verseEnd', path),
+    sourceFile: stringFrom(record, 'sourceFile', path),
   };
 
   validateScriptureRange(range);
 
   return {
     ...range,
-    sourceId: requiredString(record, 'sourceId'),
+    sourceId: stringFrom(record, 'sourceId', path),
   };
 };
 
 const parseSplashDatabase = (value: unknown): readonly SplashVerseRecord[] => {
-  const database = recordFrom(value, ContentBuildErrorCode.InvalidSplashDatabase);
-  const records = database['openingSplashVerses'];
-
-  if (!Array.isArray(records)) {
-    throw new ContentBuildError(ContentBuildErrorCode.InvalidSplashDatabase);
-  }
-
-  const verses = records.map(parseSplashVerse);
+  const database = recordFrom(value, 'splash');
+  const verses = arrayFrom(database['openingSplashVerses'], 'openingSplashVerses').map(
+    (record, index) => parseSplashVerse(record, index),
+  );
   const references = new Set(verses.map(({ reference }) => reference));
 
   if (verses.length === 0 || references.size !== verses.length) {
@@ -74,12 +70,8 @@ const parseSplashDatabase = (value: unknown): readonly SplashVerseRecord[] => {
   return verses;
 };
 
-const sourceLabel = (value: unknown, sourceId: string): string => {
-  const sources = recordFrom(value, ContentBuildErrorCode.MissingSource, sourceId);
-  const source = recordFrom(sources[sourceId], ContentBuildErrorCode.MissingSource, sourceId);
-
-  return requiredString(source, 'work');
-};
+const sourceLabel = (value: unknown, sourceId: string): string =>
+  stringFrom(sourceRecordOf(value, sourceId), 'work', `sources.${sourceId}`);
 
 export const buildSplashContent = async (
   repositoryRoot: URL,

@@ -1,8 +1,9 @@
+import { ViewHeader } from '../../components/layout.tsx';
 import {
   BODY_CLASS_NAME,
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
-  TITLE_CLASS_NAME,
+  SUBTITLE_CLASS_NAME,
 } from '../../styles.ts';
 import {
   referenceSections,
@@ -50,7 +51,7 @@ function ReferenceSectionView({
     >
       <p className={EYEBROW_CLASS_NAME}>{section.label}</p>
       <h2
-        className="pt-1 font-display text-subtitle leading-subtitle font-semibold text-foreground"
+        className={`pt-1 ${SUBTITLE_CLASS_NAME} font-semibold text-foreground`}
         id={`references-${section.group}`}
       >
         {section.records.length === 1
@@ -73,17 +74,14 @@ export function ReferencesView({ onOpenReference }: ReferencesViewProps) {
       className="scroll-region h-full overflow-x-hidden overflow-y-auto"
       aria-labelledby="references-title"
     >
-      <div className="mx-auto flex w-full max-w-360 flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-        <header>
-          <p className={EYEBROW_CLASS_NAME}>Sources and provenance</p>
-          <h1 className={`${TITLE_CLASS_NAME} pt-1`} id="references-title">
-            References
-          </h1>
-          <p className={`max-w-prose pt-3 ${BODY_CLASS_NAME} text-secondary`}>
-            These records identify the texts, guidance, Scripture, and artwork used in Lucerna.
-            Every record is available offline.
-          </p>
-        </header>
+      <div className="flex w-full flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+        <ViewHeader
+          eyebrow="Sources and provenance"
+          id="references-title"
+          lede="These records identify the texts, guidance, Scripture, and artwork used in Lucerna. Every record is available offline."
+          ledeClassName={`${BODY_CLASS_NAME} text-secondary`}
+          title="References"
+        />
 
         {referenceSections.map((section) => (
           <ReferenceSectionView key={section.group} onOpen={onOpenReference} section={section} />

@@ -6,17 +6,19 @@ import { ChevronDirection } from '../../components/icons/model.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import {
+  ACTION_TEXT_CLASS_NAME,
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
+  QUIET_BUTTON_CLASS_NAME,
   SCRIPTURE_CLASS_NAME,
   SUBTITLE_CLASS_NAME,
-  TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import { AmbientGround } from '../../components/art/AmbientGround.tsx';
 import { ArtworkCreditLine } from '../../components/art/ArtworkCreditLine.tsx';
 import { SettingsButton } from '../../components/buttons/SettingsButton.tsx';
 import { CitationLink } from '../../components/links/CitationLink.tsx';
 import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
+import { ViewHeader } from '../../components/layout.tsx';
 import { type BibleVerseLocation } from '../library/model.ts';
 import {
   apparatusReferenceTarget,
@@ -50,12 +52,9 @@ const ARTWORK_MINIMUM_HEIGHT = 200;
 const STAGE_MAXIMUM_HEIGHT = 896;
 const LANDSCAPE_STAGE_MINIMUM_HEIGHT = 516;
 
-const FOOTER_ACTION_CLASS_NAME =
-  'min-h-11 px-2 ' + SUBTITLE_CLASS_NAME + ' transition-colors focus-ring';
-
-const NOTE_BODY_CLASS_NAME = CITATION_CLASS_NAME + ' min-w-0 text-secondary';
-const NOTE_EYEBROW_ON_ART_CLASS_NAME = SUBTITLE_CLASS_NAME + ' font-semibold text-on-art-accent';
-const NOTE_BODY_ON_ART_CLASS_NAME = CITATION_CLASS_NAME + ' min-w-0 text-on-art-secondary';
+const NOTE_BODY_CLASS_NAME = `${CITATION_CLASS_NAME} min-w-0 text-secondary`;
+const NOTE_EYEBROW_ON_ART_CLASS_NAME = `${SUBTITLE_CLASS_NAME} font-semibold text-on-art-accent`;
+const NOTE_BODY_ON_ART_CLASS_NAME = `${CITATION_CLASS_NAME} min-w-0 text-on-art-secondary`;
 const DROP_CAP_CLASS_NAME =
   'first-letter:float-left first-letter:mt-1 first-letter:mr-2 first-letter:font-display first-letter:text-[3.5em] first-letter:leading-[0.78] first-letter:font-medium first-letter:text-accent spread:first-letter:text-[3.75em] spread:first-letter:leading-[0.76]';
 
@@ -95,23 +94,18 @@ function PrayerHeading({
   readonly headingRef: RefObject<HTMLHeadingElement | null>;
 }) {
   return (
-    <header
+    <ViewHeader
       className={classNames(
-        'relative z-10 col-start-1 row-start-1 flex min-w-0 flex-col gap-1',
+        'relative z-10 col-start-1 row-start-1 min-w-0 gap-1',
         dense
           ? 'px-4 pt-3 pb-2 landscape:px-5 landscape:pt-3 landscape:pb-1'
           : 'px-4 pt-2 pb-1 sm:px-6 sm:pt-3 landscape:px-6 landscape:pt-4 landscape:pb-2 spread:px-8 spread:pt-8 spread:pb-4',
       )}
-    >
-      <p className={EYEBROW_CLASS_NAME}>{rubric}</p>
-      <h1
-        className={TITLE_CLASS_NAME + ' wrap-break-word focus:outline-none'}
-        ref={headingRef}
-        tabIndex={-1}
-      >
-        {title}
-      </h1>
-    </header>
+      eyebrow={rubric}
+      headingRef={headingRef}
+      title={title}
+      titleClassName="wrap-break-word"
+    />
   );
 }
 
@@ -466,11 +460,7 @@ function PrayerControls({ actions, state }: ControlsBundle) {
       className="relative z-20 flex min-h-11 shrink-0 items-center gap-1 px-2 sm:min-h-12 sm:px-0 sm:pt-2"
       data-layout-region="controls"
     >
-      <button
-        className={FOOTER_ACTION_CLASS_NAME + ' text-muted hover:text-foreground'}
-        onClick={actions.onExit}
-        type="button"
-      >
+      <button className={`${QUIET_BUTTON_CLASS_NAME} px-2`} onClick={actions.onExit} type="button">
         Exit
       </button>
 
@@ -480,10 +470,7 @@ function PrayerControls({ actions, state }: ControlsBundle) {
       <span className="min-w-0 flex-1" />
 
       <button
-        className={
-          FOOTER_ACTION_CLASS_NAME +
-          ' text-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30'
-        }
+        className={`${QUIET_BUTTON_CLASS_NAME} px-2 disabled:cursor-not-allowed disabled:opacity-30`}
         disabled={state.atStart}
         onClick={actions.onBack}
         type="button"
@@ -491,10 +478,7 @@ function PrayerControls({ actions, state }: ControlsBundle) {
         Back
       </button>
       <button
-        className={
-          FOOTER_ACTION_CLASS_NAME +
-          ' text-accent-current underline decoration-accent-current underline-offset-8 hover:text-accent-strong'
-        }
+        className={`${ACTION_TEXT_CLASS_NAME} px-2 text-accent-current underline decoration-accent-current underline-offset-8 hover:text-accent-strong`}
         onClick={actions.onForward}
         type="button"
       >
@@ -665,7 +649,7 @@ function ScriptureText({
     <p
       ref={scriptureRef}
       className={classNames(
-        SCRIPTURE_CLASS_NAME + ' max-w-prose text-pretty pr-(--pendant-overhang-width)',
+        `${SCRIPTURE_CLASS_NAME} max-w-prose text-pretty pr-(--pendant-overhang-width)`,
         showDropCaps && !dense && DROP_CAP_CLASS_NAME,
       )}
     >
@@ -683,7 +667,7 @@ function SourceLine({
   return (
     <p
       className={classNames(
-        CITATION_CLASS_NAME + ' text-muted italic landscape:mt-auto',
+        `${CITATION_CLASS_NAME} text-muted italic landscape:mt-auto`,
         dense ? 'pt-0' : 'landscape:pt-0 spread:pt-2',
       )}
     >

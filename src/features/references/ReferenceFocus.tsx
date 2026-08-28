@@ -1,15 +1,14 @@
-import { useEffect, useRef } from 'react';
 import { contentCatalog } from '../../content/catalog.ts';
 import type { DevotionalSource, SourceReference } from '../../content/schema.ts';
 import { BackButton } from '../../components/buttons/BackButton.tsx';
+import { DetailList, FocusPage, ViewHeader } from '../../components/layout.tsx';
 import { ExternalLink } from '../../components/links/ExternalLink.tsx';
-import { useEscape } from '../../shared/useEscape.ts';
+import { useFocusPage } from '../../shared/focus.ts';
 import {
   BODY_CLASS_NAME,
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
   INLINE_LINK_CLASS_NAME,
-  TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import {
   ReferenceGroup,
@@ -19,42 +18,18 @@ import {
   type ReferenceTarget,
 } from './referenceCatalog.ts';
 
-function ReferenceTerm({ children }: { readonly children: string }) {
-  return <dt className="small-caps tracking-subtitle text-muted">{children}</dt>;
-}
-
 function SourceDetails({ source }: { readonly source: DevotionalSource }) {
   return (
-    <dl className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-2 ${CITATION_CLASS_NAME}`}>
-      <ReferenceTerm>Author</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{source.author}</dd>
-      {source.note === undefined ? null : (
-        <>
-          <ReferenceTerm>Purpose</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{source.note}</dd>
-        </>
-      )}
-      {source.translator === undefined ? null : (
-        <>
-          <ReferenceTerm>Translator</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{source.translator}</dd>
-        </>
-      )}
-      {source.publisher === undefined ? null : (
-        <>
-          <ReferenceTerm>Publisher</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{source.publisher}</dd>
-        </>
-      )}
-      {source.published === undefined ? null : (
-        <>
-          <ReferenceTerm>Published</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{source.published}</dd>
-        </>
-      )}
-      <ReferenceTerm>Rights</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{source.approval}</dd>
-    </dl>
+    <DetailList
+      rows={[
+        ['Author', source.author],
+        ['Purpose', source.note],
+        ['Translator', source.translator],
+        ['Publisher', source.publisher],
+        ['Published', source.published],
+        ['Rights', source.approval],
+      ]}
+    />
   );
 }
 
@@ -62,28 +37,16 @@ function ArtworkRecordDetails({ artworkId }: { readonly artworkId: string }) {
   const artwork = contentCatalog.artworkById(artworkId);
 
   return (
-    <dl className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-2 ${CITATION_CLASS_NAME}`}>
-      <ReferenceTerm>Artist</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{artwork.artist}</dd>
-      <ReferenceTerm>Date</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{artwork.date}</dd>
-      <ReferenceTerm>Collection</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{artwork.holder}</dd>
-      {artwork.accession === undefined ? null : (
-        <>
-          <ReferenceTerm>Accession</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{artwork.accession}</dd>
-        </>
-      )}
-      {artwork.photographer === undefined ? null : (
-        <>
-          <ReferenceTerm>Photograph</ReferenceTerm>
-          <dd className="wrap-break-word text-secondary">{artwork.photographer}</dd>
-        </>
-      )}
-      <ReferenceTerm>Rights</ReferenceTerm>
-      <dd className="wrap-break-word text-secondary">{artwork.source.approval}</dd>
-    </dl>
+    <DetailList
+      rows={[
+        ['Artist', artwork.artist],
+        ['Date', artwork.date],
+        ['Collection', artwork.holder],
+        ['Accession', artwork.accession],
+        ['Photograph', artwork.photographer],
+        ['Rights', artwork.source.approval],
+      ]}
+    />
   );
 }
 
@@ -199,18 +162,6 @@ function titleFor(target: ReferenceTarget, source: DevotionalSource): string {
     : source.work;
 }
 
-function useReferenceFocus(onBack: () => void, target: ReferenceTarget) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, [target]);
-
-  useEscape(onBack);
-
-  return headingRef;
-}
-
 export function ReferenceFocus({
   target,
   onBack,
@@ -221,26 +172,18 @@ export function ReferenceFocus({
   readonly onOpenReading: (location: ReadingLocation) => void;
 }) {
   const source = contentCatalog.sourceById(target.sourceId);
-  const headingRef = useReferenceFocus(onBack, target);
+  const targetKey = referenceTargetKey(target);
+  const headingRef = useFocusPage(onBack, targetKey);
 
   return (
-    <main
-      aria-label="Reference"
-      className="scroll-region h-dvh overflow-x-hidden overflow-y-auto bg-background pt-safe-top pb-safe-bottom text-foreground"
-      key={referenceTargetKey(target)}
-    >
+    <FocusPage key={targetKey} label="Reference">
       <article className="mx-auto flex min-h-full w-full max-w-4xl flex-col gap-6 px-4 py-5 sm:px-6 lg:px-8 lg:py-10">
         <BackButton onBack={onBack} />
-        <header>
-          <p className={EYEBROW_CLASS_NAME}>{referenceGroupLabel(target.group)}</p>
-          <h1
-            className={`${TITLE_CLASS_NAME} pt-1 focus:outline-none`}
-            ref={headingRef}
-            tabIndex={-1}
-          >
-            {titleFor(target, source)}
-          </h1>
-        </header>
+        <ViewHeader
+          eyebrow={referenceGroupLabel(target.group)}
+          headingRef={headingRef}
+          title={titleFor(target, source)}
+        />
         {target.group === ReferenceGroup.Artwork ? (
           <ArtworkRecordDetails artworkId={target.artworkId} />
         ) : (
@@ -250,6 +193,6 @@ export function ReferenceFocus({
         <SupportingReferences target={target} />
         <SourceLinks source={source} target={target} />
       </article>
-    </main>
+    </FocusPage>
   );
 }

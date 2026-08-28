@@ -1,18 +1,21 @@
 import {
+  arrayFrom,
   LIBRARY_SCHEMA_VERSION,
   LibraryBlockKind,
   LibraryHeadingLevel,
   libraryContentFrom,
+  recordFrom,
+  stringFrom,
   type LibraryBlock,
   type LibraryContent,
 } from '../../src/content/schema.ts';
+import { ORDINAL_WORDS } from '../../src/shared/ordinals.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
 import {
   ContentBuildError,
   ContentBuildErrorCode,
   readJsonFile,
-  recordFrom,
-  requiredString,
+  sourceRecordOf,
 } from './records.ts';
 
 export const LIBRARY_DATABASE = 'data/db/library.json';
@@ -50,59 +53,6 @@ const groupsOf = (text: string): readonly (readonly string[])[] => {
 
   return groups;
 };
-
-const ORDINAL_WORDS: readonly string[] = [
-  'First',
-  'Second',
-  'Third',
-  'Fourth',
-  'Fifth',
-  'Sixth',
-  'Seventh',
-  'Eighth',
-  'Ninth',
-  'Tenth',
-  'Eleventh',
-  'Twelfth',
-  'Thirteenth',
-  'Fourteenth',
-  'Fifteenth',
-  'Sixteenth',
-  'Seventeenth',
-  'Eighteenth',
-  'Nineteenth',
-  'Twentieth',
-  'Twenty-first',
-  'Twenty-second',
-  'Twenty-third',
-  'Twenty-fourth',
-  'Twenty-fifth',
-  'Twenty-sixth',
-  'Twenty-seventh',
-  'Twenty-eighth',
-  'Twenty-ninth',
-  'Thirtieth',
-  'Thirty-first',
-  'Thirty-second',
-  'Thirty-third',
-  'Thirty-fourth',
-  'Thirty-fifth',
-  'Thirty-sixth',
-  'Thirty-seventh',
-  'Thirty-eighth',
-  'Thirty-ninth',
-  'Fortieth',
-  'Forty-first',
-  'Forty-second',
-  'Forty-third',
-  'Forty-fourth',
-  'Forty-fifth',
-  'Forty-sixth',
-  'Forty-seventh',
-  'Forty-eighth',
-  'Forty-ninth',
-  'Fiftieth',
-];
 
 type SectionCounters = {
   roses: number;
@@ -214,33 +164,34 @@ const blocksFrom = (groups: readonly (readonly string[])[]): readonly LibraryBlo
 
 const workFrom = async (
   value: unknown,
+  index: number,
   sources: unknown,
   repositoryRoot: URL,
 ): Promise<unknown> => {
-  const record = recordFrom(value, ContentBuildErrorCode.InvalidLibraryDatabase);
-  const sourceId = requiredString(record, 'sourceId');
-  const sourceRecords = recordFrom(sources, ContentBuildErrorCode.MissingSource, sourceId);
-  const source = recordFrom(sourceRecords[sourceId], ContentBuildErrorCode.MissingSource, sourceId);
-  const text = await Bun.file(new URL(requiredString(source, 'path'), repositoryRoot)).text();
+  const path = `works[${index}]`;
+  const record = recordFrom(value, path);
+  const sourceId = stringFrom(record, 'sourceId', path);
+  const sourcePath = `sources.${sourceId}`;
+  const source = sourceRecordOf(sources, sourceId);
+  const text = await Bun.file(
+    new URL(stringFrom(source, 'path', sourcePath), repositoryRoot),
+  ).text();
 
   return {
     id: sourceId,
-    title: requiredString(source, 'work'),
-    author: requiredString(source, 'author'),
+    title: stringFrom(source, 'work', sourcePath),
+    author: stringFrom(source, 'author', sourcePath),
     sourceId,
-    category: requiredString(record, 'category'),
+    category: stringFrom(record, 'category', path),
     blocks: blocksFrom(groupsOf(text)),
   };
 };
 
 export const buildLibraryContent = async (repositoryRoot: URL): Promise<LibraryContent> => {
-  const database = recordFrom(
-    await readJsonFile(LIBRARY_DATABASE, repositoryRoot),
-    ContentBuildErrorCode.InvalidLibraryDatabase,
-  );
-  const works = database['works'];
+  const database = recordFrom(await readJsonFile(LIBRARY_DATABASE, repositoryRoot), 'library');
+  const works = arrayFrom(database['works'], 'works');
 
-  if (!Array.isArray(works) || works.length === 0) {
+  if (works.length === 0) {
     throw new ContentBuildError(ContentBuildErrorCode.InvalidLibraryDatabase);
   }
 
@@ -248,6 +199,8 @@ export const buildLibraryContent = async (repositoryRoot: URL): Promise<LibraryC
 
   return libraryContentFrom({
     schemaVersion: LIBRARY_SCHEMA_VERSION,
-    works: await Promise.all(works.map((work) => workFrom(work, sources, repositoryRoot))),
+    works: await Promise.all(
+      works.map((work, index) => workFrom(work, index, sources, repositoryRoot)),
+    ),
   });
 };
