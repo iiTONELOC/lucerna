@@ -1,8 +1,5 @@
-import {
-  recordFrom,
-  type BibleRedLetter,
-  type ScriptureRedSpan,
-} from '../../src/content/schema.ts';
+import type { BibleRedLetter, ScriptureRedSpan } from '../../src/content/schema.ts';
+import { recordFrom } from '../../src/content/shape.ts';
 import { buildFailure, ContentBuildErrorCode } from './records.ts';
 
 export const RED_LETTER_DATABASE = 'data/db/red-letter.json';

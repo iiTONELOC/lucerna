@@ -1,14 +1,12 @@
 import {
-  arrayFrom,
   LIBRARY_SCHEMA_VERSION,
   LibraryBlockKind,
   LibraryHeadingLevel,
   libraryContentFrom,
-  recordFrom,
-  stringFrom,
   type LibraryBlock,
   type LibraryContent,
 } from '../../src/content/schema.ts';
+import { arrayFrom, recordFrom, stringFrom } from '../../src/content/shape.ts';
 import { ORDINAL_WORDS } from '../../src/shared/ordinals.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
 import {

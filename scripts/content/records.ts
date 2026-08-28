@@ -1,4 +1,4 @@
-import { recordFrom } from '../../src/content/schema.ts';
+import { recordFrom } from '../../src/content/shape.ts';
 import { CodedError } from '../../src/shared/codedError.ts';
 
 export enum ContentBuildErrorCode {

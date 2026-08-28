@@ -5,6 +5,7 @@ import {
 } from '../../content/catalog.ts';
 import {
   guidanceStatementsOf,
+  SourceType,
   type DevotionalSource,
   type GuidanceStatement,
   type MysteryReflection,
@@ -230,7 +231,7 @@ const recordsForGroup = (
     case ReferenceGroup.Rights:
       return sourceRecords(
         group,
-        catalog.sources.filter(({ type }) => type === 'art'),
+        catalog.sources.filter(({ type }) => type === SourceType.Art),
       );
   }
 };

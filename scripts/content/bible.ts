@@ -5,7 +5,6 @@ import {
   BibleTestament,
   bibleBookFrom,
   bibleIndexFrom,
-  recordFrom,
   type BibleBlock,
   type BibleBook,
   type BibleChapter,
@@ -14,6 +13,7 @@ import {
   type BibleVerse,
   type ScriptureRedSpan,
 } from '../../src/content/schema.ts';
+import { recordFrom } from '../../src/content/shape.ts';
 import { isRecord } from '../../src/shared/guards.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
 import { buildFailure, ContentBuildError, ContentBuildErrorCode, readJsonFile } from './records.ts';

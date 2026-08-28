@@ -9,7 +9,7 @@ import {
   readJsonFile,
   sourceRecordOf,
 } from './content/records.ts';
-import { arrayFrom, positiveIntegerFrom, recordFrom, stringFrom } from '../src/content/schema.ts';
+import { arrayFrom, positiveIntegerFrom, recordFrom, stringFrom } from '../src/content/shape.ts';
 import {
   extractPassage,
   scriptureBookFromReference,

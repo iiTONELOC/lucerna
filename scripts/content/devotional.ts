@@ -1,11 +1,8 @@
 import {
-  arrayFrom,
   DEVOTIONAL_SCHEMA_VERSION,
   devotionalContentFrom,
   guidanceStatementsOf,
-  positiveIntegerFrom,
-  recordFrom,
-  stringFrom,
+  ReflectionStatus,
   type Artwork,
   type DevotionalContent,
   type DevotionalSource,
@@ -16,6 +13,7 @@ import {
   type Prayer,
   type SourceReference,
 } from '../../src/content/schema.ts';
+import { arrayFrom, positiveIntegerFrom, recordFrom, stringFrom } from '../../src/content/shape.ts';
 import { buildFailure, ContentBuildErrorCode, readJsonFile, sourceRecordOf } from './records.ts';
 import {
   RED_LETTER_DATABASE,
@@ -163,7 +161,7 @@ const enrichReflection = async (
 ): Promise<JsonRecord> => {
   const reflection = recordFrom(mystery['reflection'], 'reflection');
 
-  if (stringFrom(reflection, 'status', 'reflection') !== 'mapped') {
+  if (stringFrom(reflection, 'status', 'reflection') !== ReflectionStatus.Mapped) {
     return reflection;
   }
 
