@@ -8,7 +8,24 @@
     "thursday": "luminous",
     "friday": "sorrowful",
     "saturday": "joyful",
-    "sourceId": "holy-see-mysteries"
+    "sourceId": "holy-see-mysteries",
+    "seasonalSundays": [
+      {
+        "season": "advent",
+        "mysterySetId": "joyful",
+        "sourceId": "usccb-howto"
+      },
+      {
+        "season": "christmas",
+        "mysterySetId": "joyful",
+        "sourceId": "rosary-center-howto"
+      },
+      {
+        "season": "lent",
+        "mysterySetId": "sorrowful",
+        "sourceId": "usccb-howto"
+      }
+    ]
   },
   "prayerIds": [
     "sign-of-the-cross",

@@ -383,8 +383,24 @@ const validateRosaryOwners = (content: DevotionalContent, context: RelationshipC
 };
 
 const validateRosarySchedule = (content: DevotionalContent, context: RelationshipContext): void => {
-  for (const setId of Object.values(content.rosary.schedule).slice(0, 7)) {
+  const schedule = content.rosary.schedule;
+  const weekdaySetIds = [
+    schedule.sunday,
+    schedule.monday,
+    schedule.tuesday,
+    schedule.wednesday,
+    schedule.thursday,
+    schedule.friday,
+    schedule.saturday,
+  ];
+
+  for (const setId of weekdaySetIds) {
     requireId(context.mysterySets, setId, 'scheduled mystery set');
+  }
+
+  for (const rule of schedule.seasonalSundays) {
+    requireId(context.mysterySets, rule.mysterySetId, 'seasonal mystery set');
+    requireSource(context.sources, rule.sourceId);
   }
 };
 

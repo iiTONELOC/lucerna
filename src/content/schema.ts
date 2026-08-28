@@ -140,6 +140,18 @@ export const guidanceStatementsOf = (guidance: RosaryGuidance): readonly Guidanc
   guidance.finalPrayer,
 ];
 
+export enum LiturgicalSeason {
+  Advent = 'advent',
+  Christmas = 'christmas',
+  Lent = 'lent',
+}
+
+export type SeasonalSundayRule = {
+  readonly season: LiturgicalSeason;
+  readonly mysterySetId: string;
+  readonly sourceId: string;
+};
+
 export type RosaryContent = {
   readonly devotion: string;
   readonly schedule: {
@@ -151,6 +163,7 @@ export type RosaryContent = {
     readonly friday: string;
     readonly saturday: string;
     readonly sourceId: string;
+    readonly seasonalSundays: readonly SeasonalSundayRule[];
   };
   readonly prayerIds: readonly string[];
   readonly mysterySets: readonly MysterySet[];
@@ -664,6 +677,29 @@ const prayerStageArtFrom = (value: unknown): Readonly<Record<string, readonly st
   );
 };
 
+const liturgicalSeasonFrom = (value: string, path: string): LiturgicalSeason => {
+  switch (value) {
+    case LiturgicalSeason.Advent:
+    case LiturgicalSeason.Christmas:
+    case LiturgicalSeason.Lent:
+      return value;
+    default:
+      return invalid(path);
+  }
+};
+
+const seasonalSundaysFrom = (value: unknown, path: string): readonly SeasonalSundayRule[] =>
+  arrayFrom(value, path).map((entry, index) => {
+    const rulePath = `${path}[${index}]`;
+    const rule = recordFrom(entry, rulePath);
+
+    return {
+      season: liturgicalSeasonFrom(stringFrom(rule, 'season', rulePath), `${rulePath}.season`),
+      mysterySetId: stringFrom(rule, 'mysterySetId', rulePath),
+      sourceId: stringFrom(rule, 'sourceId', rulePath),
+    };
+  });
+
 const rosaryFrom = (value: unknown): RosaryContent => {
   const path = 'rosary';
   const rosary = recordFrom(value, path);
@@ -680,6 +716,10 @@ const rosaryFrom = (value: unknown): RosaryContent => {
       friday: stringFrom(schedule, 'friday', `${path}.schedule`),
       saturday: stringFrom(schedule, 'saturday', `${path}.schedule`),
       sourceId: stringFrom(schedule, 'sourceId', `${path}.schedule`),
+      seasonalSundays: seasonalSundaysFrom(
+        schedule['seasonalSundays'],
+        `${path}.schedule.seasonalSundays`,
+      ),
     },
     prayerIds: stringArrayFrom(rosary['prayerIds'], `${path}.prayerIds`),
     mysterySets: arrayFrom(rosary['mysterySets'], `${path}.mysterySets`).map((entry, index) =>

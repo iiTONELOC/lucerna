@@ -124,6 +124,7 @@ const uniqueSources = (
 const rosaryTextSources = (catalog: ContentCatalog): readonly DevotionalSource[] => {
   const sourceIds = [
     catalog.rosary.schedule.sourceId,
+    ...catalog.rosary.schedule.seasonalSundays.map((rule) => rule.sourceId),
     ...catalog.prayers.map((prayer) => prayer.sourceId),
   ];
 
