@@ -75,6 +75,12 @@ function ArtworkRecordDetails({ artworkId }: { readonly artworkId: string }) {
           <dd className="wrap-break-word text-secondary">{artwork.accession}</dd>
         </>
       )}
+      {artwork.photographer === undefined ? null : (
+        <>
+          <ReferenceTerm>Photograph</ReferenceTerm>
+          <dd className="wrap-break-word text-secondary">{artwork.photographer}</dd>
+        </>
+      )}
       <ReferenceTerm>Rights</ReferenceTerm>
       <dd className="wrap-break-word text-secondary">{artwork.source.approval}</dd>
     </dl>
@@ -166,6 +172,11 @@ function SourceLinks({
       {artwork === undefined ? null : (
         <ExternalLink className={INLINE_LINK_CLASS_NAME} href={source.url}>
           Open rights policy
+        </ExternalLink>
+      )}
+      {artwork?.dateSource === undefined ? null : (
+        <ExternalLink className={INLINE_LINK_CLASS_NAME} href={artwork.dateSource}>
+          Open dating source
         </ExternalLink>
       )}
       {source.citationUrl === undefined ? null : (

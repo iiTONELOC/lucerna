@@ -40,6 +40,8 @@ export type Artwork = {
   readonly height: number;
   readonly sourceId: string;
   readonly accession?: string;
+  readonly photographer?: string;
+  readonly dateSource?: string;
 };
 
 export type ScriptureRedSpan = {
@@ -455,6 +457,8 @@ const artworkFrom = (value: unknown, index: number): Artwork => {
     height: positiveIntegerFrom(artwork, 'height', path),
     sourceId: stringFrom(artwork, 'sourceId', path),
     ...optionalProperty('accession', optionalStringFrom(artwork, 'accession', path)),
+    ...optionalProperty('photographer', optionalStringFrom(artwork, 'photographer', path)),
+    ...optionalProperty('dateSource', optionalStringFrom(artwork, 'dateSource', path)),
   };
 };
 

@@ -30,6 +30,12 @@ function ArtworkProvenance({
       >
         <dt className="small-caps tracking-subtitle text-muted">Source</dt>
         <dd className="wrap-break-word text-secondary">{artwork.source.work}</dd>
+        {artwork.photographer === undefined ? null : (
+          <>
+            <dt className="small-caps tracking-subtitle text-muted">Photograph</dt>
+            <dd className="wrap-break-word text-secondary">{artwork.photographer}</dd>
+          </>
+        )}
         <dt className="small-caps tracking-subtitle text-muted">Rights</dt>
         <dd className="wrap-break-word text-secondary">{artwork.source.approval}</dd>
       </dl>

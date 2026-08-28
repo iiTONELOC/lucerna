@@ -49,7 +49,7 @@ test('compiles the complete devotional catalog from canonical records', async ()
   const annunciation = catalog.mysterySetById('joyful').mysteries[0];
 
   expect(content).toEqual(generated);
-  expect(catalog.sources).toHaveLength(20);
+  expect(catalog.sources).toHaveLength(23);
   expect(catalog.prayers).toHaveLength(8);
   expect(catalog.artworks).toHaveLength(120);
   expect(catalog.rosary.mysterySets).toHaveLength(4);

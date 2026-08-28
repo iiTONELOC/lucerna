@@ -155,6 +155,30 @@
       "type": "liturgical"
     },
     {
+      "id": "wikimedia-cc-by-2.0",
+      "work": "Wikimedia Commons — CC BY 2.0 photograph",
+      "author": "Wikimedia Commons",
+      "approval": "CC BY 2.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+      "url": "https://creativecommons.org/licenses/by/2.0/",
+      "type": "art"
+    },
+    {
+      "id": "wikimedia-cc-by-3.0",
+      "work": "Wikimedia Commons — CC BY 3.0 photograph",
+      "author": "Wikimedia Commons",
+      "approval": "CC BY 3.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+      "url": "https://creativecommons.org/licenses/by/3.0/",
+      "type": "art"
+    },
+    {
+      "id": "wikimedia-cc-by-sa-2.0",
+      "work": "Wikimedia Commons — CC BY-SA 2.0 photograph",
+      "author": "Wikimedia Commons",
+      "approval": "CC BY-SA 2.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+      "url": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "type": "art"
+    },
+    {
       "id": "wikimedia-pd-art",
       "work": "Wikimedia Commons — PD-Art",
       "author": "Wikimedia Commons",
@@ -177,13 +201,13 @@
       "id": "sign-of-the-cross",
       "title": "Sign of the Cross",
       "text": "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.",
-      "sourceId": "rosary-center-howto"
+      "sourceId": "rosary-center-prayers"
     },
     {
       "id": "apostles-creed",
       "title": "The Apostles' Creed",
-      "text": "I believe in God, the Father almighty creator of heaven and earth and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell. On the third day he rose again from the dead. He ascended into heaven and is seated at the right hand of God, the Father almighty. He will come again in glory to judge the living and the dead. I believe in the Holy Spirit, the Holy Catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen.",
-      "sourceId": "rosary-center-howto"
+      "text": "I believe in God, the Father almighty creator of heaven and earth and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried. He descended into hell. On the third day he rose again from the dead. He ascended into heaven and is seated at the right hand of God, the Father almighty; from there he will come to judge the living and the dead. I believe in the Holy Spirit, the Holy Catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.",
+      "sourceId": "rosary-center-prayers"
     },
     {
       "id": "our-father",
@@ -349,8 +373,8 @@
       "id": "benedetto-diana--salvator-mundi",
       "artist": "Benedetto Diana",
       "title": "Salvator Mundi",
-      "date": "early 16th c.",
-      "holder": "Web Gallery of Art",
+      "date": "c. 1510-20",
+      "holder": "The National Gallery, London",
       "url": "https://commons.wikimedia.org/wiki/File:Benedetto_Diana_-_Salvator_Mundi_-_Google_Art_Project.jpg",
       "file": "art/c31894ab6ffa.avif",
       "width": 922,
@@ -469,7 +493,7 @@
       "id": "domenico-fetti--salvator-mundi",
       "artist": "Domenico Fetti",
       "title": "Salvator Mundi",
-      "date": "c. 1620",
+      "date": "c. 1622-23",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/438169",
       "file": "art/3942e73093e8.avif",
@@ -519,7 +543,7 @@
       "artist": "El Greco",
       "title": "Christ as Saviour",
       "date": "c. 1610-14",
-      "holder": "National Galleries of Scotland",
+      "holder": "Museo del Greco, Toledo",
       "url": "https://commons.wikimedia.org/wiki/File:El_Greco_-_Christ_as_Saviour_-_Google_Art_Project.jpg",
       "file": "art/c01cac9592ec.avif",
       "width": 940,
@@ -598,7 +622,8 @@
       "file": "art/7e9a5b4f4a83.avif",
       "width": 842,
       "height": 1200,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-cc-by-sa-2.0",
+      "photographer": "János Korom"
     },
     {
       "id": "el-greco--the-resurrection",
@@ -629,7 +654,7 @@
       "id": "follower-of-botticelli--the-coronation-of-the-virgin",
       "artist": "Follower of Botticelli",
       "title": "The Coronation of the Virgin",
-      "date": "c. 1490",
+      "date": "4th quarter 15th c.",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/435731",
       "file": "art/840629244722.avif",
@@ -698,7 +723,8 @@
       "file": "art/7653f6d75c81.avif",
       "width": 1200,
       "height": 800,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-cc-by-2.0",
+      "photographer": "Prof. Mortel"
     },
     {
       "id": "fra-angelico--transfiguration",
@@ -755,7 +781,7 @@
       "artist": "Frans Francken II",
       "title": "The Sermon on the Mount",
       "date": "1606",
-      "holder": "Web Gallery of Art",
+      "holder": "Location unknown",
       "url": "https://commons.wikimedia.org/wiki/File:Francken,_Frans_II_%E2%80%94_Die_Bergpredigt_%E2%80%94_1606.jpg",
       "file": "art/a9acc1ddd210.avif",
       "width": 1200,
@@ -862,26 +888,28 @@
     {
       "id": "giovanni-bellini--presentation-of-jesus-at-the-temple",
       "artist": "Giovanni Bellini",
-      "title": "Presentation of Jesus at the Temple",
-      "date": "c. 1499",
+      "title": "Homage to Christ in the Temple",
+      "date": "c. 1490-1500",
       "holder": "Kunsthistorisches Museum, Vienna",
       "url": "https://commons.wikimedia.org/wiki/File:Presentation_of_Jesus_at_the_Temple-Bellini-KHM.jpg",
       "file": "art/ff5200fb4a9d.avif",
       "width": 1200,
       "height": 926,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "accession": "GG 117"
     },
     {
       "id": "giovanni-bellini--the-agony-in-the-garden",
       "artist": "Giovanni Bellini",
       "title": "The Agony in the Garden",
-      "date": "c. 1465",
+      "date": "c. 1458-60",
       "holder": "The National Gallery, London",
       "url": "https://commons.wikimedia.org/wiki/File:Bellini,Giovanni_-_Agony_in_the_Garden_-_National_Gallery.jpg",
       "file": "art/eac4e624b8d5.avif",
       "width": 1200,
       "height": 757,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.nationalgallery.org.uk/paintings/giovanni-bellini-the-agony-in-the-garden"
     },
     {
       "id": "giovanni-bellini--the-transfiguration-of-christ",
@@ -893,7 +921,8 @@
       "file": "art/6e3b4b78e369.avif",
       "width": 1200,
       "height": 906,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q3997723"
     },
     {
       "id": "guido-reni--la-trinita",
@@ -935,7 +964,7 @@
       "id": "hans-memling--the-annunciation",
       "artist": "Hans Memling",
       "title": "The Annunciation",
-      "date": "1480-89",
+      "date": "c. 1465-70",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/437490",
       "file": "art/73442658b54f.avif",
@@ -1152,13 +1181,14 @@
       "id": "murillo--immaculate-conception",
       "artist": "Murillo",
       "title": "Immaculate Conception",
-      "date": "1678",
+      "date": "1660-1665",
       "holder": "Museo del Prado, Madrid",
       "url": "https://commons.wikimedia.org/wiki/File:Murillo_-_Inmaculada_Concepci%C3%B3n_de_los_Venerables_o_de_Soult_(Museo_del_Prado,_1678).jpg",
       "file": "art/8511e52926fc.avif",
       "width": 818,
       "height": 1200,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q2456003"
     },
     {
       "id": "nicolas-poussin--the-assumption-of-the-virgin",
@@ -1177,13 +1207,14 @@
       "id": "paolo-veronese--christ-among-the-doctors-in-the-temple",
       "artist": "Paolo Veronese",
       "title": "Christ among the Doctors in the Temple",
-      "date": "c. 1558",
+      "date": "c. 1560",
       "holder": "Museo del Prado, Madrid",
       "url": "https://commons.wikimedia.org/wiki/File:Paolo_Veronese_-_Jesus_among_the_Doctors_-_WGA24816.jpg",
       "file": "art/b3804defd7d5.avif",
       "width": 1200,
       "height": 637,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q5494602"
     },
     {
       "id": "paolo-veronese--the-wedding-at-cana",
@@ -1273,7 +1304,7 @@
       "id": "petrus-christus--the-annunciation",
       "artist": "Petrus Christus",
       "title": "The Annunciation",
-      "date": "1452",
+      "date": "c. 1445",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/435899",
       "file": "art/b149323093c8.avif",
@@ -1317,7 +1348,8 @@
       "file": "art/a15d17c29809.avif",
       "width": 821,
       "height": 1200,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.nationalgallery.org.uk/paintings/piero-della-francesca-the-baptism-of-christ"
     },
     {
       "id": "piero-della-francesca--the-flagellation-of-christ",
@@ -1483,7 +1515,7 @@
       "id": "sandro-botticelli--the-annunciation",
       "artist": "Sandro Botticelli",
       "title": "The Annunciation",
-      "date": "c. 1485-92",
+      "date": "c. 1490",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/459016",
       "file": "art/ebe34711ac35.avif",
@@ -1515,7 +1547,8 @@
       "file": "art/83b0735f8ea0.avif",
       "width": 621,
       "height": 1200,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-cc-by-3.0",
+      "photographer": "Sailko"
     },
     {
       "id": "sassoferrato--madonna-in-prayer",
@@ -1565,7 +1598,8 @@
       "file": "art/680f5b070fbb.avif",
       "width": 775,
       "height": 1200,
-      "sourceId": "wikimedia-pd-art"
+      "sourceId": "wikimedia-cc-by-3.0",
+      "photographer": "Sailko"
     },
     {
       "id": "titian--christ-carrying-the-cross",
@@ -1597,7 +1631,7 @@
       "id": "titian--pentecost",
       "artist": "Titian",
       "title": "Pentecost",
-      "date": "c. 1545",
+      "date": "1546",
       "holder": "Santa Maria della Salute, Venice",
       "url": "https://commons.wikimedia.org/wiki/File:Tiziano%20Pentecost%C3%A9s.jpg",
       "file": "art/b9b0b1988505.avif",
@@ -1682,7 +1716,7 @@
       "id": "workshop-of-hans-memling--salvator-mundi",
       "artist": "Workshop of Hans Memling",
       "title": "Salvator Mundi",
-      "date": "c. 1480-94",
+      "date": "1480-85",
       "holder": "The Metropolitan Museum of Art",
       "url": "https://www.metmuseum.org/art/collection/search/437061",
       "file": "art/8426b5e2e28f.avif",
@@ -2012,7 +2046,7 @@
             "ordinal": 4,
             "title": "The Transfiguration",
             "titleSourceId": "holy-see-mysteries",
-            "fruit": "Desire for Holiness",
+            "fruit": "Desire for holiness",
             "fruitSourceId": "usccb-fruits",
             "scripture": {
               "reference": "Matthew 17:1-2",
@@ -2409,7 +2443,7 @@
             "ordinal": 5,
             "title": "The Crowning of Our Lady Queen of Heaven",
             "titleSourceId": "holy-see-mysteries",
-            "fruit": "Grace of a Happy Death",
+            "fruit": "Grace of a happy death",
             "fruitSourceId": "usccb-fruits",
             "scripture": {
               "reference": "Apocalypse (Revelation) 12:1",

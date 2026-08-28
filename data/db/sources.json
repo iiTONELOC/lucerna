@@ -13,6 +13,27 @@
     "url": "https://commons.wikimedia.org/",
     "type": "art"
   },
+  "wikimedia-cc-by-2.0": {
+    "work": "Wikimedia Commons — CC BY 2.0 photograph",
+    "author": "Wikimedia Commons",
+    "approval": "CC BY 2.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+    "url": "https://creativecommons.org/licenses/by/2.0/",
+    "type": "art"
+  },
+  "wikimedia-cc-by-sa-2.0": {
+    "work": "Wikimedia Commons — CC BY-SA 2.0 photograph",
+    "author": "Wikimedia Commons",
+    "approval": "CC BY-SA 2.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+    "url": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "type": "art"
+  },
+  "wikimedia-cc-by-3.0": {
+    "work": "Wikimedia Commons — CC BY 3.0 photograph",
+    "author": "Wikimedia Commons",
+    "approval": "CC BY 3.0 photograph of a public-domain work; the photographer is credited on the artwork record",
+    "url": "https://creativecommons.org/licenses/by/3.0/",
+    "type": "art"
+  },
   "nga-open-access": {
     "work": "National Gallery of Art — Open Access",
     "author": "National Gallery of Art, Washington",
