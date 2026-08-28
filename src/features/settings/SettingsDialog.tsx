@@ -33,6 +33,7 @@ import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
 import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
 import { useDialogOpen, useReturnFocus } from '../../shared/focus.ts';
+import { enumLabel } from '../../shared/text.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { SettingsScope, SettingsTab } from './model.ts';
 import { AboutSettings, type AboutSettingsProps } from './AboutSettings.tsx';
@@ -68,21 +69,6 @@ const SETTINGS_TAB_LABEL: Readonly<Record<SettingsTab, string>> = {
 
 const defaultTabOf = (scope: SettingsScope): SettingsTab =>
   scope === SettingsScope.Reader ? SettingsTab.Library : SettingsTab.Rosary;
-
-const enumLabel = (
-  domain: Readonly<Record<string, string | number>>,
-  value: string | number,
-): string => {
-  const memberName = Object.entries(domain).find(([, memberValue]) => memberValue === value)?.[0];
-  const labelSource = memberName ?? String(value);
-
-  return Array.from(labelSource, (character, index) => {
-    const uppercaseLetter =
-      character.toUpperCase() === character && character.toLowerCase() !== character;
-
-    return index > 0 && uppercaseLetter ? ' ' + character : character;
-  }).join('');
-};
 
 const readingSpeedLabel = (readingSpeed: number): string => {
   const preset = READING_SPEED_PRESETS.find((value) => value === readingSpeed);
