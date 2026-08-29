@@ -126,7 +126,7 @@ test('compiles the full Douay-Rheims canon under traditional names', async () =>
   );
   const generatedMatthew = bibleBookFrom(
     await Bun.file(
-      new URL('../src/generated/bible/douay-rheims/matthew.json', import.meta.url),
+      new URL('../src/generated/bible/douay-rheims/books/matthew.json', import.meta.url),
     ).json(),
   );
   const names = bible.index.books.map((book) => book.name);
