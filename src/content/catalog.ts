@@ -1,11 +1,9 @@
 import generatedBibleIndex from '../generated/bible/douay-rheims/index.json' with { type: 'json' };
 import generatedContent from '../generated/devotional-content.json' with { type: 'json' };
-import generatedLibrary from '../generated/library-content.json' with { type: 'json' };
 import { CodedError } from '../shared/codedError.ts';
 import {
   bibleIndexFrom,
   devotionalContentFrom,
-  libraryContentFrom,
   type Artwork,
   type BibleBookSummary,
   type BibleIndex,
@@ -87,6 +85,11 @@ export type ResolvedLibraryWork = LibraryWork & {
   readonly source: DevotionalSource;
 };
 
+export type ResolvedLibrary = {
+  readonly works: readonly ResolvedLibraryWork[];
+  readonly workById: (id: string) => ResolvedLibraryWork;
+};
+
 export type ResolvedRedLetter = {
   readonly notice: string;
   readonly witnesses: readonly DevotionalSource[];
@@ -104,13 +107,11 @@ export type ContentCatalog = {
   readonly prayers: readonly ResolvedPrayer[];
   readonly artworks: readonly ResolvedArtwork[];
   readonly rosary: ResolvedRosary;
-  readonly libraryWorks: readonly ResolvedLibraryWork[];
   readonly bible: ResolvedBible;
   readonly sourceById: (id: string) => DevotionalSource;
   readonly prayerById: (id: string) => ResolvedPrayer;
   readonly artworkById: (id: string) => ResolvedArtwork;
   readonly mysterySetById: (id: string) => ResolvedMysterySet;
-  readonly libraryWorkById: (id: string) => ResolvedLibraryWork;
 };
 
 const recordsById = <RecordType extends { readonly id: string }>(
@@ -186,25 +187,20 @@ const resolvedStageArtFrom = (
     ]),
   );
 
-const resolvedLibraryFrom = (
+export const resolveLibrary = (
   library: LibraryContent,
   sourceById: (id: string) => DevotionalSource,
-): Pick<ContentCatalog, 'libraryWorks' | 'libraryWorkById'> => {
-  const libraryWorks = library.works.map<ResolvedLibraryWork>((work) => ({
+): ResolvedLibrary => {
+  const works = library.works.map<ResolvedLibraryWork>((work) => ({
     ...work,
     source: sourceById(work.sourceId),
   }));
-  const libraryWorkRecords = recordsById(libraryWorks, 'library work');
+  const workRecords = recordsById(works, 'library work');
 
   return {
-    libraryWorks,
-    libraryWorkById: (id: string): ResolvedLibraryWork =>
-      requiredRecord(
-        libraryWorkRecords,
-        id,
-        CatalogLookupErrorCode.MissingLibraryWork,
-        'library work',
-      ),
+    works,
+    workById: (id: string): ResolvedLibraryWork =>
+      requiredRecord(workRecords, id, CatalogLookupErrorCode.MissingLibraryWork, 'library work'),
   };
 };
 
@@ -223,7 +219,6 @@ const resolvedBibleFrom = (
 
 export const createContentCatalog = (
   content: DevotionalContent,
-  library: LibraryContent,
   bible: BibleIndex,
 ): ContentCatalog => {
   const sourceRecords = recordsById(content.sources, 'source');
@@ -247,7 +242,6 @@ export const createContentCatalog = (
   const mysterySetRecords = recordsById(mysterySets, 'mystery set');
   const mysterySetById = (id: string): ResolvedMysterySet =>
     requiredRecord(mysterySetRecords, id, CatalogLookupErrorCode.MissingMysterySet, 'mystery set');
-  const { libraryWorks, libraryWorkById } = resolvedLibraryFrom(library, sourceById);
 
   return {
     sources: content.sources,
@@ -260,18 +254,15 @@ export const createContentCatalog = (
       mysterySets,
       prayerStageArt: resolvedStageArtFrom(content.rosary.prayerStageArt, artworkById),
     },
-    libraryWorks,
     bible: resolvedBibleFrom(bible, sourceById),
     sourceById,
     prayerById,
     artworkById,
     mysterySetById,
-    libraryWorkById,
   };
 };
 
 export const contentCatalog = createContentCatalog(
   devotionalContentFrom(generatedContent),
-  libraryContentFrom(generatedLibrary),
   bibleIndexFrom(generatedBibleIndex),
 );

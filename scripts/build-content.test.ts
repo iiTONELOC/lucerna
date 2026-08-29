@@ -3,7 +3,11 @@ import { buildBibleContent } from './content/bible.ts';
 import { buildDevotionalContent } from './content/devotional.ts';
 import { buildLibraryContent } from './content/library.ts';
 import { buildSplashContent } from './build-content.ts';
-import { CatalogLookupError, createContentCatalog } from '../src/content/catalog.ts';
+import {
+  CatalogLookupError,
+  createContentCatalog,
+  resolveLibrary,
+} from '../src/content/catalog.ts';
 import {
   BibleBlockKind,
   bibleBookFrom,
@@ -44,7 +48,8 @@ test('compiles the complete devotional catalog from canonical records', async ()
     await Bun.file(new URL('../src/generated/devotional-content.json', import.meta.url)).json(),
   );
   const bible = await buildBibleContent(repositoryRoot);
-  const catalog = createContentCatalog(content, library, bible.index);
+  const catalog = createContentCatalog(content, bible.index);
+  const resolvedLibrary = resolveLibrary(library, catalog.sourceById);
   const mysteries = catalog.rosary.mysterySets.flatMap((mysterySet) => mysterySet.mysteries);
   const annunciation = catalog.mysterySetById('joyful').mysteries[0];
 
@@ -57,8 +62,8 @@ test('compiles the complete devotional catalog from canonical records', async ()
   expect(annunciation?.artworks[0]?.id).toBe('hans-memling--the-annunciation');
   expect(annunciation?.provenance.scripture.id).toBe('douay-rheims-challoner');
   expect(catalog.rosary.prayerStageArt['hail-mary']).toHaveLength(13);
-  expect(catalog.libraryWorks).toHaveLength(1);
-  expect(catalog.libraryWorkById('de-montfort-secret').source.work).toBe(
+  expect(resolvedLibrary.works).toHaveLength(1);
+  expect(resolvedLibrary.workById('de-montfort-secret').source.work).toBe(
     'The Secret of the Rosary',
   );
   expect(catalog.bible.books).toHaveLength(73);
@@ -69,7 +74,7 @@ test('compiles the complete devotional catalog from canonical records', async ()
     catalog.prayerById,
     catalog.artworkById,
     catalog.mysterySetById,
-    catalog.libraryWorkById,
+    resolvedLibrary.workById,
   ]) {
     expect(() => lookup('missing-record')).toThrow(CatalogLookupError);
   }

@@ -382,6 +382,11 @@ const readingHandlersOf = (shell: ReturnType<typeof useAppShellState>) => ({
     shell.setReadingTarget({ kind: ReadingTargetKind.Work, workId, blockIndex: null }),
 });
 
+const settingsScopeOf = (shell: ShellFrameProps['shell']): SettingsScope =>
+  shell.readingTarget === null && shell.activeView !== ApplicationView.Library
+    ? SettingsScope.Application
+    : SettingsScope.Reader;
+
 function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
   const chromeVisible = shell.prayingSetId === null && shell.readingTarget === null;
 
@@ -416,7 +421,7 @@ function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
 
       <SettingsDialog
         open={shell.settingsOpen}
-        scope={shell.readingTarget === null ? SettingsScope.Application : SettingsScope.Reader}
+        scope={settingsScopeOf(shell)}
         onClose={() => shell.setSettingsOpen(false)}
         onOpenInstallGuide={() => {
           shell.setSettingsOpen(false);

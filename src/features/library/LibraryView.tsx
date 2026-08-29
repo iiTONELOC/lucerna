@@ -1,4 +1,5 @@
-import { contentCatalog, type ResolvedLibraryWork } from '../../content/catalog.ts';
+import type { ResolvedLibraryWork } from '../../content/catalog.ts';
+import { loadLibrary, useLoaded } from '../../content/loaders.ts';
 import { LibraryCategory } from '../../content/schema.ts';
 import { Shelf, ViewHeader } from '../../components/layout.tsx';
 import { CITATION_CLASS_NAME, NAV_CLASS_NAME } from '../../styles.ts';
@@ -76,10 +77,11 @@ function LibraryShelf({ label, onOpenBible, onOpenWork, works }: LibraryShelfPro
 }
 
 export function LibraryView({ onOpenBible, onOpenWork }: LibraryViewProps) {
+  const library = useLoaded(loadLibrary());
   const shelves = Object.values(LibraryCategory)
     .map((category) => ({
       category,
-      works: contentCatalog.libraryWorks.filter((work) => work.category === category),
+      works: (library?.works ?? []).filter((work) => work.category === category),
     }))
     .filter((shelf) => shelf.works.length > 0 || shelf.category === LibraryCategory.Scripture);
 

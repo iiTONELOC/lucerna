@@ -32,7 +32,7 @@ const SPLASH_DATABASE = 'data/db/splash-verses.json';
 const GENERATED_SPLASH_CONTENT = 'src/generated/splash-verses.json';
 const GENERATED_DEVOTIONAL_CONTENT = 'src/generated/devotional-content.json';
 const GENERATED_LIBRARY_CONTENT = 'src/generated/library-content.json';
-const GENERATED_BIBLE_DIRECTORY = 'src/generated/bible/douay-rheims/';
+const GENERATED_BIBLE_DIRECTORY = 'src/generated/bible/douay-rheims/books/';
 const GENERATED_BIBLE_INDEX = 'src/generated/bible/douay-rheims/index.json';
 
 const parseSplashVerse = (value: unknown, index: number): SplashVerseRecord => {

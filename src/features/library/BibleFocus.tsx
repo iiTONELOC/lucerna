@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
-import { loadBibleBook } from '../../content/bibleLoader.ts';
+import { loadBibleBook, useLoaded } from '../../content/loaders.ts';
 import { contentCatalog } from '../../content/catalog.ts';
 import { saveLastBibleBook } from '../../state/reading/readingPositions.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
@@ -497,24 +497,11 @@ function ChapterNav({
 }
 
 const useBibleBook = (bookId: string): BibleBook | null => {
-  const [book, setBook] = useState<BibleBook | null>(null);
-
   useEffect(() => {
-    let active = true;
-    setBook(null);
     void saveLastBibleBook(bookId);
-    void loadBibleBook(bookId).then((loaded) => {
-      if (active) {
-        setBook(loaded);
-      }
-    });
-
-    return () => {
-      active = false;
-    };
   }, [bookId]);
 
-  return book;
+  return useLoaded(loadBibleBook(bookId));
 };
 
 function BookPager({

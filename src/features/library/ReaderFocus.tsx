@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { contentCatalog, type ResolvedLibraryWork } from '../../content/catalog.ts';
+import type { ResolvedLibraryWork } from '../../content/catalog.ts';
+import { loadLibrary, useLoaded } from '../../content/loaders.ts';
 import {
   LibraryBlockKind,
   LibraryHeadingLevel,
@@ -103,23 +104,30 @@ const sectionJumpsFrom = (work: ResolvedLibraryWork): readonly ReaderJump[] =>
     return [];
   });
 
-export function ReaderFocus({
-  initialBlockIndex,
-  onBack,
-  onOpenSettings,
-  workId,
-}: {
+type ReaderFocusProps = {
   readonly initialBlockIndex: number | null;
   readonly onBack: () => void;
   readonly onOpenSettings: () => void;
   readonly workId: string;
-}) {
-  const work = contentCatalog.libraryWorkById(workId);
-  const headingRef = useHeadingFocus(workId);
+};
+
+export function ReaderFocus({ workId, ...props }: ReaderFocusProps) {
+  const library = useLoaded(loadLibrary());
+
+  return library === null ? null : <WorkReader work={library.workById(workId)} {...props} />;
+}
+
+function WorkReader({
+  initialBlockIndex,
+  onBack,
+  onOpenSettings,
+  work,
+}: Omit<ReaderFocusProps, 'workId'> & { readonly work: ResolvedLibraryWork }) {
+  const headingRef = useHeadingFocus(work.id);
   const articleRef = useRef<HTMLElement>(null);
   const tracker = useTopmostTracker(articleRef, work);
   const jumps = sectionJumpsFrom(work);
-  useReadingPosition(workId, articleRef, initialBlockIndex, tracker);
+  useReadingPosition(work.id, articleRef, initialBlockIndex, tracker);
 
   return (
     <ReaderSurface
