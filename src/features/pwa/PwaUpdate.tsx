@@ -35,7 +35,7 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
     <aside
       aria-labelledby={UPDATE_NOTICE_ID}
       aria-live="polite"
-      className="surface-chrome fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-50 flex flex-col gap-3 rounded-xl border border-hairline p-4 text-foreground sm:left-auto sm:max-w-sm"
+      className="surface-chrome fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-50 flex flex-col gap-3 rounded-xl border border-outline p-4 text-foreground sm:left-auto sm:max-w-sm"
       role="status"
     >
       <div>

@@ -3,7 +3,18 @@ import { isRecord, type UnknownRecord } from '../../shared/guards.ts';
 export enum Theme {
   EternalLight = 'dark',
   Parchment = 'light',
+  System = 'system',
 }
+
+export type ResolvedTheme = Exclude<Theme, Theme.System>;
+
+export const resolvedThemeOf = (theme: Theme, prefersLight: boolean): ResolvedTheme => {
+  if (theme !== Theme.System) {
+    return theme;
+  }
+
+  return prefersLight ? Theme.Parchment : Theme.EternalLight;
+};
 
 export enum TextScale {
   Small = '88',
@@ -25,10 +36,10 @@ export enum ReaderGround {
 }
 
 export enum OpeningDuration {
+  Manual = 'manual',
   FiveSeconds = '5',
   TenSeconds = '10',
   FifteenSeconds = '15',
-  Manual = 'manual',
 }
 
 export enum ReadingSpeed {
@@ -52,6 +63,11 @@ export enum UpdateChecks {
   WhileOpen = 'while-open',
 }
 
+export enum RosaryDisplay {
+  FullRosary = 'full-rosary',
+  CurrentDecade = 'current-decade',
+}
+
 export enum BeadMaterial {
   Wood = 'wood',
   Pearl = 'pearl',
@@ -69,6 +85,8 @@ export type Preferences = {
   readonly openingDuration: OpeningDuration;
   readonly readingSpeed: number;
   readonly beadMaterial: BeadMaterial;
+  readonly beadMaterialChosen: boolean;
+  readonly rosaryDisplay: RosaryDisplay;
   readonly showGuidance: boolean;
   readonly readGuidance: boolean;
   readonly showDecadeOfferings: boolean;
@@ -94,6 +112,8 @@ export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   openingDuration: OpeningDuration.Manual,
   readingSpeed: ReadingSpeed.Steady,
   beadMaterial: BeadMaterial.Wood,
+  beadMaterialChosen: false,
+  rosaryDisplay: RosaryDisplay.FullRosary,
   showGuidance: true,
   readGuidance: true,
   showDecadeOfferings: true,
@@ -107,8 +127,25 @@ export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   updateChecks: UpdateChecks.OnLoad,
 });
 
-const defaultBeadMaterialFor = (theme: Theme): BeadMaterial =>
+export const effectiveBeadMaterial = (
+  preferences: Preferences,
+  theme: ResolvedTheme,
+): BeadMaterial => {
+  if (preferences.beadMaterialChosen) {
+    return preferences.beadMaterial;
+  }
+
+  return theme === Theme.Parchment ? BeadMaterial.Pearl : BeadMaterial.Wood;
+};
+
+const formerDefaultBeadMaterialFor = (theme: unknown): BeadMaterial =>
   theme === Theme.Parchment ? BeadMaterial.Obsidian : BeadMaterial.Wood;
+
+const legacyBeadMaterialChosen = (raw: UnknownRecord): boolean | null => {
+  const material = raw['beadMaterial'];
+
+  return material === undefined ? false : material !== formerDefaultBeadMaterialFor(raw['theme']);
+};
 
 export enum PreferencesActionType {
   Hydrate = 'hydrate',
@@ -189,6 +226,14 @@ const parsedPreferencesFrom = (raw: UnknownRecord): ParsedPreferences => ({
     'beadMaterial',
     memberOf(Object.values(BeadMaterial)),
   )(raw['beadMaterial']),
+  beadMaterialChosen:
+    raw['beadMaterialChosen'] === undefined
+      ? legacyBeadMaterialChosen(raw)
+      : booleanFrom(raw['beadMaterialChosen']),
+  rosaryDisplay: optional(
+    'rosaryDisplay',
+    memberOf(Object.values(RosaryDisplay)),
+  )(raw['rosaryDisplay']),
   showGuidance: optional('showGuidance', booleanFrom)(raw['showGuidance']),
   readGuidance: optional('readGuidance', booleanFrom)(raw['readGuidance']),
   showDecadeOfferings: optional('showDecadeOfferings', booleanFrom)(raw['showDecadeOfferings']),
@@ -227,7 +272,14 @@ export const preferencesReducer = (state: Preferences, action: PreferencesAction
 
   const next: Preferences = { ...state, [action.key]: action.value };
 
-  return action.key === 'theme'
-    ? { ...next, beadMaterial: defaultBeadMaterialFor(next.theme) }
-    : next;
+  switch (action.key) {
+    case 'theme':
+      return { ...next, beadMaterialChosen: false };
+    case 'beadMaterial':
+      return { ...next, beadMaterialChosen: true };
+    case 'textScale':
+      return { ...next, readerTextScale: next.textScale };
+    default:
+      return next;
+  }
 };

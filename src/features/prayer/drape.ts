@@ -106,18 +106,18 @@ const HAIL_MARY_BEAD_RADIUS = 7.38;
 const OUR_FATHER_BEAD_RADIUS = 12.3;
 const CENTERPIECE_RADIUS = 18.04;
 const CRUCIFIX_HALF_HEIGHT = 27.88;
-const LINK_LENGTH = 4.51;
+export const LINK_LENGTH = 4.51;
 
 const ADJACENT_LINK_COUNT = 2;
-const SPACED_LINK_COUNT = 5;
+export const SPACED_LINK_COUNT = 5;
 
 export const CENTERPIECE_RING_SCALE = 1.18;
 
 const SAMPLES_PER_SEGMENT = 160;
 const CUBIC_WEIGHT = 3;
-const VIEWBOX_PAD = 6;
+export const VIEWBOX_PAD = 6;
 const CHAIN_BOUND_RADIUS = 2;
-const PATH_PRECISION = 2;
+export const PATH_PRECISION = 2;
 const CLOSURE_ITERATIONS = 40;
 const CLOSURE_MIN_SCALE = 0.5;
 const CLOSURE_MAX_SCALE = 3;
@@ -380,7 +380,7 @@ const segmentBetween = (request: SegmentRequest): ChainSegment | null => {
   };
 };
 
-const linkCountBetween = (before: BeadKind, after: BeadKind): number =>
+export const linkCountBetween = (before: BeadKind, after: BeadKind): number =>
   before === BeadKind.OurFather || after === BeadKind.OurFather
     ? SPACED_LINK_COUNT
     : ADJACENT_LINK_COUNT;

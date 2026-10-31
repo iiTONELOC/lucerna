@@ -2,6 +2,7 @@ import { Fragment, type ReactNode, type RefObject } from 'react';
 import { classNames } from '../shared/classNames.ts';
 import { useHorizontalTrack } from '../shared/useHorizontalTrack.ts';
 import {
+  CHAPTER_CLASS_NAME,
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
   HORIZONTAL_TRACK_CLASS_NAME,
@@ -89,7 +90,7 @@ export function ViewHeader({
 
 export type DetailRow = readonly [term: string, detail: ReactNode | undefined];
 
-export const DETAIL_TERM_CLASS_NAME = 'small-caps tracking-subtitle text-muted';
+export const DETAIL_TERM_CLASS_NAME = 'small-caps text-muted';
 
 const LIST_CLASS_NAME = `grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 gap-y-2 ${CITATION_CLASS_NAME}`;
 
@@ -136,7 +137,7 @@ export function Shelf({
   return (
     <section className="flex min-w-0 flex-col gap-3">
       {heading === undefined ? null : (
-        <h2 className={`${TITLE_CLASS_NAME} border-b border-hairline pb-2`}>{heading}</h2>
+        <h2 className={`${CHAPTER_CLASS_NAME} border-b border-hairline pb-2`}>{heading}</h2>
       )}
       <div className="group relative flex min-w-0 flex-col @container">
         <ul

@@ -11,7 +11,7 @@ import {
 import { INSTALL_SECTIONS, type InstallSection, type InstallStep } from './installGuide.ts';
 
 const INSTALL_TITLE_ID = 'install-title';
-const SECTION_LINK_CLASS_NAME = `inline-flex min-h-11 items-center rounded-lg border border-hairline px-3 text-secondary transition-colors hover:border-accent/60 hover:text-accent-current focus-ring ${NAV_CLASS_NAME}`;
+const SECTION_LINK_CLASS_NAME = `inline-flex min-h-11 items-center rounded-lg border border-outline px-3 text-secondary transition-colors hover:border-accent/60 hover:text-accent-current focus-ring ${NAV_CLASS_NAME}`;
 const STEP_NUMBER_CLASS_NAME = `flex size-8 shrink-0 items-center justify-center rounded-full border border-accent/50 ${CITATION_CLASS_NAME} text-accent-current`;
 function InstallSectionLinks() {
   return (
@@ -43,7 +43,7 @@ function InstallStepItem({
       {step.image === undefined ? null : (
         <img
           alt={step.alt ?? step.instruction}
-          className="ml-11 w-full max-w-72 rounded-lg border border-hairline sm:max-w-80"
+          className="ml-11 w-full max-w-72 rounded-lg border border-outline sm:max-w-80"
           decoding="async"
           loading="lazy"
           src={resolveInstallAsset(step.image)}

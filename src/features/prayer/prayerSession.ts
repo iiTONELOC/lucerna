@@ -14,17 +14,19 @@ import {
   READING_SPEED_MINIMUM,
   READING_SPEED_STEP,
   type Preferences,
+  type RosaryDisplay,
 } from '../../state/preferences/model.ts';
 import type { SetPreference } from '../../state/preferences/context.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import type { BibleVerseLocation } from '../library/model.ts';
 import type { ReferenceTarget } from '../references/referenceCatalog.ts';
-import { artworkPlanFor, plannedArtworkAt } from './artworkPlan.ts';
+import { artworkPlanFor, featuring, plannedArtworkAt } from './artworkPlan.ts';
 import { beadSlotsOf, createDrapeGeometry, type DrapeGeometry } from './drape.ts';
 import {
   advance,
   createProgression,
   currentStep,
+  FRUIT_LABEL,
   isAtEnd,
   isAtStart,
   jumpTo,
@@ -33,7 +35,9 @@ import {
   retreat,
   StepArchetype,
   stepIndexForAnchor,
+  stepIndexForStart,
   type NonBeadAnchor,
+  type PrayerStart,
   type PrayerStep,
   type Progression,
   type StepAnchorPoint,
@@ -50,6 +54,7 @@ import {
 } from './usePendantOverhang.ts';
 import { usePrayerFit, type FitRefs, type FitResult } from './usePrayerFit.ts';
 import { useGuidedPlayback, type GuidedPlayback } from './useGuidedPlayback.ts';
+import { isShortcutEvent } from '../../shared/keyboard.ts';
 
 export type HeadingProps = {
   readonly rubric: string;
@@ -57,6 +62,8 @@ export type HeadingProps = {
 };
 
 export type DrapeProps = {
+  readonly decade: number | undefined;
+  readonly display: RosaryDisplay;
   readonly geometry: DrapeGeometry;
   readonly anchor: StepAnchorPoint;
   readonly anchors: readonly NonBeadAnchor[];
@@ -172,11 +179,18 @@ const headingOf = (mysterySetId: string, progression: Progression): HeadingProps
   };
 };
 
-const drapeOf = (geometry: DrapeGeometry, request: ViewModelRequest): DrapeProps => {
+const drapeOf = (
+  geometry: DrapeGeometry,
+  request: ViewModelRequest,
+  display: RosaryDisplay,
+): DrapeProps => {
   const { progression, setIndex } = request;
+  const step = currentStep(progression);
 
   return {
-    anchor: currentStep(progression).anchor,
+    anchor: step.anchor,
+    decade: step.decade,
+    display,
     anchors: nonBeadAnchorsOf(progression),
     geometry,
     onSelect: (anchor: StepAnchorPoint) => setIndex(stepIndexForAnchor(progression, anchor)),
@@ -216,6 +230,7 @@ const controlsOf = (
 
 export type PrayerFocusProps = {
   readonly mysterySetId: string;
+  readonly start?: PrayerStart;
   readonly onExit: () => void;
   readonly onOpenArtwork: (artworkId: string) => void;
   readonly onOpenBibleVerse: (bookId: string, verse: BibleVerseLocation) => void;
@@ -250,13 +265,14 @@ const usePrayerPlan = (
   mysterySetId: string,
   includeFatimaPrayer: boolean,
   index: number,
+  start: PrayerStart | undefined,
 ): PrayerPlan => {
   const base = useMemo(
     () => progressionFor(mysterySetId, includeFatimaPrayer),
     [includeFatimaPrayer, mysterySetId],
   );
   const geometry = useMemo(() => createDrapeGeometry(beadSlotsOf(base)), [base]);
-  const artworkPlan = useMemo(() => artworkPlanFor(base), [base]);
+  const artworkPlan = useMemo(() => featuring(artworkPlanFor(base), base, start), [base, start]);
 
   return { artworkPlan, geometry, progression: jumpTo(base, index) };
 };
@@ -369,8 +385,7 @@ const usePrayerPlayback = ({
 }: PrayerPlaybackRequest): GuidedPlayback =>
   useGuidedPlayback({
     announcement: display.step.archetype === StepArchetype.MysteryAnnouncement,
-    fruitText:
-      fruit === null || !read.readMysteryFruits ? '' : `Fruit of the Mystery. ${fruit.text}.`,
+    fruitText: fruit === null || !read.readMysteryFruits ? '' : `${FRUIT_LABEL}. ${fruit.text}.`,
     guidanceText:
       fit.showGuidance && read.readGuidance && display.step.guidance !== undefined
         ? `Guidance. ${display.step.guidance.text} ${contentCatalog.sourceById(display.step.guidance.sourceId).work}.`
@@ -436,8 +451,6 @@ enum PrayerKey {
   Underscore = '_',
 }
 
-const KEYBOARD_EXEMPT_TARGET_SELECTOR =
-  'a, button, input, select, textarea, [contenteditable], dialog[open]';
 const CURRENT_WORD_SELECTOR = '[data-playback-word="current"]';
 const ACTIVE_NOTE_SELECTOR = '[data-playback-active="true"]';
 
@@ -480,15 +493,7 @@ const usePrayerKeyboard = (request: KeyboardRequest): void => {
   useEffect(() => {
     const actions = keyActionsOf(request);
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (
-        event.defaultPrevented ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        !isPrayerKey(event.key) ||
-        (event.target instanceof Element &&
-          event.target.closest(KEYBOARD_EXEMPT_TARGET_SELECTOR) !== null)
-      ) {
+      if (!isShortcutEvent(event) || !isPrayerKey(event.key)) {
         return;
       }
 
@@ -559,10 +564,24 @@ const useDrapeLayout = (
 
 export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSession => {
   const { preferences, setPreference } = usePreferences();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() =>
+    props.start === undefined
+      ? 0
+      : stepIndexForStart(
+          progressionFor(props.mysterySetId, preferences.includeFatimaPrayer),
+          props.start,
+        ),
+  );
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => () => setPlaying(false), []);
   const refs = usePrayerFocusRefs();
-  const plan = usePrayerPlan(props.mysterySetId, preferences.includeFatimaPrayer, index);
+  const plan = usePrayerPlan(
+    props.mysterySetId,
+    preferences.includeFatimaPrayer,
+    index,
+    props.start,
+  );
   const display = prayerDisplayOf({
     artworkPlan: plan.artworkPlan,
     mysterySetId: props.mysterySetId,
@@ -595,7 +614,7 @@ export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSessi
   return {
     controls,
     display,
-    drape: drapeOf(plan.geometry, request),
+    drape: drapeOf(plan.geometry, request, preferences.rosaryDisplay),
     fit,
     fruit,
     ...useDrapeLayout(plan.geometry, display.fitKey, refs),

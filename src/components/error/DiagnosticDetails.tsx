@@ -14,7 +14,7 @@ export function DiagnosticDetails({
 }) {
   return (
     <details
-      className={classNames('group rounded-md border border-hairline bg-background p-3', className)}
+      className={classNames('group rounded-md border border-outline bg-background p-3', className)}
     >
       <summary
         className={`focus-ring flex cursor-pointer list-none items-center gap-2 ${CITATION_CLASS_NAME} text-secondary [&::-webkit-details-marker]:hidden`}

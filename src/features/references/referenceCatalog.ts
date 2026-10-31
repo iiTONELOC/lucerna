@@ -35,6 +35,7 @@ export type SourceReferenceTarget = {
     | ReferenceGroup.Rights;
   readonly sourceId: string;
   readonly locator?: string;
+  readonly quote?: string;
   readonly sections?: readonly string[];
   readonly supportingReferences?: readonly SourceReference[];
   readonly reading?: ReadingLocation;
@@ -268,6 +269,7 @@ export const reflectionReferenceTarget = (
   group: ReferenceGroup.Guidance,
   locator: reflection.locator,
   sourceId: reflection.sourceId,
+  ...(reflection.text === undefined ? {} : { quote: reflection.text }),
   ...(reflection.blockIndex === undefined
     ? {}
     : { reading: { workId: reflection.sourceId, blockIndex: reflection.blockIndex } }),
@@ -285,6 +287,7 @@ export const guidanceReferenceTarget = (guidance: GuidanceStatement): SourceRefe
   return {
     group: ReferenceGroup.Guidance,
     locator: primary.locator,
+    quote: guidance.text,
     ...(primary.sections === undefined ? {} : { sections: primary.sections }),
     sourceId: primary.sourceId,
     supportingReferences: guidance.sourceRefs,

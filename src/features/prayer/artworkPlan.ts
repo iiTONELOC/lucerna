@@ -8,7 +8,9 @@ import { randomIndex } from '../../shared/random.ts';
 import {
   currentStep,
   PrayerId,
+  PrayerStartKind,
   StepArchetype,
+  type PrayerStart,
   type PrayerStep,
   type Progression,
 } from './progression.ts';
@@ -30,15 +32,15 @@ const shuffled = <Value>(values: readonly Value[]): Value[] => {
   return result;
 };
 
+const usesDecadeArtwork = (step: ArtworkPrayerStep): boolean =>
+  step.decade !== undefined &&
+  (step.prayerId === PrayerId.HailMary || step.prayerId === PrayerId.OurFather);
+
 const artworkPoolForStep = (
   step: PrayerStep,
   mysteryArtworkByDecade: ReadonlyMap<number, ResolvedArtwork>,
 ): readonly ResolvedArtwork[] => {
-  if (
-    step.archetype === StepArchetype.MysteryAnnouncement ||
-    (step.decade !== undefined &&
-      (step.prayerId === PrayerId.HailMary || step.prayerId === PrayerId.OurFather))
-  ) {
+  if (step.archetype === StepArchetype.MysteryAnnouncement || usesDecadeArtwork(step)) {
     const mysteryArtwork =
       step.decade === undefined ? undefined : mysteryArtworkByDecade.get(step.decade);
 
@@ -187,4 +189,41 @@ export const plannedArtworkAt = (
   }
 
   return artwork;
+};
+
+const featuredAt = (step: PrayerStep, start: PrayerStart): boolean => {
+  if (start.kind === PrayerStartKind.Guidance) {
+    return false;
+  }
+
+  if (step.archetype === StepArchetype.MysteryAnnouncement) {
+    return start.kind === PrayerStartKind.Mystery && step.decade === start.decade;
+  }
+
+  return start.kind === PrayerStartKind.Mystery
+    ? usesDecadeArtwork(step) && step.decade === start.decade
+    : !usesDecadeArtwork(step) && step.prayerId === start.prayerId;
+};
+
+export const featuring = (
+  artworkPlan: readonly ResolvedArtwork[],
+  progression: Progression,
+  start: PrayerStart | undefined,
+): readonly ResolvedArtwork[] => {
+  const featuredArtworkId =
+    start === undefined || start.kind === PrayerStartKind.Guidance
+      ? undefined
+      : start.featuredArtworkId;
+
+  if (start === undefined || featuredArtworkId === undefined) {
+    return artworkPlan;
+  }
+
+  const featured = contentCatalog.artworkById(featuredArtworkId);
+
+  return artworkPlan.map((artwork, index) => {
+    const step = progression.steps[index];
+
+    return step !== undefined && featuredAt(step, start) ? featured : artwork;
+  });
 };

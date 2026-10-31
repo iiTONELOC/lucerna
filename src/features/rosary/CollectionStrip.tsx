@@ -18,13 +18,13 @@ function ArtworkCard({
   return (
     <li className="flex shrink-0">
       <button
-        className="flex w-40 cursor-pointer flex-col gap-1.5 text-left sm:w-44 [&:active>img]:ring-2 [&:active>img]:ring-accent [&:focus-visible>img]:ring-2 [&:focus-visible>img]:ring-accent [&:hover>img]:ring-2 [&:hover>img]:ring-accent"
+        className="flex w-40 cursor-pointer flex-col gap-1.5 text-left home-wide:w-44 [&:active>img]:ring-2 [&:active>img]:ring-accent [&:focus-visible>img]:ring-2 [&:focus-visible>img]:ring-accent [&:hover>img]:ring-2 [&:hover>img]:ring-accent"
         onClick={() => onOpenArtwork(artwork.id)}
         type="button"
       >
         <img
           alt={`${artwork.title} by ${artwork.artist}`}
-          className="aspect-square w-full rounded-xl object-cover ring-1 ring-accent/30 transition-shadow"
+          className="aspect-square w-full rounded-xl object-cover ring-1 ring-accent/15 transition-shadow"
           draggable={false}
           src={resolveArtAsset(artwork.file)}
         />

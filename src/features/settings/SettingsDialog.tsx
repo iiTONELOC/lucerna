@@ -24,11 +24,16 @@ import {
   ReaderFace,
   ReaderGround,
   ReadingSpeed,
+  RosaryDisplay,
   TextScale,
+  Theme,
   UpdateChecks,
+  effectiveBeadMaterial,
   type PreferenceKey,
   type Preferences,
 } from '../../state/preferences/model.ts';
+import { APP_DESCRIPTION } from '../../appMetadata.ts';
+import { ReaderSample } from '../library/ReaderSurface.tsx';
 import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
 import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
@@ -78,7 +83,24 @@ const readingSpeedLabel = (readingSpeed: number): string => {
 };
 
 const openingDurationLabel = (openingDuration: OpeningDuration): string =>
-  openingDuration === OpeningDuration.Manual ? 'Manual' : `${openingDuration} seconds`;
+  openingDuration === OpeningDuration.Manual ? 'No timeout' : `${openingDuration} seconds`;
+
+const THEME_VALUES: readonly Theme[] = [Theme.EternalLight, Theme.Parchment, Theme.System];
+
+const THEME_LABEL: Readonly<Record<Theme, string>> = {
+  [Theme.EternalLight]: 'Dark',
+  [Theme.Parchment]: 'Parchment',
+  [Theme.System]: 'Follow system',
+};
+
+const ROSARY_DISPLAY_LABEL: Readonly<Record<RosaryDisplay, string>> = {
+  [RosaryDisplay.FullRosary]: 'Full rosary',
+  [RosaryDisplay.CurrentDecade]: 'Current decade',
+};
+
+function SettingsNote({ children }: { readonly children: ReactNode }) {
+  return <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>{children}</p>;
+}
 
 function SettingsGroup({
   legend,
@@ -272,22 +294,26 @@ function SettingsHeader({
 }
 
 function TextScaleGroup({
+  children,
+  legend,
   onChange,
   value,
 }: {
+  readonly children?: ReactNode;
+  readonly legend: string;
   readonly onChange: (next: TextScale) => void;
   readonly value: TextScale;
 }) {
   const textScaleIndex = TEXT_SCALE_VALUES.indexOf(value);
 
   return (
-    <SettingsGroup legend="Text size">
+    <SettingsGroup legend={legend}>
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 pt-3">
         <span aria-hidden="true" className="font-display text-sm text-muted">
           A
         </span>
         <input
-          aria-label="Text size"
+          aria-label={legend}
           aria-valuetext={enumLabel(TextScale, value)}
           className="focus-ring h-11 w-full cursor-pointer accent-accent"
           max={TEXT_SCALE_VALUES.length - 1}
@@ -310,6 +336,7 @@ function TextScaleGroup({
           {enumLabel(TextScale, value)}
         </output>
       </div>
+      {children}
     </SettingsGroup>
   );
 }
@@ -319,13 +346,18 @@ function TextScaleSettings() {
 
   return (
     <TextScaleGroup
+      legend="App text size"
       onChange={(textScale) => setPreference('textScale', textScale)}
       value={preferences.textScale}
-    />
+    >
+      <SettingsNote>Applies to all app text.</SettingsNote>
+      <p className={`pt-2 ${BODY_CLASS_NAME} text-secondary`}>{APP_DESCRIPTION}</p>
+    </TextScaleGroup>
   );
 }
 
-type EnumPreferenceKey = 'openingDuration' | 'readerFace' | 'readerGround' | 'updateChecks';
+type EnumPreferenceKey =
+  'openingDuration' | 'readerFace' | 'readerGround' | 'rosaryDisplay' | 'theme' | 'updateChecks';
 
 function PreferenceChoices<Key extends EnumPreferenceKey>({
   label,
@@ -353,9 +385,9 @@ function PreferenceChoices<Key extends EnumPreferenceKey>({
 
 function ReaderFaceSettings() {
   return (
-    <SettingsGroup legend="Typeface">
+    <SettingsGroup legend="Reading font">
       <PreferenceChoices
-        label="Typeface"
+        label="Reading font"
         labelOf={(readerFace) => READER_FACE_LABEL[readerFace]}
         preferenceKey="readerFace"
         values={Object.values(ReaderFace)}
@@ -366,13 +398,14 @@ function ReaderFaceSettings() {
 
 function ReaderGroundSettings() {
   return (
-    <SettingsGroup legend="Page">
+    <SettingsGroup legend="Reading page">
       <PreferenceChoices
-        label="Page"
+        label="Reading page"
         labelOf={(readerGround) => enumLabel(ReaderGround, readerGround)}
         preferenceKey="readerGround"
         values={Object.values(ReaderGround)}
       />
+      <SettingsNote>Applies to book pages only.</SettingsNote>
     </SettingsGroup>
   );
 }
@@ -385,9 +418,9 @@ function RedLetterSettings() {
         label="Words of Christ in red"
         preferenceKey="showRedLetter"
       />
-      <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
+      <SettingsNote>
         <RedLetterNoticeText notice={contentCatalog.bible.redLetter.notice} />
-      </p>
+      </SettingsNote>
     </SettingsGroup>
   );
 }
@@ -398,25 +431,52 @@ function ReaderSettings() {
   return (
     <div>
       <TextScaleGroup
+        legend="Reading text size"
         onChange={(textScale) => setPreference('readerTextScale', textScale)}
         value={preferences.readerTextScale}
       />
       <ReaderFaceSettings />
       <ReaderGroundSettings />
+      <SettingsGroup legend="Reading preview">
+        <div className="pt-3">
+          <ReaderSample>{APP_DESCRIPTION}</ReaderSample>
+        </div>
+      </SettingsGroup>
       <RedLetterSettings />
     </div>
   );
 }
 
 function OpeningScreenSettings() {
+  const { preferences } = usePreferences();
+
   return (
-    <SettingsGroup legend="Opening screen">
+    <SettingsGroup legend="Opening screen timeout">
       <PreferenceChoices
-        label="Opening screen"
+        label="Opening screen timeout"
         labelOf={openingDurationLabel}
         preferenceKey="openingDuration"
         values={Object.values(OpeningDuration)}
       />
+      <SettingsNote>
+        {preferences.openingDuration === OpeningDuration.Manual
+          ? 'Waits until you select Continue.'
+          : 'Continues on its own after the selected delay.'}
+      </SettingsNote>
+    </SettingsGroup>
+  );
+}
+
+function AppearanceSettings() {
+  return (
+    <SettingsGroup legend="App appearance">
+      <PreferenceChoices
+        label="App appearance"
+        labelOf={(theme) => THEME_LABEL[theme]}
+        preferenceKey="theme"
+        values={THEME_VALUES}
+      />
+      <SettingsNote>Follow system uses your device’s light or dark appearance.</SettingsNote>
     </SettingsGroup>
   );
 }
@@ -466,25 +526,46 @@ function ReadingSpeedSlider() {
 
 function GuidedPlaybackSettings() {
   return (
-    <SettingsGroup legend="Guided playback">
+    <SettingsGroup legend="Guided prayer">
       <p className={`pt-2 ${BODY_CLASS_NAME} text-foreground`} id={READING_SPEED_ID}>
         Reading speed
       </p>
       <ReadingSpeedPresets />
       <ReadingSpeedSlider />
+      <SettingsNote>
+        Guided prayer moves on by itself after time to read each text; higher speeds allow less
+        time.
+      </SettingsNote>
+    </SettingsGroup>
+  );
+}
+
+function RosaryDisplaySettings() {
+  return (
+    <SettingsGroup legend="Rosary display">
+      <PreferenceChoices
+        label="Rosary display"
+        labelOf={(display) => ROSARY_DISPLAY_LABEL[display]}
+        preferenceKey="rosaryDisplay"
+        values={Object.values(RosaryDisplay)}
+      />
+      <SettingsNote>
+        Current decade shows the beads being prayed, with a small map of the whole rosary.
+      </SettingsNote>
     </SettingsGroup>
   );
 }
 
 function RosaryBeadsSettings() {
-  const { preferences, setPreference } = usePreferences();
+  const { preferences, resolvedTheme, setPreference } = usePreferences();
+  const material = effectiveBeadMaterial(preferences, resolvedTheme);
 
   return (
-    <SettingsGroup legend="Rosary beads">
+    <SettingsGroup legend="Bead material">
       <div className="flex flex-wrap gap-5 pt-3">
         {Object.values(BeadMaterial).map((beadMaterial) => (
           <button
-            aria-pressed={preferences.beadMaterial === beadMaterial}
+            aria-pressed={material === beadMaterial}
             className="group flex min-h-14 min-w-14 flex-col items-center justify-center gap-2 text-muted transition-colors hover:text-foreground aria-pressed:text-foreground focus-ring"
             data-bead-material={beadMaterial}
             key={beadMaterial}
@@ -525,11 +606,10 @@ function PreferenceSwitch({ description, label, preferenceKey }: PreferenceSwitc
 }
 
 type DisplayChoice = PreferenceSwitchProps & {
-  readonly playbackKey?: BooleanPreferenceKey;
+  readonly playback?: Pick<PreferenceSwitchProps, 'label' | 'preferenceKey'>;
 };
 
-const PLAYBACK_CHOICE_LABEL = 'Read in playback';
-const PLAYBACK_CHOICE_DESCRIPTION = 'Pause to read it during guided prayer.';
+const PLAYBACK_CHOICE_DESCRIPTION = 'Allow time to read this text before continuing.';
 
 const DISPLAY_CHOICES: readonly DisplayChoice[] = [
   {
@@ -539,24 +619,27 @@ const DISPLAY_CHOICES: readonly DisplayChoice[] = [
   },
   {
     label: 'Mystery fruits',
-    description: "Show each mystery's spiritual fruit.",
+    description: 'Show each mystery’s spiritual fruit.',
     preferenceKey: 'showMysteryFruits',
-    playbackKey: 'readMysteryFruits',
+    playback: { label: 'Include fruits in guided prayer', preferenceKey: 'readMysteryFruits' },
   },
   {
     label: 'Guidance',
     description: 'Show meditation prompts.',
     preferenceKey: 'showGuidance',
-    playbackKey: 'readGuidance',
+    playback: { label: 'Include guidance in guided prayer', preferenceKey: 'readGuidance' },
   },
   {
     label: 'Decade offerings',
-    description: "Show St. Louis de Montfort's offering with each mystery.",
+    description: 'Show St. Louis de Montfort’s offering with each mystery.',
     preferenceKey: 'showDecadeOfferings',
-    playbackKey: 'readDecadeOfferings',
+    playback: {
+      label: 'Include offerings in guided prayer',
+      preferenceKey: 'readDecadeOfferings',
+    },
   },
   {
-    label: 'Drop caps',
+    label: 'Decorative initials',
     description: 'Enlarge the opening letter when space allows.',
     preferenceKey: 'showDropCaps',
   },
@@ -574,20 +657,16 @@ function PrayersSettings() {
   );
 }
 
-function DisplayChoiceRow({ playbackKey, ...choice }: DisplayChoice) {
+function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
   const { preferences } = usePreferences();
   const shown = preferences[choice.preferenceKey];
 
   return (
     <>
       <PreferenceSwitch {...choice} />
-      {playbackKey !== undefined && shown ? (
+      {playback !== undefined && shown ? (
         <div className="pl-6">
-          <PreferenceSwitch
-            description={PLAYBACK_CHOICE_DESCRIPTION}
-            label={PLAYBACK_CHOICE_LABEL}
-            preferenceKey={playbackKey}
-          />
+          <PreferenceSwitch description={PLAYBACK_CHOICE_DESCRIPTION} {...playback} />
         </div>
       ) : null}
     </>
@@ -596,7 +675,7 @@ function DisplayChoiceRow({ playbackKey, ...choice }: DisplayChoice) {
 
 function DisplaySettings() {
   return (
-    <SettingsGroup legend="Display">
+    <SettingsGroup legend="During prayer">
       {DISPLAY_CHOICES.map((choice) => (
         <DisplayChoiceRow key={choice.preferenceKey} {...choice} />
       ))}
@@ -615,9 +694,7 @@ function UpdateSettings() {
         preferenceKey="updateChecks"
         values={Object.values(UpdateChecks)}
       />
-      <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>
-        {UPDATE_CHECKS_DESCRIPTION[preferences.updateChecks]}
-      </p>
+      <SettingsNote>{UPDATE_CHECKS_DESCRIPTION[preferences.updateChecks]}</SettingsNote>
     </SettingsGroup>
   );
 }
@@ -627,7 +704,7 @@ function LinkSettings() {
     <SettingsGroup legend="External links">
       <PreferenceSwitch
         description="Ask before opening a website outside Lucerna."
-        label="Confirm before leaving"
+        label="Ask before opening websites"
         preferenceKey="confirmExternalLinks"
       />
     </SettingsGroup>
@@ -661,6 +738,7 @@ function RosaryTab() {
       <PrayersSettings />
       <DisplaySettings />
       <GuidedPlaybackSettings />
+      <RosaryDisplaySettings />
       <RosaryBeadsSettings />
     </>
   );
@@ -669,6 +747,7 @@ function RosaryTab() {
 function GeneralTab() {
   return (
     <>
+      <AppearanceSettings />
       <TextScaleSettings />
       <OpeningScreenSettings />
       <LinkSettings />
@@ -720,7 +799,7 @@ export function SettingsDialog(props: SettingsDialogProps) {
   return (
     <dialog
       aria-labelledby={SETTINGS_TITLE_ID}
-      className="surface-chrome fixed inset-x-0 bottom-0 z-50 m-0 hidden h-[50dvh] w-full max-w-none flex-col rounded-t-xl border border-hairline p-0 pb-safe-bottom text-base text-foreground open:flex lg:inset-x-auto lg:right-6 lg:bottom-6 lg:h-[min(70dvh,44rem)] lg:max-w-md lg:rounded-xl"
+      className="surface-chrome fixed inset-x-0 bottom-0 z-50 m-0 hidden h-[50dvh] w-full max-w-none flex-col rounded-t-xl border border-outline p-0 pb-safe-bottom text-base text-foreground open:flex lg:inset-x-auto lg:right-6 lg:bottom-6 lg:h-[min(70dvh,44rem)] lg:max-w-md lg:rounded-xl"
       style={cardStyle}
       onCancel={(event) => {
         event.preventDefault();

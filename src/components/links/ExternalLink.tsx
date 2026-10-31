@@ -10,7 +10,7 @@ import {
 import { useDialogOpen } from '../../shared/focus.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 
-const DIALOG_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center rounded-md border border-hairline px-4 ${BODY_CLASS_NAME} transition-colors focus-ring`;
+const DIALOG_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center rounded-md border border-outline px-4 ${BODY_CLASS_NAME} transition-colors focus-ring`;
 
 type ExternalLinkDialogProps = {
   readonly descriptionId: string;
@@ -60,7 +60,7 @@ function ExternalLinkDialog({
     <dialog
       aria-describedby={descriptionId}
       aria-labelledby={`${descriptionId}-title`}
-      className="surface-chrome m-auto max-w-md rounded-xl border border-hairline p-0 text-foreground backdrop:bg-background/80"
+      className="surface-chrome m-auto max-w-md rounded-xl border border-outline p-0 text-foreground backdrop:bg-background/80"
       onCancel={(event) => {
         event.preventDefault();
         onClose();

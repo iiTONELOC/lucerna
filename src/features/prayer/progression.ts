@@ -114,6 +114,27 @@ export type FramedPrayerStep = StepBase & {
 export type PrayerStep =
   SilentStep | CountedRepetitionStep | MysteryAnnouncementStep | FramedPrayerStep;
 
+export const FRUIT_LABEL = 'Fruit of the Mystery';
+
+export enum PrayerStartKind {
+  Mystery = 'mystery',
+  Prayer = 'prayer',
+  Guidance = 'guidance',
+}
+
+export type PrayerStart =
+  | {
+      readonly kind: PrayerStartKind.Mystery;
+      readonly decade: number;
+      readonly featuredArtworkId?: string;
+    }
+  | {
+      readonly kind: PrayerStartKind.Prayer;
+      readonly prayerId: PrayerId;
+      readonly featuredArtworkId?: string;
+    }
+  | { readonly kind: PrayerStartKind.Guidance; readonly guidance: GuidanceStatement };
+
 export type RosaryOptions = {
   readonly includeFatimaPrayer: boolean;
 };
@@ -484,3 +505,22 @@ export const stepIndexForAnchor = (progression: Progression, anchor: StepAnchorP
 
   throw new ProgressionError(ProgressionErrorCode.AnchorNotFound);
 };
+
+const startsAt = (step: PrayerStep, start: PrayerStart): boolean => {
+  switch (start.kind) {
+    case PrayerStartKind.Mystery:
+      return step.archetype === StepArchetype.MysteryAnnouncement && step.decade === start.decade;
+    case PrayerStartKind.Prayer:
+      return (
+        step.archetype !== StepArchetype.MysteryAnnouncement && step.prayerId === start.prayerId
+      );
+    case PrayerStartKind.Guidance:
+      return step.guidance?.sourceRefs === start.guidance.sourceRefs;
+  }
+};
+
+export const stepIndexForStart = (progression: Progression, start: PrayerStart): number =>
+  Math.max(
+    progression.steps.findIndex((step) => startsAt(step, start)),
+    0,
+  );

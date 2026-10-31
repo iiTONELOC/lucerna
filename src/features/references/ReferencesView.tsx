@@ -26,7 +26,7 @@ function ReferenceCard({
   return (
     <li>
       <button
-        className="flex h-full min-h-16 w-full flex-col justify-center rounded-lg border border-hairline bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-accent/5 focus-ring"
+        className="flex h-full min-h-16 w-full flex-col justify-center rounded-lg border border-outline bg-surface px-4 py-3 text-left transition-colors hover:border-accent/60 hover:bg-accent/5 focus-ring"
         onClick={() => onOpen(record.target)}
         type="button"
       >

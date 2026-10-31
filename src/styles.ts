@@ -12,6 +12,8 @@ export const SCRIPTURE_CLASS_NAME = 'font-display text-scripture leading-scriptu
 
 export const CITATION_CLASS_NAME = 'font-display text-citation leading-citation';
 
+export const CAPTION_CAPS_CLASS_NAME = `small-caps ${CITATION_CLASS_NAME}`;
+
 export const BODY_CLASS_NAME = 'font-display text-body leading-body';
 
 export const CHAPTER_CLASS_NAME =
@@ -31,6 +33,11 @@ export const UNDERLINE_LINK_CLASS_NAME =
 export const INLINE_LINK_CLASS_NAME = `inline-flex min-h-11 w-fit items-center ${UNDERLINE_LINK_CLASS_NAME} ${CITATION_CLASS_NAME}`;
 
 export const CONTENT_WIDTH_CLASS_NAME = 'mx-auto w-full max-w-360';
+
+export const SURFACE_PANEL_CLASS_NAME = 'rounded-xl border border-outline bg-surface';
+
+export const GLASS_PANEL_CLASS_NAME =
+  'edge-lit overflow-hidden rounded-xl bg-surface/72 backdrop-blur-md backdrop-saturate-150';
 
 export const HORIZONTAL_TRACK_CLASS_NAME =
   'flex min-w-0 cursor-grab overflow-x-auto overscroll-x-contain px-2 py-1 select-none active:cursor-grabbing scrollbar-none [&::-webkit-scrollbar]:hidden';

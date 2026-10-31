@@ -1,4 +1,4 @@
-import type { ResolvedRosary } from '../../content/catalog.ts';
+import type { ResolvedArtwork, ResolvedMysterySet, ResolvedRosary } from '../../content/catalog.ts';
 import { LiturgicalSeason } from '../../content/schema.ts';
 
 export enum Weekday {
@@ -116,4 +116,25 @@ export const dailyMysteryIndex = (date: Date, mysterySetId: string, poolSize: nu
   }
 
   return hash % poolSize;
+};
+
+export const dailyHeroArtworkFor = (
+  today: Date,
+  mysterySet: ResolvedMysterySet,
+): ResolvedArtwork => {
+  const heroMysteryIndex = dailyMysteryIndex(today, mysterySet.id, mysterySet.mysteries.length);
+  const heroMystery = mysterySet.mysteries[heroMysteryIndex];
+
+  if (heroMystery === undefined) {
+    throw new RangeError('Mystery set must not be empty');
+  }
+
+  const heroArtwork =
+    heroMystery.artworks[dailyMysteryIndex(today, heroMystery.title, heroMystery.artworks.length)];
+
+  if (heroArtwork === undefined) {
+    throw new RangeError('Mystery must carry at least one artwork');
+  }
+
+  return heroArtwork;
 };

@@ -23,7 +23,7 @@ type GalleryArtworkCardProps = {
 
 function GalleryArtworkCard({ artwork, onOpenArtwork, registerButton }: GalleryArtworkCardProps) {
   return (
-    <li className="flex aspect-4/5 w-[clamp(18rem,30cqi,40rem)] shrink-0 self-start">
+    <li className="flex aspect-4/5 w-[clamp(18rem,30cqi,var(--container-sm))] shrink-0 self-start">
       <article className="flex size-full" data-artwork-id={artwork.id}>
         <button
           className="group edge-lit relative flex size-full flex-col overflow-hidden rounded-xl bg-surface text-left hover:ring-2 hover:ring-accent focus-ring"

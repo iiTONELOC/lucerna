@@ -1,15 +1,22 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useState, type RefObject } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
 import { AmbientGround } from '../../components/art/AmbientGround.tsx';
 import { AmbientScrim } from '../../components/art/model.ts';
 import { BackButton } from '../../components/buttons/BackButton.tsx';
-import { DetailList, FocusPage } from '../../components/layout.tsx';
+import { FocusPage } from '../../components/layout.tsx';
 import { contentCatalog } from '../../content/catalog.ts';
+import { classNames } from '../../shared/classNames.ts';
 import { useFocusPage } from '../../shared/focus.ts';
-import { CITATION_CLASS_NAME, TITLE_CLASS_NAME, UNDERLINE_LINK_CLASS_NAME } from '../../styles.ts';
+import {
+  CAPTION_CAPS_CLASS_NAME,
+  CITATION_CLASS_NAME,
+  TITLE_CLASS_NAME,
+  UNDERLINE_LINK_CLASS_NAME,
+} from '../../styles.ts';
 import { artworkReferenceTarget, type ReferenceTarget } from '../references/referenceCatalog.ts';
+import { ArtworkViewer, FITTED_ARTWORK_CLASS_NAME, FramedArtwork } from './ArtworkViewer.tsx';
 
-const QUIET_ACTION_CLASS_NAME = `focus-ring flex min-h-11 items-center justify-center small-caps tracking-subtitle text-accent-current transition-colors hover:text-accent disabled:text-muted disabled:opacity-40 ${CITATION_CLASS_NAME}`;
+const QUIET_ACTION_CLASS_NAME = `focus-ring flex min-h-11 items-center justify-center text-accent-current transition-colors hover:text-accent disabled:text-muted disabled:opacity-40 ${CAPTION_CAPS_CLASS_NAME}`;
 
 type ArtFocusProps = {
   readonly artworkId: string;
@@ -20,77 +27,22 @@ type ArtFocusProps = {
 
 type Artwork = ReturnType<typeof contentCatalog.artworkById>;
 
-function ArtworkProvenance({
-  artwork,
-  onOpenReference,
-}: {
-  readonly artwork: Artwork;
-  readonly onOpenReference: (target: ReferenceTarget) => void;
-}) {
-  return (
-    <div className="flex w-full flex-col items-start gap-4 text-left">
-      <DetailList
-        className="w-full text-left"
-        rows={[
-          ['Source', artwork.source.work],
-          ['Photograph', artwork.photographer],
-          ['Rights', artwork.source.approval],
-        ]}
-      />
-
-      <button
-        className={`w-fit small-caps tracking-subtitle ${UNDERLINE_LINK_CLASS_NAME} ${CITATION_CLASS_NAME}`}
-        onClick={() => onOpenReference(artworkReferenceTarget(artwork))}
-        type="button"
-      >
-        View reference
-      </button>
-    </div>
-  );
-}
-
-function ArtworkDetails({
-  artwork,
-  onOpenReference,
-}: {
-  readonly artwork: Artwork;
-  readonly onOpenReference: (target: ReferenceTarget) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <>
-      <button
-        aria-expanded={expanded}
-        className={`focus-ring flex min-h-11 w-fit items-center small-caps tracking-subtitle text-accent-current lg:hidden ${CITATION_CLASS_NAME}`}
-        onClick={() => setExpanded((current) => !current)}
-        type="button"
-      >
-        {expanded ? 'Fewer details' : 'More details'}
-      </button>
-      <div className={expanded ? 'block' : 'hidden lg:block'}>
-        <ArtworkProvenance artwork={artwork} onOpenReference={onOpenReference} />
-      </div>
-    </>
-  );
-}
-
 type ArtworkStageProps = {
   readonly artwork: Artwork;
+  readonly onExpand: () => void;
 };
 
-function ArtworkStage({ artwork }: ArtworkStageProps) {
+function ArtworkStage({ artwork, onExpand }: ArtworkStageProps) {
   return (
-    <section className="relative z-10 flex min-h-0 min-w-0 flex-col lg:col-start-1 lg:row-start-2">
-      <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center p-4 lg:px-8 lg:pt-4 lg:pb-8">
-        <img
-          alt={`${artwork.title} by ${artwork.artist}`}
-          className="h-auto max-h-full w-auto max-w-full border border-hairline bg-surface p-2"
-          decoding="async"
-          height={artwork.height}
-          src={resolveArtAsset(artwork.file)}
-          width={artwork.width}
-        />
+    <section className="relative z-10 flex min-h-0 min-w-0 flex-col landscape:col-start-1 landscape:row-start-2">
+      <div className="flex min-h-0 min-w-0 flex-1 p-4 lg:px-8 lg:pt-4 lg:pb-8">
+        <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center @container-size">
+          <FramedArtwork
+            artwork={artwork}
+            className={FITTED_ARTWORK_CLASS_NAME}
+            onExpand={onExpand}
+          />
+        </div>
       </div>
     </section>
   );
@@ -142,8 +94,8 @@ function ArtworkSidebar({
   previousArtwork,
 }: ArtworkSidebarProps) {
   return (
-    <section className="relative z-10 flex min-h-0 flex-col gap-3 overflow-hidden px-6 pb-6 text-center lg:col-start-2 lg:row-start-2 lg:mr-6 lg:mb-6 lg:justify-center lg:gap-4 lg:px-0 lg:pb-0 lg:text-left">
-      <div className="scroll-region flex min-h-0 flex-col items-center gap-1 overflow-y-auto lg:flex-none lg:items-start lg:gap-2">
+    <section className="relative z-10 flex min-h-0 w-full max-w-prose flex-col gap-3 justify-self-center overflow-hidden px-6 pb-6 text-center landscape:w-auto landscape:max-w-none landscape:justify-self-stretch landscape:col-start-2 landscape:row-start-2 landscape:mr-6 landscape:mb-6 landscape:justify-center landscape:gap-4 landscape:px-0 landscape:pb-0 landscape:text-left">
+      <div className="relative flex min-h-0 flex-col items-center gap-1 landscape:flex-none landscape:items-start landscape:gap-2">
         <h1 className={`${TITLE_CLASS_NAME} focus:outline-none`} ref={headingRef} tabIndex={-1}>
           {artwork.title}
         </h1>
@@ -154,13 +106,22 @@ function ArtworkSidebar({
           {artwork.holder}
           {artwork.accession === undefined ? '' : ` · ${artwork.accession}`}
         </p>
-
-        <ArtworkDetails artwork={artwork} key={artwork.id} onOpenReference={onOpenReference} />
+        <button
+          className={classNames(
+            "w-fit pt-2 after:absolute after:inset-0 after:content-['']",
+            UNDERLINE_LINK_CLASS_NAME,
+            CAPTION_CAPS_CLASS_NAME,
+          )}
+          onClick={() => onOpenReference(artworkReferenceTarget(artwork))}
+          type="button"
+        >
+          View reference
+        </button>
       </div>
 
       <nav
         aria-label="Artwork"
-        className="grid shrink-0 grid-cols-3 items-center border-t border-hairline pt-1 lg:pt-2"
+        className="grid shrink-0 grid-cols-3 items-center border-t border-hairline pt-1 landscape:pt-2"
       >
         <NavigationButton artwork={previousArtwork} direction="Previous" onNavigate={onNavigate} />
         <span aria-hidden="true" />
@@ -201,18 +162,24 @@ export function ArtFocus({ artworkId, onBack, onNavigate, onOpenReference }: Art
   const artwork = contentCatalog.artworkById(artworkId);
   const previousArtwork = artworkIndex > 0 ? contentCatalog.artworks[artworkIndex - 1] : undefined;
   const nextArtwork = contentCatalog.artworks[artworkIndex + 1];
-  const headingRef = useFocusPage(onBack, artworkId);
+  const [fullSize, setFullSize] = useState(false);
+  const closeViewer = useCallback(() => setFullSize(false), []);
+  const headingRef = useFocusPage(fullSize ? closeViewer : onBack, artworkId);
 
-  useArrowNavigation({ nextArtwork, onNavigate, previousArtwork });
+  useArrowNavigation(
+    fullSize
+      ? { nextArtwork: undefined, onNavigate, previousArtwork: undefined }
+      : { nextArtwork, onNavigate, previousArtwork },
+  );
 
   return (
     <FocusPage className="relative isolate" label="artwork">
-      <div className="relative isolate grid h-full min-h-136 grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] lg:grid-rows-[auto_minmax(0,1fr)]">
+      <div className="relative isolate grid h-full min-h-136 grid-rows-[auto_minmax(0,1fr)_auto] landscape:min-h-0 landscape:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] landscape:grid-rows-[auto_minmax(0,1fr)]">
         <AmbientGround scrim={AmbientScrim.Focus} source={resolveArtAsset(artwork.file)} />
-        <header className="relative z-20 flex shrink-0 px-4 pt-4 lg:col-span-2 lg:px-8 lg:pt-6">
+        <header className="relative z-20 flex shrink-0 px-4 pt-4 landscape:col-span-2 lg:px-8 lg:pt-6">
           <BackButton label="Back to the collection" onBack={onBack} />
         </header>
-        <ArtworkStage artwork={artwork} />
+        <ArtworkStage artwork={artwork} onExpand={() => setFullSize(true)} />
         <ArtworkSidebar
           artwork={artwork}
           headingRef={headingRef}
@@ -222,6 +189,7 @@ export function ArtFocus({ artworkId, onBack, onNavigate, onOpenReference }: Art
           previousArtwork={previousArtwork}
         />
       </div>
+      <ArtworkViewer artwork={artwork} onClose={closeViewer} open={fullSize} />
     </FocusPage>
   );
 }

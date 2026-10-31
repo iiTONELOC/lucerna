@@ -1,13 +1,14 @@
-import { DEFAULT_PREFERENCES, type Preferences } from './model.ts';
+import { DEFAULT_PREFERENCES, Theme, type Preferences, type ResolvedTheme } from './model.ts';
 
 export const applyPreferencesToDocument = (
   preferences: Preferences,
+  theme: ResolvedTheme,
   root: HTMLElement = document.documentElement,
 ): void => {
-  if (preferences.theme === DEFAULT_PREFERENCES.theme) {
+  if (theme === Theme.EternalLight) {
     delete root.dataset.theme;
   } else {
-    root.dataset.theme = preferences.theme;
+    root.dataset.theme = theme;
   }
 
   if (preferences.textScale === DEFAULT_PREFERENCES.textScale) {

@@ -1,23 +1,24 @@
-import { useState } from 'react';
+import { useRef, type CSSProperties, type RefObject } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
-import { AmbientGround } from '../../components/art/AmbientGround.tsx';
 import { ArtworkCreditLine } from '../../components/art/ArtworkCreditLine.tsx';
 import { contentCatalog, type ResolvedArtwork } from '../../content/catalog.ts';
+import { classNames } from '../../shared/classNames.ts';
 import { capitalize } from '../../shared/text.ts';
 import {
   ACCENT_BUTTON_CLASS_NAME,
-  CONTENT_WIDTH_CLASS_NAME,
+  CHAPTER_CLASS_NAME,
+  CAPTION_CAPS_CLASS_NAME,
+  GLASS_PANEL_CLASS_NAME,
   EYEBROW_CLASS_NAME,
   NAV_CLASS_NAME,
   SUBTITLE_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
 import { CollectionStrip } from './CollectionStrip.tsx';
-import { dailyMysteryIndex, scheduledMysterySetId, Weekday } from './schedule.ts';
+import { dailyHeroArtworkFor, scheduledMysterySetId, Weekday } from './schedule.ts';
+import { useMysteryColumns, useSupportHeight } from './useHomeMeasure.ts';
 
-const PANEL_CLASS_NAME =
-  'edge-lit overflow-hidden rounded-xl bg-surface/72 backdrop-blur-md backdrop-saturate-150';
-const SECTION_HEADING_CLASS_NAME = `${TITLE_CLASS_NAME} py-4`;
+const SECTION_HEADING_CLASS_NAME = `${CHAPTER_CLASS_NAME} py-4`;
 
 const WEEKDAY_ORDER: readonly Weekday[] = [
   Weekday.Sunday,
@@ -43,16 +44,87 @@ type MysteryPickerProps = {
   readonly todaySetId: string;
 };
 
-function MysteryPicker({ onSelect, selectedSetId, todaySetId }: MysteryPickerProps) {
+type MysterySet = (typeof contentCatalog)['rosary']['mysterySets'][number];
+
+const MYSTERY_ROW_CLASS_NAME = 'flex flex-col gap-0.5 px-4 py-3';
+
+function MysteryRowText({
+  mysterySet,
+  selected,
+  today,
+}: {
+  readonly mysterySet: MysterySet;
+  readonly selected: boolean;
+  readonly today: boolean;
+}) {
   return (
-    <nav aria-label="Mystery sets" className="flex shrink-0 flex-col">
-      {contentCatalog.rosary.mysterySets.map((mysterySet, index) => {
+    <>
+      <span
+        className={classNames(
+          CAPTION_CAPS_CLASS_NAME,
+          selected ? 'text-accent-current' : 'text-muted',
+        )}
+      >
+        {scheduleDaysFor(contentCatalog.rosary.schedule, mysterySet.id)}
+        {today ? ' · today' : ''}
+      </span>
+      <span className={classNames(NAV_CLASS_NAME, selected ? 'text-foreground' : 'text-secondary')}>
+        {mysterySet.name}
+      </span>
+    </>
+  );
+}
+
+const ruleOf = (index: number, columns: number): string | undefined => {
+  if (index === 0) {
+    return undefined;
+  }
+
+  return index < columns
+    ? 'home-wide:border-t home-wide:border-hairline'
+    : 'border-t border-hairline';
+};
+
+function MysteryPicker({ onSelect, selectedSetId, todaySetId }: MysteryPickerProps) {
+  const pickerRef = useRef<HTMLElement>(null);
+  const probeRef = useRef<HTMLDivElement>(null);
+  const columns = useMysteryColumns(pickerRef, probeRef);
+  const { mysterySets } = contentCatalog.rosary;
+
+  return (
+    <nav
+      aria-label="Mystery sets"
+      className={classNames(
+        'relative grid shrink-0',
+        columns === 2 ? 'grid-cols-2 home-wide:grid-cols-1' : undefined,
+      )}
+      ref={pickerRef}
+    >
+      <div aria-hidden="true" className="invisible absolute w-max" ref={probeRef}>
+        {mysterySets.map((mysterySet) => (
+          <div className={MYSTERY_ROW_CLASS_NAME} key={mysterySet.id}>
+            <MysteryRowText
+              mysterySet={mysterySet}
+              selected={false}
+              today={mysterySet.id === todaySetId}
+            />
+          </div>
+        ))}
+      </div>
+      {mysterySets.map((mysterySet, index) => {
         const selected = mysterySet.id === selectedSetId;
 
         return (
           <button
             aria-current={selected ? 'true' : undefined}
-            className={`focus-ring relative flex min-h-11 flex-col gap-0.5 px-4 py-3 text-left transition-colors ${index === 0 ? '' : 'border-t border-hairline'} ${selected ? 'bg-linear-to-r from-accent/10 to-transparent to-70%' : 'hover:bg-foreground/4'}`}
+            className={classNames(
+              'focus-ring relative min-h-11 text-left transition-colors',
+              MYSTERY_ROW_CLASS_NAME,
+              ruleOf(index, columns),
+              selected
+                ? 'bg-linear-to-r from-accent/10 to-transparent to-70%'
+                : 'hover:bg-foreground/4',
+            )}
             key={mysterySet.id}
             onClick={() => onSelect(mysterySet.id)}
             type="button"
@@ -63,17 +135,11 @@ function MysteryPicker({ onSelect, selectedSetId, todaySetId }: MysteryPickerPro
                 className="absolute left-0 inset-y-(--rule-lit-inset) w-(--rule-lit-width) bg-accent-current"
               />
             ) : null}
-            <span
-              className={`${SUBTITLE_CLASS_NAME} ${selected ? 'text-accent-current' : 'text-muted'}`}
-            >
-              {scheduleDaysFor(contentCatalog.rosary.schedule, mysterySet.id)}
-              {mysterySet.id === todaySetId ? ' · today' : ''}
-            </span>
-            <span
-              className={`${NAV_CLASS_NAME} ${selected ? 'text-foreground' : 'text-secondary'}`}
-            >
-              {mysterySet.name}
-            </span>
+            <MysteryRowText
+              mysterySet={mysterySet}
+              selected={selected}
+              today={mysterySet.id === todaySetId}
+            />
           </button>
         );
       })}
@@ -109,6 +175,8 @@ type RosaryHomeProps = {
   readonly onBeginRosary: (mysterySetId: string) => void;
   readonly onOpenArtwork: (artworkId: string) => void;
   readonly onOpenGallery: () => void;
+  readonly onSelectSet: (mysterySetId: string) => void;
+  readonly selectedSetId: string;
 };
 
 type RosaryMystery = (typeof contentCatalog)['rosary']['mysterySets'][number]['mysteries'][number];
@@ -123,14 +191,14 @@ type MysteryHero = {
 
 function MysteryHeroCopy({ hero }: { readonly hero: MysteryHero }) {
   return (
-    <div className="relative z-10 mt-auto flex flex-col gap-2 px-5 pt-5 pb-2 text-shadow-lg text-shadow-black/80 lg:max-w-lg lg:px-8 lg:pt-8 lg:pb-3">
+    <div className="relative z-10 mt-auto flex flex-col gap-2 px-5 pt-5 pb-2 text-shadow-lg text-shadow-black/80 home-wide:max-w-lg home-wide:px-8 home-wide:pt-8 home-wide:pb-3">
       {hero.isToday ? (
         <p className={`${EYEBROW_CLASS_NAME} text-on-art-accent!`}>Selected for today</p>
       ) : null}
       <h1 className={`${TITLE_CLASS_NAME} text-on-art-foreground!`}>{hero.mysterySetName}</h1>
       <ArtworkCreditLine
         artwork={hero.artwork}
-        className="lg:hidden"
+        className="home-wide:hidden"
         onArt
         onOpenArtwork={hero.onOpenArtwork}
       />
@@ -149,7 +217,7 @@ function MysteryHeroArt({ hero }: { readonly hero: MysteryHero }) {
   return (
     <section
       aria-label="Mystery artwork"
-      className="relative flex min-h-72 min-w-0 flex-1 overflow-hidden rounded-xl sm:min-h-60 lg:min-h-64 lg:flex-auto"
+      className="relative flex min-h-[max(var(--hero-floor),60cqh)] min-w-0 flex-1 overflow-hidden rounded-xl [--hero-floor:--spacing(72)] sm:[--hero-floor:--spacing(60)] lg:flex-auto lg:[--hero-floor:--spacing(64)] home-wide:min-h-[max(var(--hero-floor),calc(var(--support-height)*1.5))] home-wide:short:min-h-[max(var(--hero-floor),60cqh)]"
       data-layout-region="hero"
     >
       <img
@@ -157,16 +225,17 @@ function MysteryHeroArt({ hero }: { readonly hero: MysteryHero }) {
         className="absolute inset-0 size-full object-cover object-[50%_25%]"
         src={resolveArtAsset(hero.artwork.file)}
       />
-      <div className="absolute inset-x-0 bottom-0 h-4/5 bg-linear-to-t from-on-art-scrim via-on-art-scrim/85 via-35% to-transparent in-data-[theme=light]:h-[70%] lg:h-[55%] lg:via-on-art-scrim/50 lg:via-50% lg:in-data-[theme=light]:h-[46%]" />
+      <div className="absolute inset-x-0 bottom-0 h-4/5 bg-linear-to-t from-on-art-scrim via-on-art-scrim/85 via-35% to-transparent in-data-[theme=light]:h-[70%] home-wide:h-[55%] home-wide:via-on-art-scrim/50 home-wide:via-50% home-wide:in-data-[theme=light]:h-[46%]" />
       <MysteryHeroCopy hero={hero} />
-      <div className="absolute right-8 bottom-4 z-10 hidden max-w-md text-right lg:block">
+      <div className="absolute right-8 bottom-4 z-10 hidden max-w-md text-right home-wide:block">
         <ArtworkCreditLine artwork={hero.artwork} onArt onOpenArtwork={hero.onOpenArtwork} />
       </div>
     </section>
   );
 }
 
-type SupportPanelsProps = CollectionPreviewProps & MysteryPickerProps;
+type SupportPanelsProps = CollectionPreviewProps &
+  MysteryPickerProps & { readonly supportRef: RefObject<HTMLDivElement | null> };
 
 function SupportPanels({
   artworks,
@@ -174,22 +243,23 @@ function SupportPanels({
   onOpenGallery,
   onSelect,
   selectedSetId,
+  supportRef,
   todaySetId,
 }: SupportPanelsProps) {
   return (
-    <div className="flex shrink-0 flex-col gap-2 lg:flex-row">
+    <div className="flex shrink-0 flex-col gap-2 home-wide:flex-row" ref={supportRef}>
       <section
         aria-label="Mystery sets"
-        className={`flex shrink-0 flex-col ${PANEL_CLASS_NAME} lg:shrink lg:basis-[clamp(14rem,22vw,24rem)]`}
+        className={`flex shrink-0 flex-col ${GLASS_PANEL_CLASS_NAME} home-wide:shrink home-wide:basis-[clamp(14rem,22vw,24rem)]`}
         data-layout-region="mysteries"
       >
-        <h2 className={`${SECTION_HEADING_CLASS_NAME} hidden px-4 lg:block`}>Mysteries</h2>
+        <h2 className={`${SECTION_HEADING_CLASS_NAME} hidden px-4 home-wide:block`}>Mysteries</h2>
         <MysteryPicker onSelect={onSelect} selectedSetId={selectedSetId} todaySetId={todaySetId} />
       </section>
 
       <section
         aria-label="The Lucerna Collection"
-        className={`flex min-w-0 shrink-0 flex-col p-2 ${PANEL_CLASS_NAME} lg:flex-1`}
+        className={`flex min-w-0 shrink-0 flex-col p-2 ${GLASS_PANEL_CLASS_NAME} home-wide:flex-1`}
         data-layout-region="collection"
       >
         <CollectionPreview
@@ -220,31 +290,21 @@ const dailyArtworksFor = (
   return daily;
 };
 
-const dailyHeroArtworkFor = (today: Date, selectedSetId: string): ResolvedArtwork => {
-  const selectedSet = contentCatalog.mysterySetById(selectedSetId);
-  const heroMysteryIndex = dailyMysteryIndex(today, selectedSetId, selectedSet.mysteries.length);
-  const heroMystery = selectedSet.mysteries[heroMysteryIndex];
+type HomeStyle = CSSProperties & { readonly '--support-height': string };
 
-  if (heroMystery === undefined) {
-    throw new RangeError('Mystery set must not be empty');
-  }
-
-  const heroArtwork =
-    heroMystery.artworks[dailyMysteryIndex(today, heroMystery.title, heroMystery.artworks.length)];
-
-  if (heroArtwork === undefined) {
-    throw new RangeError('Mystery must carry at least one artwork');
-  }
-
-  return heroArtwork;
-};
-
-export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: RosaryHomeProps) {
+export function RosaryHome({
+  onBeginRosary,
+  onOpenArtwork,
+  onOpenGallery,
+  onSelectSet,
+  selectedSetId,
+}: RosaryHomeProps) {
+  const supportRef = useRef<HTMLDivElement>(null);
+  const supportHeight = useSupportHeight(supportRef);
   const today = new Date();
   const todaySetId = scheduledMysterySetId(today, contentCatalog.rosary.schedule);
-  const [selectedSetId, setSelectedSetId] = useState(todaySetId);
   const selectedSet = contentCatalog.mysterySetById(selectedSetId);
-  const heroArtwork = dailyHeroArtworkFor(today, selectedSetId);
+  const heroArtwork = dailyHeroArtworkFor(today, selectedSet);
   const dailyArtworks = dailyArtworksFor(selectedSet.mysteries, heroArtwork.id);
   const hero: MysteryHero = {
     artwork: heroArtwork,
@@ -253,21 +313,22 @@ export function RosaryHome({ onBeginRosary, onOpenArtwork, onOpenGallery }: Rosa
     onBegin: () => onBeginRosary(selectedSetId),
     onOpenArtwork,
   };
+  const homeStyle: HomeStyle = { '--support-height': `${String(supportHeight)}px` };
 
   return (
     <section className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden">
-      <AmbientGround source={resolveArtAsset(heroArtwork.file)} />
-
       <div
-        className={`scroll-region relative z-10 flex min-h-0 flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto ${CONTENT_WIDTH_CLASS_NAME}`}
+        className="scroll-region relative z-10 flex min-h-0 w-full flex-1 flex-col gap-2 overflow-x-hidden overflow-y-auto @container-size/home"
+        style={homeStyle}
       >
         <MysteryHeroArt hero={hero} />
         <SupportPanels
           artworks={dailyArtworks}
           onOpenArtwork={onOpenArtwork}
           onOpenGallery={onOpenGallery}
-          onSelect={setSelectedSetId}
+          onSelect={onSelectSet}
           selectedSetId={selectedSetId}
+          supportRef={supportRef}
           todaySetId={todaySetId}
         />
       </div>

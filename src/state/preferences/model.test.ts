@@ -7,11 +7,15 @@ import {
   ReaderFace,
   ReaderGround,
   ReadingSpeed,
+  RosaryDisplay,
   TextScale,
   Theme,
   UpdateChecks,
+  effectiveBeadMaterial,
   parsePreferences,
   preferencesReducer,
+  resolvedThemeOf,
+  type Preferences,
 } from './model.ts';
 
 describe('update check preferences', () => {
@@ -36,6 +40,8 @@ describe('parsePreferences', () => {
       openingDuration: OpeningDuration.FifteenSeconds,
       readingSpeed: ReadingSpeed.Brisk,
       beadMaterial: BeadMaterial.Pearl,
+      beadMaterialChosen: true,
+      rosaryDisplay: RosaryDisplay.CurrentDecade,
       showGuidance: false,
       readGuidance: false,
       showDecadeOfferings: false,
@@ -251,38 +257,89 @@ describe('preferencesReducer display controls', () => {
         key: 'beadMaterial',
         value: BeadMaterial.Obsidian,
       }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, beadMaterial: BeadMaterial.Obsidian });
+    ).toEqual({
+      ...DEFAULT_PREFERENCES,
+      beadMaterial: BeadMaterial.Obsidian,
+      beadMaterialChosen: true,
+    });
+  });
+
+  test('sets the reading text size with the app text size', () => {
+    const next = preferencesReducer(DEFAULT_PREFERENCES, {
+      type: PreferencesActionType.Set,
+      key: 'textScale',
+      value: TextScale.Large,
+    });
+
+    expect(next.readerTextScale).toBe(TextScale.Large);
   });
 });
 
-describe('preferencesReducer theme defaults', () => {
-  test('selects obsidian by default when Parchment is selected', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'theme',
-        value: Theme.Parchment,
-      }),
-    ).toEqual({
-      ...DEFAULT_PREFERENCES,
-      theme: Theme.Parchment,
-      beadMaterial: BeadMaterial.Obsidian,
-    });
+const choose = <Key extends keyof Preferences>(
+  preferences: Preferences,
+  key: Key,
+  value: Preferences[Key],
+): Preferences => preferencesReducer(preferences, { type: PreferencesActionType.Set, key, value });
+
+describe('app appearance', () => {
+  test('follows the device appearance when set to follow system', () => {
+    expect(resolvedThemeOf(Theme.System, true)).toBe(Theme.Parchment);
+    expect(resolvedThemeOf(Theme.System, false)).toBe(Theme.EternalLight);
+    expect(resolvedThemeOf(Theme.Parchment, false)).toBe(Theme.Parchment);
   });
 
-  test('allows the Parchment bead material to be changed after theme selection', () => {
-    const parchment = preferencesReducer(DEFAULT_PREFERENCES, {
-      type: PreferencesActionType.Set,
-      key: 'theme',
-      value: Theme.Parchment,
+  test('uses pearl beads on Parchment and wood on dark until a material is chosen', () => {
+    const parchment = choose(DEFAULT_PREFERENCES, 'theme', Theme.Parchment);
+
+    expect(effectiveBeadMaterial(parchment, Theme.Parchment)).toBe(BeadMaterial.Pearl);
+    expect(effectiveBeadMaterial(DEFAULT_PREFERENCES, Theme.EternalLight)).toBe(BeadMaterial.Wood);
+  });
+
+  test('keeps a chosen bead material until the appearance changes', () => {
+    const rose = choose(DEFAULT_PREFERENCES, 'beadMaterial', BeadMaterial.Rose);
+
+    expect(effectiveBeadMaterial(rose, Theme.Parchment)).toBe(BeadMaterial.Rose);
+    expect(effectiveBeadMaterial(choose(rose, 'theme', Theme.Parchment), Theme.Parchment)).toBe(
+      BeadMaterial.Pearl,
+    );
+  });
+
+  test('keeps a material chosen before the choice was recorded', () => {
+    const legacy = parsePreferences({
+      theme: Theme.Parchment,
+      textScale: TextScale.Standard,
+      beadMaterial: BeadMaterial.Rose,
+    });
+    const formerDefault = parsePreferences({
+      theme: Theme.Parchment,
+      textScale: TextScale.Standard,
+      beadMaterial: BeadMaterial.Obsidian,
     });
 
+    expect(effectiveBeadMaterial(legacy, Theme.Parchment)).toBe(BeadMaterial.Rose);
+    expect(effectiveBeadMaterial(formerDefault, Theme.Parchment)).toBe(BeadMaterial.Pearl);
+  });
+});
+
+describe('rosary display', () => {
+  test('shows the full rosary unless the current decade is chosen', () => {
+    expect(DEFAULT_PREFERENCES.rosaryDisplay).toBe(RosaryDisplay.FullRosary);
     expect(
-      preferencesReducer(parchment, {
-        type: PreferencesActionType.Set,
-        key: 'beadMaterial',
-        value: BeadMaterial.Rose,
+      parsePreferences({
+        theme: Theme.EternalLight,
+        textScale: TextScale.Standard,
+        rosaryDisplay: RosaryDisplay.CurrentDecade,
+      }).rosaryDisplay,
+    ).toBe(RosaryDisplay.CurrentDecade);
+  });
+
+  test('rejects an unknown rosary display', () => {
+    expect(
+      parsePreferences({
+        theme: Theme.EternalLight,
+        textScale: TextScale.Standard,
+        rosaryDisplay: 'ring',
       }),
-    ).toEqual({ ...parchment, beadMaterial: BeadMaterial.Rose });
+    ).toEqual(DEFAULT_PREFERENCES);
   });
 });

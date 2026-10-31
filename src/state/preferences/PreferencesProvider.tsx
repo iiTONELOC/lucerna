@@ -4,6 +4,7 @@ import {
   useMemo,
   useReducer,
   useState,
+  useSyncExternalStore,
   type Dispatch,
   type PropsWithChildren,
 } from 'react';
@@ -15,10 +16,22 @@ import {
   type PreferencesAction,
   PreferencesActionType,
   preferencesReducer,
+  resolvedThemeOf,
+  type ResolvedTheme,
 } from './model.ts';
 import { loadPreferences, savePreferences } from './storage.ts';
 
 type PreferencesDispatch = Dispatch<PreferencesAction>;
+
+const LIGHT_QUERY = '(prefers-color-scheme: light)';
+
+const prefersLight = (): boolean => window.matchMedia(LIGHT_QUERY).matches;
+
+const subscribeToLight = (onChange: () => void): (() => void) => {
+  const query = window.matchMedia(LIGHT_QUERY);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+};
 
 const useHydratedPreferences = (): [Preferences, PreferencesDispatch, boolean] => {
   const [preferences, dispatch] = useReducer(preferencesReducer, DEFAULT_PREFERENCES);
@@ -32,7 +45,10 @@ const useHydratedPreferences = (): [Preferences, PreferencesDispatch, boolean] =
         return;
       }
 
-      applyPreferencesToDocument(storedPreferences);
+      applyPreferencesToDocument(
+        storedPreferences,
+        resolvedThemeOf(storedPreferences.theme, prefersLight()),
+      );
       dispatch({ type: PreferencesActionType.Hydrate, preferences: storedPreferences });
       setHydrated(true);
     });
@@ -45,8 +61,12 @@ const useHydratedPreferences = (): [Preferences, PreferencesDispatch, boolean] =
   return [preferences, dispatch, hydrated];
 };
 
-const usePersistedPreferences = (preferences: Preferences, hydrated: boolean): void => {
-  useLayoutEffect(() => applyPreferencesToDocument(preferences), [preferences]);
+const usePersistedPreferences = (
+  preferences: Preferences,
+  theme: ResolvedTheme,
+  hydrated: boolean,
+): void => {
+  useLayoutEffect(() => applyPreferencesToDocument(preferences, theme), [preferences, theme]);
   useEffect(() => {
     if (hydrated) {
       void savePreferences(preferences);
@@ -56,16 +76,23 @@ const usePersistedPreferences = (preferences: Preferences, hydrated: boolean): v
 
 const contextValueFrom = (
   preferences: Preferences,
+  resolvedTheme: ResolvedTheme,
   dispatch: PreferencesDispatch,
 ): PreferencesContextValue => ({
   preferences,
+  resolvedTheme,
   setPreference: (key, value) => dispatch({ type: PreferencesActionType.Set, key, value }),
 });
 
 export function PreferencesProvider({ children }: Readonly<PropsWithChildren>) {
   const [preferences, dispatch, hydrated] = useHydratedPreferences();
-  usePersistedPreferences(preferences, hydrated);
-  const value = useMemo(() => contextValueFrom(preferences, dispatch), [dispatch, preferences]);
+  const light = useSyncExternalStore(subscribeToLight, prefersLight, () => false);
+  const resolvedTheme = resolvedThemeOf(preferences.theme, light);
+  usePersistedPreferences(preferences, resolvedTheme, hydrated);
+  const value = useMemo(
+    () => contextValueFrom(preferences, resolvedTheme, dispatch),
+    [dispatch, preferences, resolvedTheme],
+  );
 
   if (!hydrated) {
     return null;

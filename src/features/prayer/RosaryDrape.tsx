@@ -12,6 +12,7 @@ import {
   type Marker,
   type PlacedBead,
 } from './drape.ts';
+import type { StrandGeometry } from './decadeStrand.ts';
 import { StepAnchor, type NonBeadAnchor, type StepAnchorPoint } from './progression.ts';
 
 const CONTACT_BLUR = 1.5;
@@ -602,6 +603,85 @@ export function RosaryDrape(props: RosaryDrapeProps) {
       />
       <CrucifixMark active={target.kind === StepAnchor.Crucifix} marker={geometry.crucifix} />
       <TargetLayer anchors={anchors} geometry={geometry} onSelect={onSelect} target={target} />
+    </svg>
+  );
+}
+
+type DecadeStrandProps = {
+  readonly strand: StrandGeometry;
+  readonly target: ActiveTarget | null;
+  readonly prayedThroughBeadIndex: number;
+  readonly onSelect: (anchor: StepAnchorPoint) => void;
+};
+
+const nearestStrandBead = (strand: StrandGeometry, x: number): PlacedBead | undefined =>
+  strand.beads.reduce<PlacedBead | undefined>(
+    (nearest, bead) =>
+      nearest === undefined || Math.abs(bead.center.x - x) < Math.abs(nearest.center.x - x)
+        ? bead
+        : nearest,
+    undefined,
+  );
+
+export function DecadeStrand({
+  strand,
+  target,
+  prayedThroughBeadIndex,
+  onSelect,
+}: DecadeStrandProps) {
+  const ids = drapeIdsFrom(useId());
+  const bandRef = useRef<SVGPathElement>(null);
+  const { viewBox } = strand;
+
+  const selectNearestBead = (event: MouseEvent<SVGPathElement>): void => {
+    const matrix = bandRef.current?.getScreenCTM() ?? null;
+    const bead =
+      matrix === null
+        ? undefined
+        : nearestStrandBead(
+            strand,
+            new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse()).x,
+          );
+
+    if (bead !== undefined) {
+      onSelect({ beadIndex: bead.beadIndex, kind: StepAnchor.Bead });
+    }
+  };
+
+  return (
+    <svg
+      aria-label="Current decade"
+      className="pointer-events-none block h-auto w-full overflow-visible"
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+    >
+      <DrapeDefs ids={ids} />
+      <path
+        aria-hidden="true"
+        className={HIT_CLASS_NAME}
+        d={strand.chainSegments.map((segment) => segment.path).join(' ')}
+        fill="none"
+        onClick={selectNearestBead}
+        ref={bandRef}
+        stroke="transparent"
+        strokeLinecap="round"
+        strokeWidth={TOUCH_TARGET_MINIMUM_PIXELS}
+        vectorEffect="non-scaling-stroke"
+      />
+      <ChainLayer segments={strand.chainSegments} />
+      <ContactShadows beads={strand.beads} filterId={ids.contact} />
+      {target === null ? null : (
+        <g aria-hidden="true">
+          <ActiveHighlight ids={ids} target={target} />
+        </g>
+      )}
+      <BeadLayer
+        activeBeadIndex={target?.kind === StepAnchor.Bead ? target.beadIndex : null}
+        beads={strand.beads}
+        ids={ids}
+        onSelect={onSelect}
+        prayedThroughBeadIndex={prayedThroughBeadIndex}
+      />
+      <Speculars beads={strand.beads} />
     </svg>
   );
 }

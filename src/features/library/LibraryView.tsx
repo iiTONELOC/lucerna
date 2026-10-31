@@ -2,7 +2,7 @@ import type { ResolvedLibraryWork } from '../../content/catalog.ts';
 import { loadLibrary, useLoaded } from '../../content/loaders.ts';
 import { LibraryCategory } from '../../content/schema.ts';
 import { Shelf, ViewHeader } from '../../components/layout.tsx';
-import { CITATION_CLASS_NAME, NAV_CLASS_NAME } from '../../styles.ts';
+import { CAPTION_CAPS_CLASS_NAME, NAV_CLASS_NAME } from '../../styles.ts';
 import { BIBLE_EDITION, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL } from './model.ts';
 
 const LIBRARY_TITLE_ID = 'library-title';
@@ -41,7 +41,7 @@ function ShelfCard({
       >
         <span aria-hidden="true" className="h-1 w-10 shrink-0 rounded-full bg-accent" />
         <span className={`${NAV_CLASS_NAME} font-medium text-foreground`}>{title}</span>
-        <span className={`small-caps mt-auto ${CITATION_CLASS_NAME} text-muted`}>{detail}</span>
+        <span className={`mt-auto ${CAPTION_CAPS_CLASS_NAME} text-muted`}>{detail}</span>
       </button>
     </li>
   );

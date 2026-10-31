@@ -113,7 +113,7 @@ function JumpPanel({
 
   return (
     <div
-      className="scroll-region absolute top-full left-1/2 z-20 mt-1 max-h-80 w-80 max-w-[85vw] -translate-x-1/2 overflow-y-auto rounded-lg border border-hairline bg-surface p-3 shadow-lg"
+      className="scroll-region absolute top-full left-1/2 z-20 mt-1 max-h-80 w-80 max-w-[85vw] -translate-x-1/2 overflow-y-auto rounded-lg border border-outline bg-surface p-3 shadow-lg"
       ref={panelRef}
     >
       <div className="flex flex-wrap justify-start gap-x-1">

@@ -35,7 +35,8 @@ export function DiagnosticsSettings() {
         Diagnostics
       </h3>
       <p className={`pt-3 ${CITATION_CLASS_NAME} text-muted`}>
-        Lucerna keeps the last error on this device. Nothing is sent unless you send it.
+        <span className="block">Lucerna keeps the last error on this device.</span>
+        <span className="block">Nothing is sent unless you send it.</span>
       </p>
       {diagnostics === null ? (
         <p className={`pt-3 ${CITATION_CLASS_NAME} text-muted`}>No error has been recorded.</p>

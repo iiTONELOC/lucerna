@@ -2,7 +2,7 @@ import type { ReactNode, RefObject } from 'react';
 import { useEscape } from '../../shared/useEscape.ts';
 import { ReaderGround, Theme, type Preferences } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { CITATION_CLASS_NAME } from '../../styles.ts';
+import { CITATION_CLASS_NAME, READING_CLASS_NAME } from '../../styles.ts';
 import type { DevotionalSource } from '../../content/schema.ts';
 import { BackButton } from '../../components/buttons/BackButton.tsx';
 import { SettingsButton } from '../../components/buttons/SettingsButton.tsx';
@@ -12,6 +12,19 @@ const readerSurfacePropsOf = (preferences: Preferences) => ({
   'data-reader-scale': preferences.readerTextScale,
   ...(preferences.readerGround === ReaderGround.Parchment ? { 'data-theme': Theme.Parchment } : {}),
 });
+
+export function ReaderSample({ children }: { readonly children: ReactNode }) {
+  const { preferences } = usePreferences();
+
+  return (
+    <p
+      {...readerSurfacePropsOf(preferences)}
+      className={`${READING_CLASS_NAME} rounded-lg bg-background p-4`}
+    >
+      {children}
+    </p>
+  );
+}
 
 const useReaderEscape = (onBack: () => void): void => {
   useEscape((event) => {
