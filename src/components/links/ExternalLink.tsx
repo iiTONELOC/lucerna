@@ -1,4 +1,3 @@
-import { BODY_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
 import {
   useId,
   useRef,
@@ -6,13 +5,17 @@ import {
   type ComponentProps,
   type ReactNode,
   type RefObject,
+  type MouseEvent,
 } from 'react';
+import { useReading } from '../../content/reading.ts';
 import { useDialogOpen } from '../../shared/focus.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import { BODY_CLASS_NAME, TITLE_CLASS_NAME } from '../../styles.ts';
 
 const DIALOG_ACTION_CLASS_NAME = `flex min-h-11 items-center justify-center rounded-md border border-outline px-4 ${BODY_CLASS_NAME} transition-colors focus-ring`;
 
 type ExternalLinkDialogProps = {
+  readonly onBeforeOpen?: () => Promise<boolean>;
   readonly descriptionId: string;
   readonly href: string;
   readonly onClose: () => void;
@@ -23,7 +26,9 @@ type ExternalLinkDialogProps = {
 function ExternalLinkDialogActions({
   href,
   onClose,
-}: Pick<ExternalLinkDialogProps, 'href' | 'onClose'>) {
+  onBeforeOpen,
+}: Pick<ExternalLinkDialogProps, 'href' | 'onClose' | 'onBeforeOpen'>) {
+  const { wording } = useReading();
   return (
     <div className="mt-5 flex justify-end gap-3">
       <button
@@ -31,16 +36,19 @@ function ExternalLinkDialogActions({
         onClick={onClose}
         type="button"
       >
-        Stay here
+        {wording.external.stay}
       </button>
       <a
         className={`${DIALOG_ACTION_CLASS_NAME} border-accent text-accent-current`}
         href={href}
-        onClick={onClose}
+        onClick={(event) => {
+          followAfterSaving(event, href, onBeforeOpen);
+          onClose();
+        }}
         rel="noreferrer"
         target="_blank"
       >
-        Continue
+        {wording.external.continue}
       </a>
     </div>
   );
@@ -50,9 +58,11 @@ function ExternalLinkDialog({
   descriptionId,
   href,
   onClose,
+  onBeforeOpen,
   open,
   triggerRef,
 }: ExternalLinkDialogProps) {
+  const { wording } = useReading();
   const dialogRef = useRef<HTMLDialogElement>(null);
   useDialogOpen(dialogRef, open, true);
 
@@ -73,12 +83,16 @@ function ExternalLinkDialog({
     >
       <div className="p-5 sm:p-6">
         <h2 className={TITLE_CLASS_NAME} id={`${descriptionId}-title`}>
-          Open an external website?
+          {wording.external.title}
         </h2>
         <p className={`pt-3 ${BODY_CLASS_NAME} text-secondary`} id={descriptionId}>
-          This page is not part of Lucerna and may require an internet connection.
+          {wording.external.body}
         </p>
-        <ExternalLinkDialogActions href={href} onClose={onClose} />
+        <ExternalLinkDialogActions
+          href={href}
+          onClose={onClose}
+          {...(onBeforeOpen === undefined ? {} : { onBeforeOpen })}
+        />
       </div>
     </dialog>
   );
@@ -87,9 +101,10 @@ function ExternalLinkDialog({
 type ExternalLinkProps = Omit<ComponentProps<'a'>, 'children' | 'href' | 'rel' | 'target'> & {
   readonly children: ReactNode;
   readonly href: string;
+  readonly onBeforeOpen?: () => Promise<boolean>;
 };
 
-export function ExternalLink({ children, href, ...anchorProps }: ExternalLinkProps) {
+export function ExternalLink({ children, href, onBeforeOpen, ...anchorProps }: ExternalLinkProps) {
   const { preferences } = usePreferences();
   const [confirming, setConfirming] = useState(false);
   const triggerRef = useRef<HTMLAnchorElement>(null);
@@ -104,6 +119,8 @@ export function ExternalLink({ children, href, ...anchorProps }: ExternalLinkPro
           if (preferences.confirmExternalLinks) {
             event.preventDefault();
             setConfirming(true);
+          } else {
+            followAfterSaving(event, href, onBeforeOpen);
           }
         }}
         ref={triggerRef}
@@ -118,7 +135,30 @@ export function ExternalLink({ children, href, ...anchorProps }: ExternalLinkPro
         onClose={() => setConfirming(false)}
         open={confirming}
         triggerRef={triggerRef}
+        {...(onBeforeOpen === undefined ? {} : { onBeforeOpen })}
       />
     </>
   );
 }
+
+const followAfterSaving = (
+  event: MouseEvent<HTMLAnchorElement>,
+  href: string,
+  prepare: (() => Promise<boolean>) | undefined,
+): void => {
+  if (prepare === undefined) return;
+  event.preventDefault();
+  const { rel, target } = event.currentTarget;
+  const destination = window.open('', target);
+  if (destination !== null) destination.opener = null;
+  void prepare().then((allowed) => {
+    if (!allowed) {
+      destination?.close();
+      return;
+    }
+    const link = (destination?.document ?? document).createElement('a');
+    link.href = href;
+    link.rel = rel;
+    link.click();
+  });
+};

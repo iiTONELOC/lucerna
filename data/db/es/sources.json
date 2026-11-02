@@ -1,0 +1,177 @@
+{
+  "met-open-access": {
+    "work": "Museo Metropolitano de Arte — Acceso abierto",
+    "author": "Museo Metropolitano de Arte",
+    "approval": "CC0 / dominio público"
+  },
+  "wikimedia-pd-art": {
+    "work": "Wikimedia Commons — PD-Art",
+    "author": "Wikimedia Commons",
+    "approval": "PD-Art / dominio público"
+  },
+  "wikimedia-cc-by-2.0": {
+    "work": "Wikimedia Commons — fotografía CC BY 2.0",
+    "author": "Wikimedia Commons",
+    "approval": "Fotografía CC BY 2.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra"
+  },
+  "wikimedia-cc-by-sa-2.0": {
+    "work": "Wikimedia Commons — fotografía CC BY-SA 2.0",
+    "author": "Wikimedia Commons",
+    "approval": "Fotografía CC BY-SA 2.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra"
+  },
+  "wikimedia-cc-by-3.0": {
+    "work": "Wikimedia Commons — fotografía CC BY 3.0",
+    "author": "Wikimedia Commons",
+    "approval": "Fotografía CC BY 3.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra"
+  },
+  "nga-open-access": {
+    "work": "Galería Nacional de Arte — Acceso abierto",
+    "author": "Galería Nacional de Arte, Washington",
+    "approval": "CC0 / dominio público"
+  },
+  "rosary-center-prayers": {
+    "work": "Oraciones del Rosario (forma tradicional en inglés)",
+    "author": "Rosary Center & Confraternity (frailes dominicos, O.P.)",
+    "approval": "litúrgico de dominio público"
+  },
+  "rosary-center-howto": {
+    "work": "Cómo rezar el Rosario",
+    "author": "Rosary Center & Confraternity (frailes dominicos, O.P.)",
+    "approval": "litúrgico de dominio público"
+  },
+  "traditional-catholic-prayers-howto": {
+    "work": "Cómo rezar el Rosario",
+    "author": "Traditional Catholic Prayers",
+    "approval": "página de referencia; no se incluye ningún contenido de la página"
+  },
+  "douay-rheims-challoner": {
+    "work": "Biblia Douay-Rheims, revisión de Challoner (DRC 1750)",
+    "author": "Revisión de Challoner",
+    "approval": "dominio público"
+  },
+  "world-english-bible": {
+    "work": "World English Bible (WEB)",
+    "author": "Revisión de eBible.org de la ASV de 1901",
+    "approval": "dominio público",
+    "note": "Cotejada con la Douay-Rheims para marcar las palabras de Cristo; no es el texto de las lecturas."
+  },
+  "king-james-version": {
+    "work": "Biblia del rey Jacobo (texto de Blayney de 1769)",
+    "author": "Iglesia de Inglaterra, edición de eBible.org",
+    "approval": "dominio público",
+    "note": "Cotejada con la Douay-Rheims para marcar las palabras de Cristo; no es el texto de las lecturas."
+  },
+  "claude-fable-5": {
+    "work": "Claude Fable 5",
+    "author": "Anthropic",
+    "approval": "servicio comercial de IA",
+    "note": "Herramienta de IA usada para el cotejo de las palabras de Cristo."
+  },
+  "holy-see-mysteries": {
+    "work": "Los misterios del Rosario (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "holy-see-joyful": {
+    "work": "Los misterios del Rosario: misterios gozosos (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "holy-see-sorrowful": {
+    "work": "Los misterios del Rosario: misterios dolorosos (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "holy-see-glorious": {
+    "work": "Los misterios del Rosario: misterios gloriosos (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "holy-see-luminous": {
+    "work": "Los misterios del Rosario: misterios luminosos (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "holy-see-howto": {
+    "work": "Cómo rezar el Rosario, en la página Los misterios del Rosario (página en inglés)",
+    "author": "La Santa Sede",
+    "approval": "litúrgico de dominio público"
+  },
+  "usccb-fruits": {
+    "work": "Cómo rezar el Rosario (frutos de los misterios)",
+    "author": "USCCB",
+    "approval": "litúrgico de dominio público"
+  },
+  "usccb-howto": {
+    "work": "Cómo rezar el Rosario",
+    "author": "USCCB",
+    "approval": "litúrgico de dominio público"
+  },
+  "de-montfort-secret": {
+    "work": "El secreto admirable del Santísimo Rosario",
+    "author": "San Luis María Grignion de Montfort",
+    "approval": "dominio público en EE. UU.; los derechos de autor de la edición estadounidense de 1954 requerían renovación en 1981/1982 y no se halló ningún registro en la base de datos de renovaciones de derechos de autor de Stanford"
+  },
+  "rosarium-virginis-mariae": {
+    "work": "Rosarium Virginis Mariae (2002)",
+    "author": "Papa Juan Pablo II",
+    "approval": "magisterio (carta apostólica)"
+  },
+  "holy-see-compendium-es": {
+    "work": "Compendio del Catecismo de la Iglesia Católica",
+    "author": "La Santa Sede",
+    "approval": "Libreria Editrice Vaticana, 2005; oraciones litúrgicas comunes"
+  },
+  "holy-see-emigrants-rosary-es": {
+    "work": "Rosario de los Emigrantes e Itinerantes",
+    "author": "Pontificio Consejo para la Pastoral de los Emigrantes e Itinerantes",
+    "approval": "oración litúrgica común"
+  },
+  "holy-see-mysteries-es": {
+    "work": "Los Misterios del Santo Rosario",
+    "author": "La Santa Sede",
+    "approval": "oración litúrgica común"
+  },
+  "holy-see-joyful-es": {
+    "work": "Misterios Gozosos - Los misterios del Rosario",
+    "author": "La Santa Sede",
+    "approval": "oración litúrgica común"
+  },
+  "holy-see-luminous-es": {
+    "work": "Misterios Luminosos - Los Misterios del Santo Rosario",
+    "author": "La Santa Sede",
+    "approval": "oración litúrgica común"
+  },
+  "holy-see-sorrowful-es": {
+    "work": "Misterios Dolorosos - Los Misterios del Santo Rosario",
+    "author": "La Santa Sede",
+    "approval": "oración litúrgica común"
+  },
+  "holy-see-glorious-es": {
+    "work": "Misterios Gloriosos - Los Misterios del Santo Rosario",
+    "author": "La Santa Sede",
+    "approval": "oración litúrgica común"
+  },
+  "clementine-vulgate": {
+    "work": "Biblia Vulgata Clementina (1598), con la Glosa ordinaria (edición Migne, 1880)",
+    "author": "San Jerónimo; edición latVUC de eBible.org",
+    "approval": "dominio público"
+  },
+  "scio-de-san-miguel": {
+    "work": "Scío de San Miguel",
+    "author": "Latin Prayer",
+    "approval": "dominio público"
+  },
+  "claude-opus-5-5": {
+    "work": "Claude Opus 5.5",
+    "author": "Anthropic",
+    "approval": "servicio comercial de IA",
+    "note": "Herramienta de IA usada para las traducciones al español de la interfaz, los frutos, la guía y la política de privacidad."
+  },
+  "gpt-6-astra": {
+    "work": "GPT-6 Astra",
+    "author": "OpenAI",
+    "approval": "servicio comercial de IA",
+    "note": "Herramienta de IA usada para traducir al español El secreto admirable del Santísimo Rosario y para revisar todas las traducciones al español."
+  }
+}

@@ -1,13 +1,22 @@
-import { contentCatalog } from '../../content/catalog.ts';
+import { createContext, useContext } from 'react';
+import { type ResolvedBible } from '../../content/catalog.ts';
+import { INITIAL_READING, type ReadingSnapshot } from '../../content/reading.ts';
 import { BibleTestament, LibraryCategory, type ScripturePassage } from '../../content/schema.ts';
 
-export const LIBRARY_CATEGORY_LABEL: Readonly<Record<LibraryCategory, string>> = {
-  [LibraryCategory.Scripture]: 'Scripture',
-  [LibraryCategory.Devotions]: 'Devotions',
-};
+export const LIBRARY_CATEGORY_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<LibraryCategory, string>> => ({
+  [LibraryCategory.Scripture]: reading.wording.library.scripture,
+  [LibraryCategory.Devotions]: reading.wording.library.devotions,
+});
 
-export const BIBLE_TITLE = 'The Holy Bible';
-export const BIBLE_EDITION = 'Douay-Rheims Version';
+export const BIBLE_TITLE = (reading: ReadingSnapshot) => reading.wording.library.bibleTitle;
+export const BIBLE_EDITION_LABEL = (reading: ReadingSnapshot) =>
+  reading.wording.library.bibleEditions;
+
+export const OpenBibleContext = createContext<ResolvedBible>(INITIAL_READING.catalog.bible);
+
+export const useOpenBible = (): ResolvedBible => useContext(OpenBibleContext);
 
 export type ReaderJump = {
   readonly blockIndex: number;
@@ -34,17 +43,20 @@ export type ScriptureLocation = {
   readonly verse: BibleVerseLocation;
 };
 
-export const scriptureLocationOf = (scripture: ScripturePassage): ScriptureLocation | null => {
-  const book = contentCatalog.bible.books.find(
-    ({ name }) => name === scripture.book || name.startsWith(`${scripture.book} `),
-  );
+export const scriptureLocationOf = (
+  reading: ReadingSnapshot,
+  scripture: ScripturePassage,
+): ScriptureLocation | null => {
+  const book = reading.catalog.bible.books.find(({ id }) => id === scripture.bookId);
 
   return book === undefined
     ? null
     : { bookId: book.id, verse: { chapter: scripture.chapter, verse: scripture.verseStart } };
 };
 
-export const TESTAMENT_LABEL: Readonly<Record<BibleTestament, string>> = {
-  [BibleTestament.Old]: 'The Old Testament',
-  [BibleTestament.New]: 'The New Testament',
-};
+export const TESTAMENT_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<BibleTestament, string>> => ({
+  [BibleTestament.Old]: reading.wording.library.oldTestament,
+  [BibleTestament.New]: reading.wording.library.newTestament,
+});

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import lucernaMark from '../../assets/brand/lucerna-mark.svg';
 import { SettingsGlyph } from '../../components/icons/SettingsGlyph.tsx';
+import { useReading } from '../../content/reading.ts';
 import { classNames } from '../../shared/classNames.ts';
-import { capitalize } from '../../shared/text.ts';
 import { Theme } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import {
@@ -105,15 +105,16 @@ function NavItem({ className, icon, label, onSelect, selected = false, showLabel
 }
 
 function LanternButton({ onGoHome }: { readonly onGoHome: () => void }) {
+  const { wording } = useReading();
   const { resolvedTheme } = usePreferences();
   const isParchment = resolvedTheme === Theme.Parchment;
 
   return (
     <button
-      aria-label="Go to the Rosary"
+      aria-label={wording.navigation.goToRosary}
       className={`focus-ring flex size-12 shrink-0 items-center justify-center text-accent transition-colors ${MARK_BACKDROP_CLASS_NAME} ${isParchment ? 'bg-accent-strong hover:bg-accent-current' : 'hover:bg-foreground/5'}`}
       onClick={onGoHome}
-      title="Go to the Rosary"
+      title={wording.navigation.goToRosary}
       type="button"
     >
       <img alt="" aria-hidden="true" className="size-10 max-w-none" src={lucernaMark} />
@@ -134,12 +135,13 @@ type ViewItemsProps = Omit<NavigationProps, 'onOpenSettings'> & {
 };
 
 function ViewItems({ activeView, itemClassName, onSelectView, showLabels, views }: ViewItemsProps) {
+  const { wording } = useReading();
   return views.map((view) => (
     <NavItem
       className={itemClassName}
       icon={VIEW_ICONS[view]}
       key={view}
-      label={capitalize(view)}
+      label={wording.views[view]}
       onSelect={() => onSelectView(view)}
       selected={activeView === view}
       showLabel={showLabels}
@@ -148,9 +150,10 @@ function ViewItems({ activeView, itemClassName, onSelectView, showLabels, views 
 }
 
 export function BottomBar({ activeView, onOpenSettings, onSelectView }: NavigationProps) {
+  const { wording } = useReading();
   return (
     <nav
-      aria-label="Primary"
+      aria-label={wording.navigation.primary}
       className={classNames(
         '@container flex shrink-0 items-center p-1 rail:hidden',
         SURFACE_PANEL_CLASS_NAME,
@@ -167,7 +170,7 @@ export function BottomBar({ activeView, onOpenSettings, onSelectView }: Navigati
       <NavItem
         className={BAR_ITEM_CLASS_NAME}
         icon={<SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />}
-        label="Settings"
+        label={wording.navigation.settings}
         onSelect={onOpenSettings}
         showLabel
       />
@@ -181,6 +184,7 @@ export function DesktopRail({
   onOpenSettings,
   onSelectView,
 }: NavigationProps & { readonly onGoHome: () => void }) {
+  const { wording } = useReading();
   return (
     <aside
       className={classNames(
@@ -190,7 +194,7 @@ export function DesktopRail({
     >
       <LanternButton onGoHome={onGoHome} />
 
-      <nav aria-label="Primary" className="mt-4 flex flex-col gap-1">
+      <nav aria-label={wording.navigation.primary} className="mt-4 flex flex-col gap-1">
         <ViewItems
           activeView={activeView}
           itemClassName={RAIL_ITEM_CLASS_NAME}
@@ -210,7 +214,7 @@ export function DesktopRail({
         <NavItem
           className={RAIL_ITEM_CLASS_NAME}
           icon={<SettingsGlyph className={RAIL_ICON_SIZE_CLASS_NAME} />}
-          label="Settings"
+          label={wording.navigation.settings}
           onSelect={onOpenSettings}
           showLabel={false}
         />

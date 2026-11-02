@@ -1,24 +1,29 @@
 import type { CSSProperties, RefObject } from 'react';
-import { classNames } from '../../shared/classNames.ts';
-import { effectiveBeadMaterial } from '../../state/preferences/model.ts';
-import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { AmbientGround } from '../../components/art/AmbientGround.tsx';
 import { ViewHeader } from '../../components/layout.tsx';
+import { useReading } from '../../content/reading.ts';
+import { classNames } from '../../shared/classNames.ts';
+import { useLandscape } from '../../shared/useLandscape.ts';
+import { effectiveBeadMaterial } from '../../state/preferences/model.ts';
+import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import { SupportCompletion } from '../support/Support.tsx';
+import { useSupportExit } from '../support/supportActivity.ts';
+import { SupportActivity } from '../support/model.ts';
+import { ArtworkPage } from './ArtworkPage.tsx';
+import { decadeViewOf } from './decadeStrand.ts';
+import { PrayerControls } from './PrayerControls.tsx';
+import { Drape, DrapeBandSizer } from './PrayerDrape.tsx';
 import {
   usePrayerFocusSession,
+  useStepNotice,
   type DrapeProps,
   type HeadingProps,
   type PrayerFocusProps,
   type PrayerFocusSession,
 } from './prayerSession.ts';
+import { PrayerReadingPage, TAIL_CLEARANCE_CLASS_NAME } from './ReadingPage.tsx';
 import { pendantLeftOf } from './usePendantOverhang.ts';
 import { SCROLL_FALLBACK_MAXIMUM_HEIGHT } from './usePrayerFit.ts';
-import { Drape, DrapeBandSizer } from './PrayerDrape.tsx';
-import { ArtworkPage } from './ArtworkPage.tsx';
-import { PrayerReadingPage, TAIL_CLEARANCE_CLASS_NAME } from './ReadingPage.tsx';
-import { PrayerControls } from './PrayerControls.tsx';
-import { useLandscape } from '../../shared/useLandscape.ts';
-import { decadeViewOf } from './decadeStrand.ts';
 
 const ARTWORK_MINIMUM_HEIGHT = 200;
 
@@ -84,12 +89,13 @@ function PrayerHeading({
 function PrayerBook({ session }: { readonly session: PrayerFocusSession }) {
   const { display, drape, fit, onOpenArtwork, refs } = session;
   const landscape = useLandscape();
+  const aiNotice = useStepNotice(display.step);
 
   return (
     <div
       ref={refs.surface}
       className={classNames(
-        'relative grid max-h-full min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-xl border border-outline bg-background/45 shadow-2xl backdrop-blur-sm in-data-[theme=light]:shadow-none landscape:grid-cols-[minmax(0,min(calc(100%/1.92),var(--reading-page-maximum)))_minmax(0,1fr)] landscape:grid-rows-[max-content_max-content_minmax(0,1fr)]',
+        'relative grid max-h-full min-h-0 flex-1 grid-cols-1 overflow-hidden rounded-xl border border-outline bg-background/45 shadow-2xl backdrop-blur-sm in-data-[theme=light]:shadow-none landscape:grid-cols-[minmax(0,min(calc(100%/1.7),var(--reading-page-maximum)))_minmax(0,1fr)] landscape:grid-rows-[max-content_max-content_minmax(0,1fr)]',
         fit.showArtwork
           ? 'grid-rows-[max-content_minmax(var(--prayer-artwork-minimum-height),1fr)_minmax(0,max-content)]'
           : 'grid-rows-[max-content_max-content_minmax(0,1fr)]',
@@ -108,6 +114,7 @@ function PrayerBook({ session }: { readonly session: PrayerFocusSession }) {
         drape={drape}
         drapeRef={refs.drape}
         notes={{
+          aiNotice,
           guidedPlayback: session.playback,
           offering: display.offering,
           onOpenReference: session.onOpenReference,
@@ -133,19 +140,20 @@ function PrayerBook({ session }: { readonly session: PrayerFocusSession }) {
           />
         </>
       ) : null}
-      <PrayerReadingPage session={session} />
+      <PrayerReadingPage aiNotice={aiNotice} session={session} />
     </div>
   );
 }
 
 function PrayerFocusStage({ session }: { readonly session: PrayerFocusSession }) {
+  const { wording } = useReading();
   const { controls, display, drape, fit, preferences, refs } = session;
   const { resolvedTheme } = usePreferences();
 
   return (
     <section
       ref={refs.stage}
-      aria-label="Rosary prayer"
+      aria-label={wording.navigation.rosaryPrayer}
       className="scroll-region relative h-full min-h-0 overflow-hidden text-foreground landscape:overflow-y-auto"
       data-bead-material={effectiveBeadMaterial(preferences, resolvedTheme)}
       style={stageStyleOf(drape)}
@@ -167,8 +175,19 @@ function PrayerFocusStage({ session }: { readonly session: PrayerFocusSession })
   );
 }
 
-export function PrayerFocus(props: PrayerFocusProps) {
-  const session = usePrayerFocusSession(props);
+export function PrayerFocus(props: Omit<PrayerFocusProps, 'onComplete'>) {
+  const completion = useSupportExit(SupportActivity.Rosary, props.mysterySetId);
+  const session = usePrayerFocusSession({
+    ...props,
+    onComplete: () => completion.finish(props.onExit),
+  });
+  if (completion.completed) {
+    return (
+      <div className="scroll-region h-full overflow-y-auto bg-background text-foreground">
+        <SupportCompletion id={completion.id} onDone={completion.resume} />
+      </div>
+    );
+  }
 
   return <PrayerFocusStage session={session} />;
 }

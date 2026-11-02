@@ -1,6 +1,8 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { AiTranslationMark, AiTranslationNotice } from '../../components/marks/Marks.tsx';
 import type { ResolvedLibraryWork } from '../../content/catalog.ts';
 import { loadLibrary, useLoaded } from '../../content/loaders.ts';
+import { useReading } from '../../content/reading.ts';
 import {
   LibraryBlockKind,
   LibraryHeadingLevel,
@@ -11,10 +13,12 @@ import {
 } from '../../content/schema.ts';
 import {
   CHAPTER_CLASS_NAME,
+  CITATION_CLASS_NAME,
   READING_CLASS_NAME,
   SUBTITLE_CLASS_NAME,
   TITLE_CLASS_NAME,
 } from '../../styles.ts';
+import { apparatusReferenceTarget, type ReferenceTarget } from '../references/referenceCatalog.ts';
 import { currentJumpOf, LIBRARY_CATEGORY_LABEL, type ReaderJump } from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
 import { ReaderLocationControl } from './ReaderLocation.tsx';
@@ -107,12 +111,14 @@ const sectionJumpsFrom = (work: ResolvedLibraryWork): readonly ReaderJump[] =>
 type ReaderFocusProps = {
   readonly initialBlockIndex: number | null;
   readonly onBack: () => void;
+  readonly onOpenReference: (target: ReferenceTarget) => void;
   readonly onOpenSettings: () => void;
   readonly workId: string;
 };
 
 export function ReaderFocus({ workId, ...props }: ReaderFocusProps) {
-  const library = useLoaded(loadLibrary());
+  const reading = useReading();
+  const library = useLoaded(loadLibrary(reading));
 
   return library === null ? null : <WorkReader work={library.workById(workId)} {...props} />;
 }
@@ -120,14 +126,22 @@ export function ReaderFocus({ workId, ...props }: ReaderFocusProps) {
 function WorkReader({
   initialBlockIndex,
   onBack,
+  onOpenReference,
   onOpenSettings,
   work,
 }: Omit<ReaderFocusProps, 'workId'> & { readonly work: ResolvedLibraryWork }) {
+  const reading = useReading();
   const headingRef = useHeadingFocus(work.id);
   const articleRef = useRef<HTMLElement>(null);
   const tracker = useTopmostTracker(articleRef, work);
   const jumps = sectionJumpsFrom(work);
-  useReadingPosition(work.id, articleRef, initialBlockIndex, tracker);
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  useReadingPosition(
+    { contentKey: work.id, storageKey: work.id },
+    articleRef,
+    initialBlockIndex,
+    tracker,
+  );
 
   return (
     <ReaderSurface
@@ -147,11 +161,26 @@ function WorkReader({
       onOpenSettings={onOpenSettings}
     >
       <ReaderHeader
-        eyebrow={LIBRARY_CATEGORY_LABEL[work.category]}
+        eyebrow={LIBRARY_CATEGORY_LABEL(reading)[work.category]}
         headingRef={headingRef}
         subtitle={work.author}
         title={work.title}
       />
+      {work.translation === undefined ? null : (
+        <p className={`${CITATION_CLASS_NAME} text-muted`}>
+          {reading.wording.settings.aiTranslated}
+          <AiTranslationMark
+            onToggle={() => setNoticeOpen((current) => !current)}
+            open={noticeOpen}
+          />
+        </p>
+      )}
+      {noticeOpen ? (
+        <AiTranslationNotice
+          onClose={() => setNoticeOpen(false)}
+          onOpenSource={(sourceId) => onOpenReference(apparatusReferenceTarget(sourceId))}
+        />
+      ) : null}
       {work.blocks.map((block, index) => (
         <div key={`${block.kind}-${index}`} {...blockIndexPropsOf(index)}>
           <ReaderBlock block={block} />

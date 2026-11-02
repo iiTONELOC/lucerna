@@ -169,5 +169,86 @@
     "approval": "magisterial (apostolic letter)",
     "url": "https://www.vatican.va/content/john-paul-ii/en/apost_letters/2002/documents/hf_jp-ii_apl_20021016_rosarium-virginis-mariae.html",
     "type": "magisterial"
+  },
+  "holy-see-compendium-es": {
+    "work": "Compendium of the Catechism of the Catholic Church (Spanish edition)",
+    "author": "The Holy See",
+    "approval": "Libreria Editrice Vaticana, 2005; common liturgical prayers",
+    "url": "https://www.vatican.va/archive/compendium_ccc/documents/archive_2005_compendium-ccc_sp.html",
+    "type": "prayer"
+  },
+  "holy-see-emigrants-rosary-es": {
+    "work": "Rosary of Migrants and Itinerant People (Spanish page)",
+    "author": "Pontifical Council for the Pastoral Care of Migrants and Itinerant People",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/roman_curia/pontifical_councils/migrants/Rosario/rc_pc_migrants_rosario_sp.html",
+    "type": "prayer"
+  },
+  "holy-see-mysteries-es": {
+    "work": "The Mysteries of the Holy Rosary (Spanish page)",
+    "author": "The Holy See",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_sp.html",
+    "type": "liturgical"
+  },
+  "holy-see-joyful-es": {
+    "work": "Joyful Mysteries - The Mysteries of the Rosary (Spanish page)",
+    "author": "The Holy See",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_gaudiosi_sp.html",
+    "type": "liturgical"
+  },
+  "holy-see-luminous-es": {
+    "work": "Luminous Mysteries - The Mysteries of the Holy Rosary (Spanish page)",
+    "author": "The Holy See",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_luminosi_sp.html",
+    "type": "liturgical"
+  },
+  "holy-see-sorrowful-es": {
+    "work": "Sorrowful Mysteries - The Mysteries of the Holy Rosary (Spanish page)",
+    "author": "The Holy See",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_dolorosi_sp.html",
+    "type": "liturgical"
+  },
+  "holy-see-glorious-es": {
+    "work": "Glorious Mysteries - The Mysteries of the Holy Rosary (Spanish page)",
+    "author": "The Holy See",
+    "approval": "common liturgical prayer",
+    "url": "https://www.vatican.va/special/rosary/documents/misteri_gloriosi_sp.html",
+    "type": "liturgical"
+  },
+  "clementine-vulgate": {
+    "work": "Clementine Vulgate (1598), with the Glossa Ordinaria (Migne edition, 1880)",
+    "author": "Saint Jerome; eBible.org latVUC edition",
+    "approval": "public domain",
+    "url": "https://ebible.org/find/details.php?id=latVUC",
+    "path": "data/library/bibles/clementine-vulgate",
+    "type": "bible"
+  },
+  "scio-de-san-miguel": {
+    "work": "Scío de San Miguel",
+    "author": "Latin Prayer",
+    "approval": "public domain",
+    "url": "https://latinprayer.org/es/biblia/",
+    "path": "data/library/bibles/scio",
+    "type": "bible"
+  },
+  "claude-opus-5-5": {
+    "work": "Claude Opus 5.5",
+    "author": "Anthropic",
+    "approval": "commercial AI service",
+    "url": "https://www.anthropic.com/claude",
+    "type": "apparatus",
+    "note": "AI tooling used for the Spanish translations of the interface, fruits, guidance and privacy policy."
+  },
+  "gpt-6-astra": {
+    "work": "GPT-6 Astra",
+    "author": "OpenAI",
+    "approval": "commercial AI service",
+    "url": "https://openai.com",
+    "type": "apparatus",
+    "note": "AI tooling used to translate The Secret of the Rosary into Spanish and to review every Spanish translation."
   }
 }

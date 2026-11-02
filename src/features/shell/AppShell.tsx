@@ -1,9 +1,10 @@
 import { Activity, Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
 import { AmbientGround } from '../../components/art/AmbientGround.tsx';
-import { contentCatalog } from '../../content/catalog.ts';
-import { CONTENT_WIDTH_CLASS_NAME } from '../../styles.ts';
+import type { BibleEditionId } from '../../content/language.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import { loadLastBibleBook } from '../../state/reading/readingPositions.ts';
+import { CONTENT_WIDTH_CLASS_NAME } from '../../styles.ts';
 import { ArtFocus } from '../gallery/ArtFocus.tsx';
 import { GalleryView } from '../gallery/GalleryView.tsx';
 import { BibleContents } from '../library/BibleContents.tsx';
@@ -13,18 +14,18 @@ import { type BibleVerseLocation } from '../library/model.ts';
 import { ReaderFocus } from '../library/ReaderFocus.tsx';
 import { PrayerFocus } from '../prayer/PrayerFocus.tsx';
 import { type PrayerStart } from '../prayer/progression.ts';
-import { ReferenceFocus, type ReferenceActions } from '../references/ReferenceFocus.tsx';
+import { cacheEdition } from '../pwa/registration.ts';
 import { type ReferenceTarget } from '../references/referenceCatalog.ts';
+import { ReferenceFocus, type ReferenceActions } from '../references/ReferenceFocus.tsx';
 import { ReferencesView } from '../references/ReferencesView.tsx';
 import { RosaryHome } from '../rosary/RosaryHome.tsx';
-import { dailyHeroArtworkFor, scheduledMysterySetId } from '../rosary/schedule.ts';
+import { useDailyHeroArtwork, scheduledMysterySetId } from '../rosary/schedule.ts';
 import { SettingsScope } from '../settings/model.ts';
 import { SettingsDialog } from '../settings/SettingsDialog.tsx';
 import { ApplicationView } from './model.ts';
-import { BottomBar, DesktopRail } from './Navigation.tsx';
 import {
-  destinationOf,
   DestinationKind,
+  destinationOf,
   destinationOfRecord,
   goBack,
   INITIAL_NAVIGATION,
@@ -39,6 +40,7 @@ import {
   type Destination,
   type Navigation,
 } from './navigation.ts';
+import { BottomBar, DesktopRail } from './Navigation.tsx';
 
 type ShellRailProps = {
   readonly activeView: ApplicationView;
@@ -132,6 +134,39 @@ const pageKeyOf = (destination: Destination, index: number): string =>
     ? `${String(index)}-${destination.kind}-${String(destination.run)}`
     : `${String(index)}-${destination.kind}`;
 
+type BibleDestination = Extract<
+  Destination,
+  { readonly kind: DestinationKind.BibleBook | DestinationKind.BibleContents }
+>;
+
+function BibleFramePage({
+  actions,
+  destination,
+}: {
+  readonly actions: ShellActions;
+  readonly destination: BibleDestination;
+}) {
+  return destination.kind === DestinationKind.BibleBook ? (
+    <BibleFocus
+      bookId={destination.bookId}
+      edition={destination.edition}
+      initialBlockIndex={destination.blockIndex}
+      initialVerse={destination.verse ?? null}
+      onBack={actions.back}
+      onOpenBook={(bookId) => actions.turnToBook(destination.edition, bookId)}
+      onOpenReference={actions.openReference}
+      onOpenSettings={actions.toggleSettings}
+    />
+  ) : (
+    <BibleContents
+      edition={destination.edition}
+      onBack={actions.back}
+      onOpenBook={(bookId) => actions.openBibleBook(destination.edition, bookId, null)}
+      onOpenSettings={actions.toggleSettings}
+    />
+  );
+}
+
 function FramePage({
   actions,
   destination,
@@ -157,30 +192,14 @@ function FramePage({
         <ReaderFocus
           initialBlockIndex={destination.blockIndex}
           onBack={actions.back}
+          onOpenReference={actions.openReference}
           onOpenSettings={actions.toggleSettings}
           workId={destination.workId}
         />
       );
     case DestinationKind.BibleBook:
-      return (
-        <BibleFocus
-          bookId={destination.bookId}
-          initialBlockIndex={destination.blockIndex}
-          initialVerse={destination.verse ?? null}
-          onBack={actions.back}
-          onOpenBook={actions.turnToBook}
-          onOpenReference={actions.openReference}
-          onOpenSettings={actions.toggleSettings}
-        />
-      );
     case DestinationKind.BibleContents:
-      return (
-        <BibleContents
-          onBack={actions.back}
-          onOpenBook={(bookId) => actions.openBibleBook(bookId, null)}
-          onOpenSettings={actions.toggleSettings}
-        />
-      );
+      return <BibleFramePage actions={actions} destination={destination} />;
     default:
       return null;
   }
@@ -229,14 +248,16 @@ function Stack({ active, overlay, path, render }: StackProps) {
   );
 }
 
-const shellMainLabel = (navigation: Navigation): string => {
+const shellMainLabel = (reading: ReadingSnapshot, navigation: Navigation): string => {
   const top = destinationOf(navigation);
 
   if (top === undefined) {
-    return navigation.area;
+    return reading.wording.views[navigation.area];
   }
 
-  return top.kind === DestinationKind.Prayer ? 'Rosary prayer' : 'Reading';
+  return top.kind === DestinationKind.Prayer
+    ? reading.wording.navigation.rosaryPrayer
+    : reading.wording.navigation.reading;
 };
 
 type ShellContentProps = Omit<StandardViewProps, 'activeView'> & {
@@ -245,12 +266,13 @@ type ShellContentProps = Omit<StandardViewProps, 'activeView'> & {
 };
 
 function ShellContent({ areas, navigation, ...props }: ShellContentProps) {
+  const reading = useReading();
   const path = pathOf(navigation);
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <main
-        aria-label={shellMainLabel(navigation)}
+        aria-label={shellMainLabel(reading, navigation)}
         className="flex min-h-0 flex-1 flex-col overflow-hidden"
       >
         {areas.map((area) => {
@@ -287,8 +309,8 @@ function ShellContent({ areas, navigation, ...props }: ShellContentProps) {
   );
 }
 
-const knownBookOf = (lastBookId: string | null): string | null =>
-  lastBookId !== null && contentCatalog.bible.books.some((book) => book.id === lastBookId)
+const knownBookOf = (reading: ReadingSnapshot, lastBookId: string | null): string | null =>
+  lastBookId !== null && reading.catalog.bible.books.some((book) => book.id === lastBookId)
     ? lastBookId
     : null;
 
@@ -320,24 +342,9 @@ const useFocusTrail = () => {
   };
 };
 
-function useAppShellState() {
+function useShellNavigation() {
   const [navigation, setNavigation] = useState(INITIAL_NAVIGATION);
-  const [homeSetId, setHomeSetId] = useState(() =>
-    scheduledMysterySetId(new Date(), contentCatalog.rosary.schedule),
-  );
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [restoreFocusArtworkId, setRestoreFocusArtworkId] = useState<string | null>(null);
-  const runRef = useRef(0);
-  const [visited, setVisited] = useState<readonly ApplicationView[]>([navigation.area]);
-  const areas = Object.values(ApplicationView).filter(
-    (area) => area === navigation.area || visited.includes(area),
-  );
-
-  useEffect(() => {
-    if (!visited.includes(navigation.area)) {
-      setVisited([...visited, navigation.area]);
-    }
-  }, [navigation.area, visited]);
   const focusTrail = useFocusTrail();
 
   const open = (destination: Destination): void => {
@@ -358,6 +365,35 @@ function useAppShellState() {
     focusTrail.restore(previous);
   };
 
+  return {
+    back,
+    clearRestoreFocus: () => setRestoreFocusArtworkId(null),
+    focusTrail,
+    navigation,
+    open,
+    restoreFocusArtworkId,
+    setNavigation,
+  };
+}
+
+type ShellNavigation = ReturnType<typeof useShellNavigation>;
+
+function useVisitedAreas(area: ApplicationView): readonly ApplicationView[] {
+  const [visited, setVisited] = useState<readonly ApplicationView[]>([area]);
+
+  useEffect(() => {
+    if (!visited.includes(area)) {
+      setVisited([...visited, area]);
+    }
+  }, [area, visited]);
+
+  return Object.values(ApplicationView).filter((view) => view === area || visited.includes(view));
+}
+
+function useOpeners({ focusTrail, navigation, open, setNavigation }: ShellNavigation) {
+  const reading = useReading();
+  const runRef = useRef(0);
+
   const beginRosary = (mysterySetId: string, start?: PrayerStart): void => {
     runRef.current += 1;
     open({
@@ -369,61 +405,106 @@ function useAppShellState() {
   };
 
   const openBibleVerse = (bookId: string, verse: BibleVerseLocation): void =>
-    open({ blockIndex: null, bookId, kind: DestinationKind.BibleBook, verse });
+    open({
+      blockIndex: null,
+      bookId,
+      edition: reading.edition,
+      kind: DestinationKind.BibleBook,
+      verse,
+    });
 
-  const reference: ReferenceActions = {
-    onOpenBible: () => {
-      focusTrail.remember(navigation);
-      void loadLastBibleBook().then((lastBookId) =>
-        setNavigation((current) => openBible(current, knownBookOf(lastBookId))),
-      );
-    },
-    onOpenBibleVerse: openBibleVerse,
-    onOpenReading: ({ blockIndex, workId }) =>
-      open({ blockIndex, kind: DestinationKind.Work, workId }),
-    onOpenReference: (target: ReferenceTarget) => open({ kind: DestinationKind.Reference, target }),
-    onPray: (mysterySetId, start) =>
-      beginRosary(
-        mysterySetId ?? scheduledMysterySetId(new Date(), contentCatalog.rosary.schedule),
-        start,
-      ),
-    onShowSet: (mysterySetId) => {
-      setHomeSetId(mysterySetId);
-      setNavigation((current) => showArea(current, ApplicationView.Rosary));
-    },
+  const openLastBook = (edition: BibleEditionId): void => {
+    focusTrail.remember(navigation);
+    void Promise.all([cacheEdition(reading.language, edition), loadLastBibleBook(edition)]).then(
+      ([cached, lastBookId]) => {
+        if (cached) {
+          setNavigation((current) =>
+            current === navigation
+              ? openBible(current, edition, knownBookOf(reading, lastBookId))
+              : current,
+          );
+        }
+      },
+    );
   };
 
-  const actions = {
-    back,
-    beginRosary: (mysterySetId: string) => beginRosary(mysterySetId),
-    clearRestoreFocus: () => setRestoreFocusArtworkId(null),
-    goToRosary: () => setNavigation((current) => selectArea(current, ApplicationView.Rosary)),
-    openArtwork: (artworkId: string) => open({ artworkId, kind: DestinationKind.Artwork }),
-    openBible: reference.onOpenBible,
-    openBibleBook: (bookId: string, blockIndex: number | null) =>
-      open({ blockIndex, bookId, kind: DestinationKind.BibleBook }),
-    openBibleVerse,
-    openRecord: (target: ReferenceTarget) => open(destinationOfRecord(target)),
-    openReference: reference.onOpenReference,
-    openWork: (workId: string) => open({ blockIndex: null, kind: DestinationKind.Work, workId }),
-    reference,
-    selectHomeSet: setHomeSetId,
-    selectView: (view: ApplicationView) => setNavigation((current) => selectArea(current, view)),
-    stepArtwork: (artworkId: string) =>
-      setNavigation((current) =>
-        replaceDestination(current, { artworkId, kind: DestinationKind.Artwork }),
-      ),
-    toggleSettings: () => setSettingsOpen((current) => !current),
-    turnToBook: (bookId: string) => setNavigation((current) => turnToBook(current, bookId)),
-  };
+  return { beginRosary, openBibleVerse, openLastBook };
+}
+
+type Openers = ReturnType<typeof useOpeners>;
+
+const referenceActionsOf = (
+  reading: ReadingSnapshot,
+  { open, setNavigation }: ShellNavigation,
+  { beginRosary, openBibleVerse, openLastBook }: Openers,
+  setHomeSetId: (mysterySetId: string) => void,
+): ReferenceActions => ({
+  onOpenBible: () => openLastBook(reading.edition),
+  onOpenBibleVerse: openBibleVerse,
+  onOpenReading: ({ blockIndex, workId }) =>
+    open({ blockIndex, kind: DestinationKind.Work, workId }),
+  onOpenReference: (target: ReferenceTarget) => open({ kind: DestinationKind.Reference, target }),
+  onPray: (mysterySetId, start) =>
+    beginRosary(
+      mysterySetId ?? scheduledMysterySetId(new Date(), reading.catalog.rosary.schedule),
+      start,
+    ),
+  onShowSet: (mysterySetId) => {
+    setHomeSetId(mysterySetId);
+    setNavigation((current) => showArea(current, ApplicationView.Rosary));
+  },
+});
+
+const shellActionsOf = (
+  { back, clearRestoreFocus, open, setNavigation }: ShellNavigation,
+  { beginRosary, openBibleVerse, openLastBook }: Openers,
+  reference: ReferenceActions,
+  setHomeSetId: (mysterySetId: string) => void,
+) => ({
+  back,
+  beginRosary: (mysterySetId: string) => beginRosary(mysterySetId),
+  clearRestoreFocus,
+  goToRosary: () => setNavigation((current) => selectArea(current, ApplicationView.Rosary)),
+  openArtwork: (artworkId: string) => open({ artworkId, kind: DestinationKind.Artwork }),
+  openBible: openLastBook,
+  openBibleBook: (edition: BibleEditionId, bookId: string, blockIndex: number | null) =>
+    open({ blockIndex, bookId, edition, kind: DestinationKind.BibleBook }),
+  openBibleVerse,
+  openRecord: (target: ReferenceTarget) => open(destinationOfRecord(target)),
+  openReference: reference.onOpenReference,
+  openWork: (workId: string) => open({ blockIndex: null, kind: DestinationKind.Work, workId }),
+  reference,
+  selectHomeSet: setHomeSetId,
+  selectView: (view: ApplicationView) => setNavigation((current) => selectArea(current, view)),
+  stepArtwork: (artworkId: string) =>
+    setNavigation((current) =>
+      replaceDestination(current, { artworkId, kind: DestinationKind.Artwork }),
+    ),
+  turnToBook: (edition: BibleEditionId, bookId: string) =>
+    setNavigation((current) => turnToBook(current, edition, bookId)),
+});
+
+function useAppShellState() {
+  const reading = useReading();
+  const shell = useShellNavigation();
+  const openers = useOpeners(shell);
+  const areas = useVisitedAreas(shell.navigation.area);
+  const [homeSetId, setHomeSetId] = useState(() =>
+    scheduledMysterySetId(new Date(), reading.catalog.rosary.schedule),
+  );
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const reference = referenceActionsOf(reading, shell, openers, setHomeSetId);
 
   return {
-    actions,
+    actions: {
+      ...shellActionsOf(shell, openers, reference, setHomeSetId),
+      toggleSettings: () => setSettingsOpen((current) => !current),
+    },
     areas,
     closeSettings: () => setSettingsOpen(false),
     homeSetId,
-    navigation,
-    restoreFocusArtworkId,
+    navigation: shell.navigation,
+    restoreFocusArtworkId: shell.restoreFocusArtworkId,
     settingsOpen,
   };
 }
@@ -433,6 +514,7 @@ type ShellState = ReturnType<typeof useAppShellState>;
 type ShellFrameProps = {
   readonly hidden: boolean;
   readonly onOpenInstallGuide: () => void;
+  readonly onOpenPrivacy: () => void;
   readonly shell: ShellState;
 };
 
@@ -445,10 +527,10 @@ const settingsScopeOf = ({ navigation }: ShellState): SettingsScope => {
     : SettingsScope.Application;
 };
 
-function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
+function ShellFrame({ hidden, onOpenInstallGuide, onOpenPrivacy, shell }: ShellFrameProps) {
   const { actions, navigation } = shell;
   const chromeVisible = pathOf(navigation).length === 0;
-  const homeSet = contentCatalog.mysterySetById(shell.homeSetId);
+  const heroArtwork = useDailyHeroArtwork(shell.homeSetId);
   const homeAmbient = chromeVisible && navigation.area === ApplicationView.Rosary;
 
   return (
@@ -456,9 +538,7 @@ function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
       className={`relative flex h-dvh flex-col overflow-hidden bg-background text-foreground ${chromeVisible ? 'gap-2 p-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] rail:flex-row' : ''}`}
       hidden={hidden}
     >
-      {homeAmbient ? (
-        <AmbientGround source={resolveArtAsset(dailyHeroArtworkFor(new Date(), homeSet).file)} />
-      ) : null}
+      {homeAmbient ? <AmbientGround source={resolveArtAsset(heroArtwork.file)} /> : null}
       <ShellRail
         activeView={navigation.area}
         hidden={!chromeVisible}
@@ -482,6 +562,10 @@ function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
           shell.closeSettings();
           onOpenInstallGuide();
         }}
+        onOpenPrivacy={() => {
+          shell.closeSettings();
+          onOpenPrivacy();
+        }}
         onOpenReferences={() => {
           actions.selectView(ApplicationView.References);
           shell.closeSettings();
@@ -491,7 +575,13 @@ function ShellFrame({ hidden, onOpenInstallGuide, shell }: ShellFrameProps) {
   );
 }
 
-export function AppShell({ onOpenInstallGuide }: { readonly onOpenInstallGuide: () => void }) {
+export function AppShell({
+  onOpenInstallGuide,
+  onOpenPrivacy,
+}: {
+  readonly onOpenInstallGuide: () => void;
+  readonly onOpenPrivacy: () => void;
+}) {
   const shell = useAppShellState();
   const path = pathOf(shell.navigation);
 
@@ -500,6 +590,7 @@ export function AppShell({ onOpenInstallGuide }: { readonly onOpenInstallGuide: 
       <ShellFrame
         hidden={isOverlay(path.at(-1))}
         onOpenInstallGuide={onOpenInstallGuide}
+        onOpenPrivacy={onOpenPrivacy}
         shell={shell}
       />
       {shell.areas.map((area) => (

@@ -1,8 +1,9 @@
+import { verseLocatorOf } from '../../src/content/language.ts';
 import type { ScriptureRedSpan } from '../../src/content/schema.ts';
+import { BIBLE_DEFINITIONS } from './bibleBooks.ts';
+import { BIBLE_EDITIONS, type BibleEdition, type ContentReading } from './editions.ts';
 import { ContentBuildError, ContentBuildErrorCode } from './records.ts';
 import { redSpansOf, type RedLetterEntry } from './redLetter.ts';
-
-export const SCRIPTURE_SOURCE_DIRECTORY = 'data/library/bibles/douay-rheims/';
 
 export type ScriptureRange = {
   readonly reference: string;
@@ -14,10 +15,15 @@ export type ScriptureRange = {
 };
 
 const BOOK_MARKER = String.raw`\h `;
+const CODE_MARKER = String.raw`\id `;
 export const CHAPTER_MARKER = String.raw`\c `;
 export const VERSE_MARKER = String.raw`\v `;
 export const FOOTNOTE_START = String.raw`\f `;
 export const FOOTNOTE_END = String.raw`\f*`;
+export const ITALIC_START = String.raw`\it `;
+export const ITALIC_END = String.raw`\it*`;
+export const NOTE_PATTERN = /\\f \+[\s\S]*?\\f\*/gu;
+const ITALIC_PATTERN = /\\it .*?\\it\*/gu;
 
 const sourceBookFor = (referenceBook: string): string => {
   switch (referenceBook) {
@@ -43,9 +49,12 @@ export const scriptureBookFromReference = (reference: string): string => {
 export const validateScriptureRange = (range: ScriptureRange): void => {
   if (
     range.verseEnd < range.verseStart ||
-    !range.sourceFile.startsWith(SCRIPTURE_SOURCE_DIRECTORY) ||
     range.sourceFile.includes('..') ||
-    !range.sourceFile.endsWith('.sfm')
+    !Object.values(BIBLE_EDITIONS).some(
+      (edition) =>
+        range.sourceFile.startsWith(edition.directory) &&
+        range.sourceFile.endsWith(edition.extension),
+    )
   ) {
     throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceRange);
   }
@@ -76,7 +85,7 @@ const removeFootnotes = (value: string): string => {
 };
 
 const cleanVerseText = (value: string): string => {
-  const text = removeFootnotes(value).replace(/\s+/gu, ' ').trim();
+  const text = removeFootnotes(value).replaceAll(ITALIC_PATTERN, '').replace(/\s+/gu, ' ').trim();
 
   if (text.length === 0 || text.includes('\\')) {
     throw new ContentBuildError(ContentBuildErrorCode.UnsupportedMarker);
@@ -92,6 +101,77 @@ export const sourceBookOf = (source: string): string | undefined =>
     ?.slice(BOOK_MARKER.length)
     .trim();
 
+export const sourceCodeOf = (source: string): string | undefined =>
+  source
+    .split(/\r?\n/u)
+    .find((line) => line.startsWith(CODE_MARKER))
+    ?.slice(CODE_MARKER.length)
+    .trim()
+    .split(' ')[0];
+
+export const editionFileOf = (
+  edition: BibleEdition,
+  code: string,
+  fileNames: readonly string[],
+): string => {
+  const marker = edition.fileMarkerOf(code);
+  const matches = fileNames.filter(
+    (fileName) => fileName.includes(marker) && fileName.endsWith(edition.extension),
+  );
+  const fileName = matches[0];
+
+  if (matches.length !== 1 || fileName === undefined) {
+    throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, code);
+  }
+
+  return fileName;
+};
+
+export const editionFileNamesOf = async (
+  edition: BibleEdition,
+  repositoryRoot: URL,
+): Promise<readonly string[]> =>
+  Array.fromAsync(
+    new Bun.Glob(`*${edition.extension}`).scan({
+      cwd: new URL(edition.directory, repositoryRoot).pathname,
+    }),
+  );
+
+const versesOf = ({ verseStart, verseEnd }: ScriptureRange): string =>
+  verseStart === verseEnd ? String(verseStart) : `${String(verseStart)}-${String(verseEnd)}`;
+
+export const editionRangeOf = async (
+  range: ScriptureRange,
+  { bookNameOf, edition, language }: ContentReading,
+  repositoryRoot: URL,
+): Promise<ScriptureRange> => {
+  if (range.sourceFile.startsWith(edition.directory)) {
+    return range;
+  }
+
+  const code = sourceCodeOf(await Bun.file(new URL(range.sourceFile, repositoryRoot)).text());
+  const definition = BIBLE_DEFINITIONS.find((candidate) => candidate.code === code);
+
+  if (code === undefined || definition === undefined) {
+    throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, range.sourceFile);
+  }
+
+  const fileName = editionFileOf(edition, code, await editionFileNamesOf(edition, repositoryRoot));
+  const sourceFile = `${edition.directory}${fileName}`;
+  const book = sourceBookOf(await Bun.file(new URL(sourceFile, repositoryRoot)).text());
+
+  if (book === undefined) {
+    throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, sourceFile);
+  }
+
+  return {
+    ...range,
+    reference: `${bookNameOf(definition)} ${verseLocatorOf(language, range.chapter, versesOf(range))}`,
+    book,
+    sourceFile,
+  };
+};
+
 const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<number, string> => {
   if (sourceBookOf(source) !== sourceBookFor(range.book)) {
     throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, range.sourceFile);
@@ -100,7 +180,7 @@ const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<n
   let chapter = 0;
   const passage = new Map<number, string>();
 
-  for (const line of source.split(/\r?\n/u)) {
+  for (const line of source.replaceAll(NOTE_PATTERN, '').split(/\r?\n/u)) {
     if (line.startsWith(CHAPTER_MARKER)) {
       chapter = Number(line.slice(CHAPTER_MARKER.length).trim());
       continue;
@@ -132,8 +212,14 @@ const passageVersesFrom = (source: string, range: ScriptureRange): ReadonlyMap<n
   return passage;
 };
 
+const quotedPassageOf = (verses: readonly string[]): string => {
+  const text = verses.join(' ');
+
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+};
+
 export const extractPassage = (source: string, range: ScriptureRange): string =>
-  [...passageVersesFrom(source, range).values()].join(' ');
+  quotedPassageOf([...passageVersesFrom(source, range).values()]);
 
 export type ScripturePassageContent = {
   readonly text: string;
@@ -164,5 +250,5 @@ export const extractPassageContent = (
     offset += verseText.length + 1;
   }
 
-  return { text: parts.join(' '), red };
+  return { text: quotedPassageOf(parts), red };
 };

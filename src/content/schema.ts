@@ -9,6 +9,7 @@ import {
   taggedUnion,
   variant,
 } from './shape.ts';
+import { BibleEditionId } from './language.ts';
 
 export enum SourceType {
   Apparatus = 'apparatus',
@@ -74,6 +75,7 @@ export type ScriptureRedSpan = ReturnType<typeof RED_SPAN>;
 const SCRIPTURE = shape({
   reference: field.string(),
   book: field.string(),
+  bookId: field.string(),
   bookAlias: field.optional(field.string()),
   chapter: field.integer(1),
   verseStart: field.integer(1),
@@ -97,6 +99,11 @@ const redSpansInside = ({ red, text }: ScripturePassage, path: string): void => 
 export enum ReflectionStatus {
   Candidate = 'candidate',
   Mapped = 'mapped',
+  Unavailable = 'unavailable',
+}
+
+export enum Translation {
+  Ai = 'ai',
 }
 
 const REFLECTION = shape({
@@ -110,6 +117,7 @@ const REFLECTION = shape({
   note: field.optional(field.string()),
   text: field.optional(field.string()),
   blockIndex: field.optional(field.integer(1)),
+  translation: field.optional(field.member(Translation)),
 });
 
 export type MysteryReflection = ReturnType<typeof REFLECTION>;
@@ -121,6 +129,7 @@ const MYSTERY = shape({
   titleSourceId: field.string(),
   fruit: field.string(),
   fruitSourceId: field.string(),
+  fruitTranslation: field.optional(field.member(Translation)),
   scripture: refine(field.nested(SCRIPTURE), redSpansInside),
   reflection: field.nested(REFLECTION),
   artIds: nonEmpty(field.array(field.string())),
@@ -160,6 +169,7 @@ const STATEMENT = field.nested(GUIDANCE_STATEMENT);
 
 const GUIDANCE = shape({
   settings: field.nested(shape({ preferenceId: field.string(), default: field.boolean() })),
+  translation: field.optional(field.member(Translation)),
   sourceIds: field.array(field.string()),
   silentSteps: field.array(field.string()),
   openingHailMarys: field.array(
@@ -231,12 +241,22 @@ const ROSARY = shape({
 
 export type RosaryContent = ReturnType<typeof ROSARY>;
 
+const TOOL_MARKING = {
+  notice: field.string(),
+  toolSourceIds: nonEmpty(field.array(field.string())),
+};
+
+const AI_TRANSLATION = shape(TOOL_MARKING);
+
+export type AiTranslation = ReturnType<typeof AI_TRANSLATION>;
+
 const DEVOTIONAL_CONTENT = shape({
   schemaVersion: field.literal(DEVOTIONAL_SCHEMA_VERSION),
   sources: field.array(field.nested(DEVOTIONAL_SOURCE)),
   prayers: field.array(field.nested(PRAYER)),
   artworks: field.array(field.nested(ARTWORK)),
   rosary: field.nested(ROSARY),
+  aiTranslation: field.optional(field.nested(AI_TRANSLATION)),
 });
 
 export type DevotionalContent = ReturnType<typeof DEVOTIONAL_CONTENT>;
@@ -290,6 +310,7 @@ const LIBRARY_WORK = shape({
   author: field.string(),
   sourceId: field.string(),
   category: field.member(LibraryCategory),
+  translation: field.optional(field.member(Translation)),
   blocks: nonEmpty(field.array(field.nested(LIBRARY_BLOCK))),
 });
 
@@ -392,9 +413,8 @@ const BIBLE_BOOK_SUMMARY = shape({
 export type BibleBookSummary = ReturnType<typeof BIBLE_BOOK_SUMMARY>;
 
 const BIBLE_RED_LETTER = shape({
-  notice: field.string(),
+  ...TOOL_MARKING,
   witnessSourceIds: nonEmpty(field.array(field.string())),
-  toolSourceIds: nonEmpty(field.array(field.string())),
 });
 
 export type BibleRedLetter = ReturnType<typeof BIBLE_RED_LETTER>;
@@ -408,6 +428,7 @@ const uniqueBookIds = (books: readonly BibleBookSummary[], path: string): void =
 const BIBLE_INDEX = shape({
   schemaVersion: field.literal(BIBLE_SCHEMA_VERSION),
   sourceId: field.string(),
+  edition: field.member(BibleEditionId),
   redLetter: field.nested(BIBLE_RED_LETTER),
   books: refine(nonEmpty(field.array(field.nested(BIBLE_BOOK_SUMMARY))), uniqueBookIds),
 });
@@ -415,3 +436,19 @@ const BIBLE_INDEX = shape({
 export type BibleIndex = ReturnType<typeof BIBLE_INDEX>;
 
 export const bibleIndexFrom = (value: unknown): BibleIndex => BIBLE_INDEX(value, 'bibleIndex');
+
+const SPLASH_VERSE = shape({
+  reference: field.string(),
+  text: field.string(),
+  sourceId: field.string(),
+  sourceLabel: field.string(),
+});
+
+export type SplashVerse = ReturnType<typeof SPLASH_VERSE>;
+
+const SPLASH_VERSES = nonEmpty(field.array(field.nested(SPLASH_VERSE)));
+
+export const splashVersesFrom = (value: unknown): readonly SplashVerse[] =>
+  SPLASH_VERSES.parse(value, 'splashVerses');
+
+export type JsonModule = { readonly default: unknown };

@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { BibleChoice, LanguageChoice } from '../../content/language.ts';
 import {
   BeadMaterial,
   DEFAULT_PREFERENCES,
@@ -31,6 +32,8 @@ describe('update check preferences', () => {
 describe('parsePreferences', () => {
   test('accepts the complete stored preference record', () => {
     const stored = {
+      language: LanguageChoice.Spanish,
+      bibleChoice: BibleChoice.Latin,
       theme: Theme.Parchment,
       textScale: TextScale.Large,
       readerFace: ReaderFace.Sans,
@@ -48,6 +51,7 @@ describe('parsePreferences', () => {
       readDecadeOfferings: false,
       showDropCaps: false,
       showMysteryFruits: false,
+      aiTranslations: false,
       readMysteryFruits: false,
       showScriptureReadings: false,
       includeFatimaPrayer: false,
@@ -122,36 +126,18 @@ describe('parsePreferences reading speed', () => {
 });
 
 describe('parsePreferences validation', () => {
-  test('returns safe defaults for malformed input', () => {
-    expect(parsePreferences({ theme: 'unknown', textScale: TextScale.Standard })).toEqual(
+  test.each([
+    ['an unknown theme', { theme: 'unknown' }],
+    ['the retired high contrast theme', { theme: 'hc' }],
+    [
+      'a bead material that is not a real material',
+      { theme: Theme.Parchment, beadMaterial: 'plastic' },
+    ],
+    ['a non boolean toggle', { theme: Theme.Parchment, showGuidance: 'yes' }],
+  ])('returns safe defaults for %s', (_case, stored) => {
+    expect(parsePreferences({ ...stored, textScale: TextScale.Standard })).toEqual(
       DEFAULT_PREFERENCES,
     );
-  });
-
-  test('rejects the retired high contrast preference', () => {
-    expect(parsePreferences({ theme: 'hc', textScale: TextScale.Standard })).toEqual(
-      DEFAULT_PREFERENCES,
-    );
-  });
-
-  test('rejects a stored bead material that is not a real material', () => {
-    expect(
-      parsePreferences({
-        theme: Theme.Parchment,
-        textScale: TextScale.Standard,
-        beadMaterial: 'plastic',
-      }),
-    ).toEqual(DEFAULT_PREFERENCES);
-  });
-
-  test('rejects a non boolean stored toggle rather than coercing it', () => {
-    expect(
-      parsePreferences({
-        theme: Theme.Parchment,
-        textScale: TextScale.Standard,
-        showGuidance: 'yes',
-      }),
-    ).toEqual(DEFAULT_PREFERENCES);
   });
 });
 
@@ -195,60 +181,29 @@ describe('preferencesReducer', () => {
       }),
     ).toEqual({ ...DEFAULT_PREFERENCES, readingSpeed: ReadingSpeed.Unhurried });
   });
-
-  test('turns the Fatima prayer off without disturbing the rest', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'includeFatimaPrayer',
-        value: false,
-      }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, includeFatimaPrayer: false });
-  });
-
-  test('turns drop caps off without disturbing the rest', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'showDropCaps',
-        value: false,
-      }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, showDropCaps: false });
-  });
 });
 
-describe('preferencesReducer general controls', () => {
-  test('turns external link confirmation off without disturbing the rest', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'confirmExternalLinks',
-        value: false,
-      }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, confirmExternalLinks: false });
-  });
-});
+describe('preferencesReducer general controls', () => {});
 
 describe('preferencesReducer display controls', () => {
-  test('turns mystery fruits off without disturbing the rest', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'showMysteryFruits',
-        value: false,
-      }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, showMysteryFruits: false });
-  });
-
-  test('turns scripture readings off without disturbing the rest', () => {
-    expect(
-      preferencesReducer(DEFAULT_PREFERENCES, {
-        type: PreferencesActionType.Set,
-        key: 'showScriptureReadings',
-        value: false,
-      }),
-    ).toEqual({ ...DEFAULT_PREFERENCES, showScriptureReadings: false });
-  });
+  test.each([
+    'includeFatimaPrayer',
+    'showDropCaps',
+    'confirmExternalLinks',
+    'showMysteryFruits',
+    'showScriptureReadings',
+  ] satisfies readonly (keyof typeof DEFAULT_PREFERENCES)[])(
+    'turns %s off without disturbing the rest',
+    (key) => {
+      expect(
+        preferencesReducer(DEFAULT_PREFERENCES, {
+          type: PreferencesActionType.Set,
+          key,
+          value: false,
+        }),
+      ).toEqual({ ...DEFAULT_PREFERENCES, [key]: false });
+    },
+  );
 
   test('changes the bead material without disturbing the rest', () => {
     expect(

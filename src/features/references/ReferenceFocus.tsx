@@ -4,7 +4,8 @@ import { Chevron } from '../../components/icons/Chevron.tsx';
 import { ChevronDirection } from '../../components/icons/model.ts';
 import { DetailList, FocusPage, type DetailRow } from '../../components/layout.tsx';
 import { ExternalLink } from '../../components/links/ExternalLink.tsx';
-import { contentCatalog, type ResolvedArtwork } from '../../content/catalog.ts';
+import { type ResolvedArtwork } from '../../content/catalog.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import type { DevotionalSource, SourceReference } from '../../content/schema.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { useFocusPage } from '../../shared/focus.ts';
@@ -31,6 +32,7 @@ import {
 } from './referenceCatalog.ts';
 import {
   COMPACT_USE_KINDS,
+  REFERENCE_USE_LABEL,
   ReferenceUseActionKind,
   sectionsLabel,
   usesOfArtwork,
@@ -80,36 +82,43 @@ const runAction = (action: ReferenceUseAction, actions: ReferenceActions): void 
   }
 };
 
-const artworkOf = (target: ReferenceTarget): ResolvedArtwork | undefined =>
+const artworkOf = (
+  reading: ReadingSnapshot,
+  target: ReferenceTarget,
+): ResolvedArtwork | undefined =>
   target.group === ReferenceGroup.Artwork
-    ? contentCatalog.artworkById(target.artworkId)
+    ? reading.catalog.artworkById(target.artworkId)
     : undefined;
 
-const sourceRows = (source: DevotionalSource): readonly DetailRow[] => [
-  ['Author', source.author],
-  ['Purpose', source.note],
-  ['Translator', source.translator],
-  ['Publisher', source.publisher],
-  ['Published', source.published],
+const sourceRows = (reading: ReadingSnapshot, source: DevotionalSource): readonly DetailRow[] => [
+  [reading.wording.references.author, source.author],
+  [reading.wording.references.purpose, source.note],
+  [reading.wording.references.translator, source.translator],
+  [reading.wording.references.publisher, source.publisher],
+  [reading.wording.references.published, source.published],
 ];
 
-const sourceLinks = (source: DevotionalSource): readonly Link[] => [
-  ['Open original source', source.url],
-  ['Open alternate text', source.citationUrl],
-  ['Open renewal search', source.renewalSearchUrl],
+const sourceLinks = (reading: ReadingSnapshot, source: DevotionalSource): readonly Link[] => [
+  [reading.wording.references.openSource, source.url],
+  [reading.wording.references.openAlternate, source.citationUrl],
+  [reading.wording.references.openRenewal, source.renewalSearchUrl],
 ];
 
-const artworkLinks = (artwork: ResolvedArtwork): readonly Link[] => [
-  ['Open original source', artwork.url],
-  ['Open rights policy', artwork.source.url],
-  ['Open dating source', artwork.dateSource],
+const artworkLinks = (reading: ReadingSnapshot, artwork: ResolvedArtwork): readonly Link[] => [
+  [reading.wording.references.openSource, artwork.url],
+  [reading.wording.references.openRights, artwork.source.url],
+  [reading.wording.references.openDating, artwork.dateSource],
 ];
 
 function SourceLinks({ links }: { readonly links: readonly Link[] }) {
+  const { wording } = useReading();
   const present = links.filter((link): link is readonly [string, string] => link[1] !== undefined);
 
   return (
-    <nav aria-label="External source links" className="flex flex-wrap items-center gap-x-6 gap-y-2">
+    <nav
+      aria-label={wording.references.externalLinks}
+      className="flex flex-wrap items-center gap-x-6 gap-y-2"
+    >
       {present.map(([label, href], index) => (
         <ExternalLink
           className={index === 0 ? ACCENT_BUTTON_CLASS_NAME : INLINE_LINK_CLASS_NAME}
@@ -132,6 +141,7 @@ function RecordPlate({
   readonly source: DevotionalSource;
   readonly target: ReferenceTarget;
 }) {
+  const reading = useReading();
   return (
     <header
       className={classNames(
@@ -145,7 +155,7 @@ function RecordPlate({
       >
         {source.work.charAt(0)}
       </span>
-      <p className={EYEBROW_CLASS_NAME}>{referenceGroupLabel(target.group)}</p>
+      <p className={EYEBROW_CLASS_NAME}>{referenceGroupLabel(reading, target.group)}</p>
       <h1 className={`${TITLE_CLASS_NAME} pt-2 focus:outline-none`} ref={headingRef} tabIndex={-1}>
         {source.work}
       </h1>
@@ -163,12 +173,13 @@ function ArtworkHeader({
   readonly headingRef: RefObject<HTMLHeadingElement | null>;
   readonly onExpand: () => void;
 }) {
+  const reading = useReading();
   const placard: readonly DetailRow[] = [
-    ['Date', artwork.date],
-    ['Collection', artwork.holder],
-    ['Accession', artwork.accession],
-    ['Photograph', artwork.photographer],
-    ['Rights', artwork.source.approval],
+    [reading.wording.references.date, artwork.date],
+    [reading.wording.references.collection, artwork.holder],
+    [reading.wording.references.accession, artwork.accession],
+    [reading.wording.references.photograph, artwork.photographer],
+    [reading.wording.references.rights, artwork.source.approval],
   ];
 
   return (
@@ -187,7 +198,9 @@ function ArtworkHeader({
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-6">
         <div>
-          <p className={EYEBROW_CLASS_NAME}>{referenceGroupLabel(ReferenceGroup.Artwork)}</p>
+          <p className={EYEBROW_CLASS_NAME}>
+            {referenceGroupLabel(reading, ReferenceGroup.Artwork)}
+          </p>
           <h1
             className={`${TITLE_CLASS_NAME} pt-2 focus:outline-none`}
             ref={headingRef}
@@ -201,7 +214,7 @@ function ArtworkHeader({
           className="gap-x-0! gap-y-0! border-t border-hairline *:border-b *:border-hairline *:py-3 [&>dd]:pl-5 [&>dd]:text-body [&>dd]:leading-body [&>dd]:text-foreground"
           rows={placard}
         />
-        <SourceLinks links={artworkLinks(artwork)} />
+        <SourceLinks links={artworkLinks(reading, artwork)} />
       </div>
     </header>
   );
@@ -214,29 +227,30 @@ function CitedLocation({
   readonly onOpenReading: (location: ReadingLocation) => void;
   readonly target: ReferenceTarget;
 }) {
+  const reading = useReading();
   if (target.group === ReferenceGroup.Artwork || target.locator === undefined) {
     return null;
   }
 
-  const { quote, reading, sections } = target;
+  const { quote, reading: location, sections } = target;
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className={EYEBROW_CLASS_NAME}>Cited location</h2>
+      <h2 className={EYEBROW_CLASS_NAME}>{reading.wording.references.citedLocation}</h2>
       <div className="flex flex-col gap-2 border-l-2 border-accent-current pl-4">
         {quote === undefined ? null : <p className={READING_CLASS_NAME}>{quote}</p>}
         <div className="flex flex-wrap items-baseline gap-x-4">
           <span className={CAPS_NOTE_CLASS_NAME}>{target.locator}</span>
           {sections === undefined ? null : (
-            <span className={NOTE_CLASS_NAME}>{sectionsLabel(sections)}</span>
+            <span className={NOTE_CLASS_NAME}>{sectionsLabel(reading, sections)}</span>
           )}
-          {reading === undefined ? null : (
+          {location === undefined ? null : (
             <button
               className={INLINE_LINK_CLASS_NAME}
-              onClick={() => onOpenReading(reading)}
+              onClick={() => onOpenReading(location)}
               type="button"
             >
-              View in the Library
+              {reading.wording.references.viewInLibrary}
             </button>
           )}
         </div>
@@ -249,6 +263,7 @@ const supportingKey = (reference: SourceReference): string =>
   `${reference.sourceId}:${reference.locator}:${reference.sections?.join(',') ?? ''}`;
 
 function SupportingCitations({ target }: { readonly target: ReferenceTarget }) {
+  const reading = useReading();
   if (target.group === ReferenceGroup.Artwork || (target.supportingReferences?.length ?? 0) < 2) {
     return null;
   }
@@ -259,7 +274,7 @@ function SupportingCitations({ target }: { readonly target: ReferenceTarget }) {
       {target.supportingReferences?.map((reference) => (
         <div className="border-l border-hairline pl-3" key={supportingKey(reference)}>
           <p className={`${CITATION_CLASS_NAME} text-secondary`}>
-            {contentCatalog.sourceById(reference.sourceId).work}
+            {reading.catalog.sourceById(reference.sourceId).work}
           </p>
           <p className={NOTE_CLASS_NAME}>{reference.locator}</p>
         </div>
@@ -435,11 +450,14 @@ function UseSection({
   readonly labelled: boolean;
   readonly section: ReferenceUseSection;
 }) {
+  const reading = useReading();
   const openKey = openGroupKeyOf(section, currentLocator);
 
   return (
     <section className="flex flex-col gap-2">
-      {labelled ? <h3 className={CAPS_NOTE_CLASS_NAME}>{section.kind}</h3> : null}
+      {labelled ? (
+        <h3 className={CAPS_NOTE_CLASS_NAME}>{REFERENCE_USE_LABEL(reading)[section.kind]}</h3>
+      ) : null}
       {section.groups.map((group) => {
         if (group.mysterySetId !== undefined) {
           return (
@@ -475,9 +493,10 @@ function ArtworkUses({
   readonly actions: ReferenceActions;
   readonly sections: readonly ReferenceUseSection[];
 }) {
+  const { wording } = useReading();
   const rows = sections.flatMap((section) =>
     section.groups.flatMap((group) =>
-      group.rows.map((row) => ({ group: group.label ?? 'Prayer', row })),
+      group.rows.map((row) => ({ group: group.label ?? wording.references.prayer, row })),
     ),
   );
 
@@ -503,8 +522,11 @@ function ReferenceUses({
   readonly actions: ReferenceActions;
   readonly target: ReferenceTarget;
 }) {
+  const reading = useReading();
   const artwork = target.group === ReferenceGroup.Artwork;
-  const sections = artwork ? usesOfArtwork(target.artworkId) : usesOfSource(target.sourceId);
+  const sections = artwork
+    ? usesOfArtwork(reading, target.artworkId)
+    : usesOfSource(reading, target.sourceId);
   const currentLocator = artwork ? undefined : target.locator;
 
   if (sections.length === 0) {
@@ -513,7 +535,7 @@ function ReferenceUses({
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className={EYEBROW_CLASS_NAME}>Where Lucerna uses it</h2>
+      <h2 className={EYEBROW_CLASS_NAME}>{reading.wording.references.usedIn}</h2>
       {artwork ? (
         <ArtworkUses actions={actions} sections={sections} />
       ) : (
@@ -532,19 +554,20 @@ function ReferenceUses({
 }
 
 function RecordPanel({ source }: { readonly source: DevotionalSource }) {
+  const reading = useReading();
   return (
     <aside
-      aria-label="Record"
+      aria-label={reading.wording.references.record}
       className={`${SURFACE_PANEL_CLASS_NAME} flex flex-col gap-4 p-5 @3xl:w-80 @3xl:shrink-0`}
     >
-      <h2 className={EYEBROW_CLASS_NAME}>Record</h2>
-      <DetailList rows={sourceRows(source)} />
+      <h2 className={EYEBROW_CLASS_NAME}>{reading.wording.references.record}</h2>
+      <DetailList rows={sourceRows(reading, source)} />
       {source.approval === undefined ? null : (
         <p className={`${CITATION_CLASS_NAME} rounded-lg border border-outline p-3 text-secondary`}>
           {source.approval}
         </p>
       )}
-      <SourceLinks links={sourceLinks(source)} />
+      <SourceLinks links={sourceLinks(reading, source)} />
     </aside>
   );
 }
@@ -573,8 +596,9 @@ export function ReferenceFocus({
   readonly onBack: () => void;
   readonly target: ReferenceTarget;
 }) {
-  const source = contentCatalog.sourceById(target.sourceId);
-  const artwork = artworkOf(target);
+  const reading = useReading();
+  const source = reading.catalog.sourceById(target.sourceId);
+  const artwork = artworkOf(reading, target);
   const targetKey = referenceTargetKey(target);
   const [fullSize, setFullSize] = useState(false);
   const closeViewer = useCallback(() => setFullSize(false), []);
@@ -585,7 +609,7 @@ export function ReferenceFocus({
   );
 
   return (
-    <FocusPage key={targetKey} label="Reference">
+    <FocusPage key={targetKey} label={reading.wording.references.reference}>
       <div className="sticky top-0 z-20 bg-background pt-3">
         <div className={columnClassName}>
           <BackButton onBack={onBack} />

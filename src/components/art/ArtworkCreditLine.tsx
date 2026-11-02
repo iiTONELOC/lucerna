@@ -1,4 +1,5 @@
 import type { ResolvedArtwork } from '../../content/catalog.ts';
+import { useReading } from '../../content/reading.ts';
 import { CITATION_CLASS_NAME, TOUCH_LINK_CLASS_NAME } from '../../styles.ts';
 
 export function ArtworkCreditLine({
@@ -12,6 +13,7 @@ export function ArtworkCreditLine({
   readonly onArt?: boolean;
   readonly onOpenArtwork: (artworkId: string) => void;
 }) {
+  const { wording } = useReading();
   return (
     <p
       className={`${CITATION_CLASS_NAME} wrap-break-word italic ${onArt ? 'text-on-art-muted' : 'text-muted'} ${className ?? ''}`}
@@ -22,7 +24,7 @@ export function ArtworkCreditLine({
         onClick={() => onOpenArtwork(artwork.id)}
         type="button"
       >
-        View in gallery
+        {wording.common.viewInGallery}
       </button>
     </p>
   );

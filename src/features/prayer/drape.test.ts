@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { contentCatalog } from '../../content/catalog.ts';
+import { INITIAL_READING } from '../../content/reading.ts';
 import {
   activeTargetOf,
-  nearestAnchorOf,
-  beadSlotsOf,
   BeadKind,
+  beadSlotsOf,
   createDrapeGeometry,
+  nearestAnchorOf,
   PENDANT_BEAD_COUNT,
   type ChainSpan,
   type DrapeGeometry,
@@ -26,7 +27,7 @@ if (mysterySet === undefined) {
   throw new RangeError('Rosary catalog must contain a mystery set');
 }
 
-const progression = createProgression(mysterySet, contentCatalog.rosary.guidance, {
+const progression = createProgression(INITIAL_READING, mysterySet, contentCatalog.rosary.guidance, {
   includeFatimaPrayer: true,
 });
 const slots = beadSlotsOf(progression);

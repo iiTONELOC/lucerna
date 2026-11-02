@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useReading } from '../../content/reading.ts';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { loadReadingPosition, saveReadingPosition } from '../../state/reading/readingPositions.ts';
@@ -12,6 +13,11 @@ export const blockIndexPropsOf = (index: number): Readonly<Record<string, number
 
 type ArticleRef = RefObject<HTMLElement | null>;
 
+type ReadingIdentity = {
+  readonly contentKey: string;
+  readonly storageKey: string;
+};
+
 export const scrollToBlock = (articleRef: ArticleRef, index: number): void => {
   const target =
     index > 0
@@ -22,11 +28,16 @@ export const scrollToBlock = (articleRef: ArticleRef, index: number): void => {
 };
 
 const useRestoreReadingPosition = (
-  workId: string,
+  { contentKey, storageKey }: ReadingIdentity,
   articleRef: ArticleRef,
   initialBlockIndex: number | null,
 ): void => {
+  const previous = useRef({ contentKey, storageKey });
   useEffect(() => {
+    const editionChanged =
+      previous.current.contentKey === contentKey && previous.current.storageKey !== storageKey;
+    previous.current = { contentKey, storageKey };
+    if (editionChanged) return undefined;
     if (initialBlockIndex !== null) {
       scrollToBlock(articleRef, initialBlockIndex);
       return undefined;
@@ -34,7 +45,7 @@ const useRestoreReadingPosition = (
 
     let cancelled = false;
 
-    void loadReadingPosition(workId).then((index) => {
+    void loadReadingPosition(storageKey).then((index) => {
       if (!cancelled && index !== null) {
         scrollToBlock(articleRef, index);
       }
@@ -43,7 +54,7 @@ const useRestoreReadingPosition = (
     return () => {
       cancelled = true;
     };
-  }, [articleRef, initialBlockIndex, workId]);
+  }, [articleRef, contentKey, initialBlockIndex, storageKey]);
 };
 
 const observeTopmostBlock = (
@@ -168,10 +179,11 @@ const useAnchorOnScaleChange = (
   currentIndexRef: RefObject<number>,
 ): void => {
   const { preferences } = usePreferences();
-  const scaleKey = `${preferences.textScale}/${preferences.readerTextScale}`;
+  const reading = useReading();
+  const scaleKey = `${preferences.textScale}/${preferences.readerTextScale}/${reading.language}`;
   const previousScaleRef = useRef(scaleKey);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (previousScaleRef.current === scaleKey) {
       return;
     }
@@ -182,14 +194,14 @@ const useAnchorOnScaleChange = (
 };
 
 export const useReadingPosition = (
-  workId: string,
+  identity: ReadingIdentity,
   articleRef: ArticleRef,
   initialBlockIndex: number | null,
   tracker: TopmostTracker,
 ): void => {
   const currentIndexRef = useRef(0);
 
-  useRestoreReadingPosition(workId, articleRef, initialBlockIndex);
-  useTrackReadingPosition(workId, tracker, currentIndexRef);
+  useRestoreReadingPosition(identity, articleRef, initialBlockIndex);
+  useTrackReadingPosition(identity.storageKey, tracker, currentIndexRef);
   useAnchorOnScaleChange(articleRef, currentIndexRef);
 };

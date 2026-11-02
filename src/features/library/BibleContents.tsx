@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Chevron } from '../../components/icons/Chevron.tsx';
 import { ChevronDirection } from '../../components/icons/model.ts';
-import { contentCatalog } from '../../content/catalog.ts';
+import type { BibleEditionId } from '../../content/language.ts';
+import { loadBible, useLoaded } from '../../content/loaders.ts';
+import { useReading } from '../../content/reading.ts';
 import { BibleTestament, LibraryCategory, type BibleBookSummary } from '../../content/schema.ts';
 import {
   loadOpenTestaments,
@@ -9,7 +11,14 @@ import {
   type OpenTestaments,
 } from '../../state/reading/readingPositions.ts';
 import { CHAPTER_CLASS_NAME, CITATION_CLASS_NAME, READING_CLASS_NAME } from '../../styles.ts';
-import { BIBLE_EDITION, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL, TESTAMENT_LABEL } from './model.ts';
+import {
+  BIBLE_EDITION_LABEL,
+  BIBLE_TITLE,
+  LIBRARY_CATEGORY_LABEL,
+  OpenBibleContext,
+  TESTAMENT_LABEL,
+  useOpenBible,
+} from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
 import { ReaderColophon, ReaderSurface } from './ReaderSurface.tsx';
 import { useHeadingFocus } from './useHeadingFocus.ts';
@@ -21,6 +30,7 @@ function BookRow({
   readonly book: BibleBookSummary;
   readonly onOpenBook: (bookId: string) => void;
 }) {
+  const { wording } = useReading();
   return (
     <li>
       <button
@@ -30,7 +40,7 @@ function BookRow({
       >
         <span className={READING_CLASS_NAME}>{book.name}</span>
         <span className={`${CITATION_CLASS_NAME} shrink-0 text-muted`}>
-          {book.chapterCount === 1 ? '1 chapter' : `${String(book.chapterCount)} chapters`}
+          {wording.library.chapterCount(book.chapterCount)}
         </span>
       </button>
     </li>
@@ -48,7 +58,8 @@ function TestamentSection({
   readonly open: boolean;
   readonly testament: BibleTestament;
 }) {
-  const books = contentCatalog.bible.books.filter((book) => book.testament === testament);
+  const reading = useReading();
+  const books = useOpenBible().books.filter((book) => book.testament === testament);
 
   return (
     <section className="flex flex-col gap-2">
@@ -59,7 +70,7 @@ function TestamentSection({
           onClick={onToggle}
           type="button"
         >
-          {TESTAMENT_LABEL[testament]}
+          {TESTAMENT_LABEL(reading)[testament]}
           <Chevron
             className="size-5 shrink-0 text-muted"
             direction={open ? ChevronDirection.Down : ChevronDirection.Right}
@@ -108,26 +119,26 @@ const useOpenTestaments = () => {
   return { openTestaments, toggleTestament };
 };
 
-export function BibleContents({
-  onBack,
-  onOpenBook,
-  onOpenSettings,
-}: {
+type BibleContentsProps = {
   readonly onBack: () => void;
   readonly onOpenBook: (bookId: string) => void;
   readonly onOpenSettings: () => void;
-}) {
-  const headingRef = useHeadingFocus(BIBLE_TITLE);
+};
+
+function BibleContentsPage({ onBack, onOpenBook, onOpenSettings }: BibleContentsProps) {
+  const reading = useReading();
+  const bible = useOpenBible();
+  const headingRef = useHeadingFocus(BIBLE_TITLE(reading));
   const { openTestaments, toggleTestament } = useOpenTestaments();
 
   return (
     <ReaderSurface onBack={onBack} onOpenSettings={onOpenSettings}>
       <ReaderHeader
-        eyebrow={LIBRARY_CATEGORY_LABEL[LibraryCategory.Scripture]}
+        eyebrow={LIBRARY_CATEGORY_LABEL(reading)[LibraryCategory.Scripture]}
         headingRef={headingRef}
-        subtitle={BIBLE_EDITION}
+        subtitle={BIBLE_EDITION_LABEL(reading)[bible.directory]}
         tight
-        title={BIBLE_TITLE}
+        title={BIBLE_TITLE(reading)}
       />
       {openTestaments === null
         ? null
@@ -140,7 +151,21 @@ export function BibleContents({
               testament={testament}
             />
           ))}
-      <ReaderColophon source={contentCatalog.bible.source} />
+      <ReaderColophon source={bible.source} />
     </ReaderSurface>
+  );
+}
+
+export function BibleContents({
+  edition,
+  ...props
+}: BibleContentsProps & { readonly edition: BibleEditionId }) {
+  const reading = useReading();
+  const bible = useLoaded(loadBible(reading, edition));
+
+  return bible === null ? null : (
+    <OpenBibleContext value={bible}>
+      <BibleContentsPage {...props} />
+    </OpenBibleContext>
   );
 }

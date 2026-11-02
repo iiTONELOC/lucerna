@@ -1,9 +1,9 @@
 import {
   CatalogLookupError,
   CatalogLookupErrorCode,
-  contentCatalog,
   type ResolvedArtwork,
 } from '../../content/catalog.ts';
+import { type ReadingSnapshot } from '../../content/reading.ts';
 import { randomIndex } from '../../shared/random.ts';
 import {
   currentStep,
@@ -37,6 +37,7 @@ const usesDecadeArtwork = (step: ArtworkPrayerStep): boolean =>
   (step.prayerId === PrayerId.HailMary || step.prayerId === PrayerId.OurFather);
 
 const artworkPoolForStep = (
+  reading: ReadingSnapshot,
   step: PrayerStep,
   mysteryArtworkByDecade: ReadonlyMap<number, ResolvedArtwork>,
 ): readonly ResolvedArtwork[] => {
@@ -55,7 +56,7 @@ const artworkPoolForStep = (
     return [mysteryArtwork];
   }
 
-  const stageArt = contentCatalog.rosary.prayerStageArt[step.prayerId];
+  const stageArt = reading.catalog.rosary.prayerStageArt[step.prayerId];
 
   if (stageArt === undefined || stageArt.length === 0) {
     throw new CatalogLookupError(CatalogLookupErrorCode.MissingArtwork, 'artwork', step.prayerId);
@@ -146,11 +147,12 @@ const rotatedArtworkFor = (
 };
 
 const plannedArtworkForStep = (
+  reading: ReadingSnapshot,
   step: PrayerStep,
   mysteryArtworkByDecade: ReadonlyMap<number, ResolvedArtwork>,
   rotations: Map<PrayerId, ArtworkRotation>,
 ): ResolvedArtwork => {
-  const pool = artworkPoolForStep(step, mysteryArtworkByDecade);
+  const pool = artworkPoolForStep(reading, step, mysteryArtworkByDecade);
 
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
     return requiredArtwork(pool, step.mystery.title);
@@ -161,12 +163,15 @@ const plannedArtworkForStep = (
     : rotatedArtworkFor(step, pool, rotations);
 };
 
-export const artworkPlanFor = (progression: Progression): readonly ResolvedArtwork[] => {
+export const artworkPlanFor = (
+  reading: ReadingSnapshot,
+  progression: Progression,
+): readonly ResolvedArtwork[] => {
   const rotations = new Map<PrayerId, ArtworkRotation>();
   const mysteryArtworkByDecade = mysteryArtworkByDecadeFor(progression);
 
   return progression.steps.map((step) =>
-    plannedArtworkForStep(step, mysteryArtworkByDecade, rotations),
+    plannedArtworkForStep(reading, step, mysteryArtworkByDecade, rotations),
   );
 };
 
@@ -206,6 +211,7 @@ const featuredAt = (step: PrayerStep, start: PrayerStart): boolean => {
 };
 
 export const featuring = (
+  reading: ReadingSnapshot,
   artworkPlan: readonly ResolvedArtwork[],
   progression: Progression,
   start: PrayerStart | undefined,
@@ -219,7 +225,7 @@ export const featuring = (
     return artworkPlan;
   }
 
-  const featured = contentCatalog.artworkById(featuredArtworkId);
+  const featured = reading.catalog.artworkById(featuredArtworkId);
 
   return artworkPlan.map((artwork, index) => {
     const step = progression.steps[index];

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { contentCatalog, type ResolvedMysterySet } from '../../content/catalog.ts';
+import { INITIAL_READING } from '../../content/reading.ts';
 import type { RosaryGuidance } from '../../content/schema.ts';
 import {
   advance,
@@ -46,10 +47,10 @@ const mysterySetFixture = (): ResolvedMysterySet => {
 };
 
 const progressionFixture = (): Progression =>
-  createProgression(mysterySetFixture(), guidance, FULL_ROSARY);
+  createProgression(INITIAL_READING, mysterySetFixture(), guidance, FULL_ROSARY);
 
 const progressionWithoutFatima = (): Progression =>
-  createProgression(mysterySetFixture(), guidance, { includeFatimaPrayer: false });
+  createProgression(INITIAL_READING, mysterySetFixture(), guidance, { includeFatimaPrayer: false });
 
 const stepsOfArchetype = (progression: Progression, archetype: StepArchetype): PrayerStep[] =>
   progression.steps.filter((step) => step.archetype === archetype);
@@ -118,7 +119,9 @@ describe('createProgression validation', () => {
   test('rejects a mystery set with no mysteries rather than building a short rosary', () => {
     const emptySet: ResolvedMysterySet = { ...mysterySetFixture(), mysteries: [] };
 
-    expect(() => createProgression(emptySet, guidance, FULL_ROSARY)).toThrow(ProgressionError);
+    expect(() => createProgression(INITIAL_READING, emptySet, guidance, FULL_ROSARY)).toThrow(
+      ProgressionError,
+    );
   });
 });
 
@@ -145,9 +148,9 @@ describe('silent steps', () => {
   test('refuses to build when the content and the declared silent steps disagree', () => {
     const drifted: RosaryGuidance = { ...guidance, silentSteps: [SilentStepId.ApostlesCreed] };
 
-    expect(() => createProgression(mysterySetFixture(), drifted, FULL_ROSARY)).toThrow(
-      ProgressionError,
-    );
+    expect(() =>
+      createProgression(INITIAL_READING, mysterySetFixture(), drifted, FULL_ROSARY),
+    ).toThrow(ProgressionError);
   });
 });
 
@@ -207,9 +210,9 @@ describe('decade Hail Mary guidance', () => {
       decadeHailMarys: { ...guidance.decadeHailMarys, text: 'Meditate while praying.' },
     };
 
-    expect(() => createProgression(mysterySetFixture(), drifted, FULL_ROSARY)).toThrow(
-      ProgressionError,
-    );
+    expect(() =>
+      createProgression(INITIAL_READING, mysterySetFixture(), drifted, FULL_ROSARY),
+    ).toThrow(ProgressionError);
   });
 });
 

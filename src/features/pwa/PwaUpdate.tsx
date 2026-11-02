@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useReading } from '../../content/reading.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import {
   ACCENT_BUTTON_CLASS_NAME,
@@ -31,6 +32,7 @@ export function PwaUpdate() {
 }
 
 function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
+  const { wording } = useReading();
   return (
     <aside
       aria-labelledby={UPDATE_NOTICE_ID}
@@ -40,11 +42,9 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
     >
       <div>
         <p className={EYEBROW_CLASS_NAME} id={UPDATE_NOTICE_ID}>
-          Update ready
+          {wording.update.ready}
         </p>
-        <p className={`${BODY_CLASS_NAME} text-secondary`}>
-          A new version of Lucerna is cached and ready.
-        </p>
+        <p className={`${BODY_CLASS_NAME} text-secondary`}>{wording.update.cached}</p>
       </div>
       <div className="flex flex-wrap gap-3">
         <button
@@ -52,10 +52,10 @@ function UpdateNotice({ onDismiss }: { readonly onDismiss: () => void }) {
           onClick={applyServiceWorkerUpdate}
           type="button"
         >
-          Update now
+          {wording.update.now}
         </button>
         <button className={`${QUIET_BUTTON_CLASS_NAME} px-4`} onClick={onDismiss} type="button">
-          Later
+          {wording.common.later}
         </button>
       </div>
     </aside>

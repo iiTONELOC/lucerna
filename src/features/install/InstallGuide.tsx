@@ -1,6 +1,7 @@
 import { resolveInstallAsset } from '../../assets/install.ts';
 import { BackButton } from '../../components/buttons/BackButton.tsx';
 import { FocusPage, ViewHeader } from '../../components/layout.tsx';
+import { useReading } from '../../content/reading.ts';
 import {
   CITATION_CLASS_NAME,
   EYEBROW_CLASS_NAME,
@@ -14,9 +15,10 @@ const INSTALL_TITLE_ID = 'install-title';
 const SECTION_LINK_CLASS_NAME = `inline-flex min-h-11 items-center rounded-lg border border-outline px-3 text-secondary transition-colors hover:border-accent/60 hover:text-accent-current focus-ring ${NAV_CLASS_NAME}`;
 const STEP_NUMBER_CLASS_NAME = `flex size-8 shrink-0 items-center justify-center rounded-full border border-accent/50 ${CITATION_CLASS_NAME} text-accent-current`;
 function InstallSectionLinks() {
+  const reading = useReading();
   return (
-    <nav aria-label="Devices" className="flex flex-wrap gap-2">
-      {INSTALL_SECTIONS.map((section) => (
+    <nav aria-label={reading.wording.install.devices} className="flex flex-wrap gap-2">
+      {INSTALL_SECTIONS(reading).map((section) => (
         <a className={SECTION_LINK_CLASS_NAME} href={`#install-${section.id}`} key={section.id}>
           {section.heading}
         </a>
@@ -75,22 +77,23 @@ function InstallSectionView({ section }: { readonly section: InstallSection }) {
 }
 
 export function InstallGuide({ onBack }: { readonly onBack: () => void }) {
+  const reading = useReading();
   return (
     <FocusPage labelledBy={INSTALL_TITLE_ID}>
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pt-5 pb-[60dvh] sm:px-6 lg:px-8 lg:pt-10">
         <BackButton onBack={onBack} />
         <ViewHeader
-          eyebrow="Keep Lucerna on your device"
+          eyebrow={reading.wording.install.eyebrow}
           id={INSTALL_TITLE_ID}
-          lede="Lucerna works in a browser. Add it to your device and it opens like any other application."
-          title="How to add Lucerna to your device"
+          lede={reading.wording.install.lede}
+          title={reading.wording.install.title}
         >
           <div className="pt-2">
             <InstallSectionLinks />
           </div>
         </ViewHeader>
 
-        {INSTALL_SECTIONS.map((section) => (
+        {INSTALL_SECTIONS(reading).map((section) => (
           <InstallSectionView key={section.id} section={section} />
         ))}
       </div>

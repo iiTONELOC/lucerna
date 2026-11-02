@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { contentCatalog } from '../../content/catalog.ts';
+import { INITIAL_READING } from '../../content/reading.ts';
 import { GALLERY_DATE_GROUP_YEARS, galleryGroupsFor, GallerySort, yearOf } from './gallerySort.ts';
 
 const artworks = contentCatalog.artworks;
@@ -7,11 +8,11 @@ const mysterySets = contentCatalog.rosary.mysterySets;
 const todaySet = mysterySets[2] as (typeof mysterySets)[number];
 
 const flatten = (sort: GallerySort) =>
-  galleryGroupsFor(sort, artworks, todaySet.id).flatMap((group) => group.artworks);
+  galleryGroupsFor(INITIAL_READING, sort, artworks, todaySet.id).flatMap((group) => group.artworks);
 
 describe('mystery grouping', () => {
   test('opens one group for each mystery set with the daily set first', () => {
-    const groups = galleryGroupsFor(GallerySort.Mystery, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Mystery, artworks, todaySet.id);
     const setNames = [
       todaySet.name,
       ...mysterySets
@@ -23,7 +24,7 @@ describe('mystery grouping', () => {
   });
 
   test('places every declared mystery artwork under its own set', () => {
-    const groups = galleryGroupsFor(GallerySort.Mystery, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Mystery, artworks, todaySet.id);
 
     for (const mysterySet of contentCatalog.rosary.mysterySets) {
       const group = groups.find((candidate) => candidate.heading === mysterySet.name);
@@ -35,7 +36,7 @@ describe('mystery grouping', () => {
   });
 
   test('opens one named group for each prayer artwork pool', () => {
-    const groups = galleryGroupsFor(GallerySort.Mystery, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Mystery, artworks, todaySet.id);
 
     for (const prayerId of Object.keys(contentCatalog.rosary.prayerStageArt)) {
       const group = groups.find((candidate) => candidate.id === prayerId);
@@ -46,7 +47,7 @@ describe('mystery grouping', () => {
   });
 
   test('gives every category a stable identity', () => {
-    const groups = galleryGroupsFor(GallerySort.Mystery, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Mystery, artworks, todaySet.id);
     const ids = groups.map((group) => group.id);
 
     expect(new Set(ids).size).toBe(ids.length);
@@ -62,7 +63,7 @@ describe('mystery grouping', () => {
 
 describe('artist grouping', () => {
   test('opens one named row for each artist in surname order', () => {
-    const groups = galleryGroupsFor(GallerySort.Artist, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Artist, artworks, todaySet.id);
     const expectedArtists = [...new Set(artworks.map((artwork) => artwork.artist))].sort(
       (left, right) =>
         (left.split(' ').at(-1) ?? left).localeCompare(right.split(' ').at(-1) ?? right) ||
@@ -73,7 +74,7 @@ describe('artist grouping', () => {
   });
 
   test('keeps only that artist works in each row', () => {
-    const groups = galleryGroupsFor(GallerySort.Artist, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Artist, artworks, todaySet.id);
 
     for (const group of groups) {
       expect(group.artworks.every((artwork) => artwork.artist === group.heading)).toBe(true);
@@ -90,7 +91,7 @@ describe('artist grouping', () => {
 
 describe('date grouping', () => {
   test('opens one named row for each nonempty fifty-year period', () => {
-    const groups = galleryGroupsFor(GallerySort.Date, artworks, todaySet.id);
+    const groups = galleryGroupsFor(INITIAL_READING, GallerySort.Date, artworks, todaySet.id);
 
     for (const group of groups) {
       const firstArtwork = group.artworks[0];

@@ -1,17 +1,11 @@
-import splashVerses from '../../generated/splash-verses.json';
+import { CURRENT_EDITION_CONTENT } from '../../content/currentLanguage.ts';
+import { splashVersesFrom, type SplashVerse } from '../../content/schema.ts';
 import { randomIndex } from '../../shared/random.ts';
-
-export type SplashVerse = {
-  readonly reference: string;
-  readonly text: string;
-  readonly sourceId: string;
-  readonly sourceLabel: string;
-};
 
 export type SplashIndex = (length: number) => number;
 
 const EMPTY_VERSES_ERROR = 'Splash verses must not be empty';
-const OPENING_VERSES: readonly SplashVerse[] = splashVerses;
+const OPENING_VERSES = splashVersesFrom(CURRENT_EDITION_CONTENT.splashVerses);
 
 export const selectSplashVerse = (
   verses: readonly SplashVerse[],

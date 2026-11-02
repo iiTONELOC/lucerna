@@ -9,14 +9,15 @@ import {
 import { arrayFrom, recordFrom, stringFrom } from '../../src/content/shape.ts';
 import { ORDINAL_WORDS } from '../../src/shared/ordinals.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
+import { sourcesInLanguage } from './overlay.ts';
+import type { ContentLanguage } from './editions.ts';
 import {
+  buildFailure,
   ContentBuildError,
   ContentBuildErrorCode,
   readJsonFile,
   sourceRecordOf,
 } from './records.ts';
-
-export const LIBRARY_DATABASE = 'data/db/library.json';
 
 const FRONT_MATTER_GROUP_COUNT = 2;
 const SUBHEADING_MAXIMUM_LENGTH = 65;
@@ -160,6 +161,68 @@ const blocksFrom = (groups: readonly (readonly string[])[]): readonly LibraryBlo
   return blocks;
 };
 
+const failTranslation = buildFailure(ContentBuildErrorCode.InvalidLibraryDatabase);
+
+const translatedBlockOf = (block: LibraryBlock, value: unknown, path: string): LibraryBlock => {
+  const translation = recordFrom(value, path);
+
+  if (stringFrom(translation, 'kind', path) !== block.kind) {
+    return failTranslation(`${path}.kind`);
+  }
+
+  if (block.kind !== LibraryBlockKind.Verse) {
+    return { ...block, text: stringFrom(translation, 'text', path) };
+  }
+
+  const lines = arrayFrom(translation['lines'], `${path}.lines`).map((line) =>
+    typeof line === 'string' ? line : failTranslation(`${path}.lines`),
+  );
+
+  return lines.length === block.lines.length
+    ? { ...block, lines }
+    : failTranslation(`${path}.lines`);
+};
+
+const translatedBlocksOf = (
+  blocks: readonly LibraryBlock[],
+  value: unknown,
+  path: string,
+): readonly LibraryBlock[] => {
+  const translations = arrayFrom(recordFrom(value, path)['blocks'], `${path}.blocks`);
+
+  if (translations.length !== blocks.length) {
+    return failTranslation(`${path}.blocks`);
+  }
+
+  return blocks.map((block, index) =>
+    translatedBlockOf(block, translations[index], `${path}.blocks[${String(index)}]`),
+  );
+};
+
+const translatedWorkOf = async (
+  work: Record<string, unknown>,
+  text: string,
+  record: Record<string, unknown>,
+  repositoryRoot: URL,
+): Promise<Record<string, unknown>> => {
+  const translationPath = record['translationPath'];
+
+  if (typeof translationPath !== 'string') {
+    return work;
+  }
+
+  const translation = recordFrom(
+    await readJsonFile(translationPath, repositoryRoot),
+    translationPath,
+  );
+
+  return {
+    ...work,
+    translation: stringFrom(record, 'translation', translationPath),
+    blocks: translatedBlocksOf(blocksFrom(groupsOf(text)), translation, translationPath),
+  };
+};
+
 const workFrom = async (
   value: unknown,
   index: number,
@@ -174,26 +237,43 @@ const workFrom = async (
   const text = await Bun.file(
     new URL(stringFrom(source, 'path', sourcePath), repositoryRoot),
   ).text();
-
-  return {
-    id: sourceId,
-    title: stringFrom(source, 'work', sourcePath),
-    author: stringFrom(source, 'author', sourcePath),
-    sourceId,
-    category: stringFrom(record, 'category', path),
-    blocks: blocksFrom(groupsOf(text)),
-  };
+  return translatedWorkOf(
+    {
+      id: sourceId,
+      title: stringFrom(source, 'work', sourcePath),
+      author: stringFrom(source, 'author', sourcePath),
+      sourceId,
+      category: stringFrom(record, 'category', path),
+      blocks: blocksFrom(groupsOf(text)),
+    },
+    text,
+    record,
+    repositoryRoot,
+  );
 };
 
-export const buildLibraryContent = async (repositoryRoot: URL): Promise<LibraryContent> => {
-  const database = recordFrom(await readJsonFile(LIBRARY_DATABASE, repositoryRoot), 'library');
+export const buildLibraryContent = async (
+  repositoryRoot: URL,
+  contentLanguage: ContentLanguage,
+): Promise<LibraryContent> => {
+  const { libraryDatabase } = contentLanguage;
+
+  if (libraryDatabase === null) {
+    return libraryContentFrom({ schemaVersion: LIBRARY_SCHEMA_VERSION, works: [] });
+  }
+
+  const database = recordFrom(await readJsonFile(libraryDatabase, repositoryRoot), 'library');
   const works = arrayFrom(database['works'], 'works');
 
   if (works.length === 0) {
     throw new ContentBuildError(ContentBuildErrorCode.InvalidLibraryDatabase);
   }
 
-  const sources = await readJsonFile(SOURCE_DATABASE, repositoryRoot);
+  const sources = await sourcesInLanguage(
+    contentLanguage,
+    await readJsonFile(SOURCE_DATABASE, repositoryRoot),
+    repositoryRoot,
+  );
 
   return libraryContentFrom({
     schemaVersion: LIBRARY_SCHEMA_VERSION,

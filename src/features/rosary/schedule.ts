@@ -1,5 +1,28 @@
+import { useState } from 'react';
+import { useReading } from '../../content/reading.ts';
 import type { ResolvedArtwork, ResolvedMysterySet, ResolvedRosary } from '../../content/catalog.ts';
 import { LiturgicalSeason } from '../../content/schema.ts';
+import { CodedError } from '../../shared/codedError.ts';
+
+export enum ScheduleErrorCode {
+  InvalidDate = 'invalid-date',
+  InvalidPoolSize = 'invalid-pool-size',
+  EmptyMysterySet = 'empty-mystery-set',
+  MysteryWithoutArtwork = 'mystery-without-artwork',
+}
+
+const SCHEDULE_ERROR_MESSAGE: Readonly<Record<ScheduleErrorCode, string>> = {
+  [ScheduleErrorCode.InvalidDate]: 'Date must be valid',
+  [ScheduleErrorCode.InvalidPoolSize]: 'Pool size must be a positive integer',
+  [ScheduleErrorCode.EmptyMysterySet]: 'Mystery set must not be empty',
+  [ScheduleErrorCode.MysteryWithoutArtwork]: 'Mystery must carry at least one artwork',
+};
+
+export class ScheduleError extends CodedError<ScheduleErrorCode> {
+  constructor(code: ScheduleErrorCode) {
+    super('ScheduleError', code, SCHEDULE_ERROR_MESSAGE[code]);
+  }
+}
 
 export enum Weekday {
   Sunday = 'sunday',
@@ -28,7 +51,7 @@ const weekdayFrom = (date: Date): Weekday => {
     case 6:
       return Weekday.Saturday;
     default:
-      throw new RangeError('Date must be valid');
+      throw new ScheduleError(ScheduleErrorCode.InvalidDate);
   }
 };
 
@@ -101,11 +124,11 @@ export const scheduledMysterySetId = (date: Date, schedule: ResolvedRosary['sche
 
 export const dailyMysteryIndex = (date: Date, mysterySetId: string, poolSize: number): number => {
   if (Number.isNaN(date.getTime())) {
-    throw new RangeError('Date must be valid');
+    throw new ScheduleError(ScheduleErrorCode.InvalidDate);
   }
 
   if (!Number.isInteger(poolSize) || poolSize < 1) {
-    throw new RangeError('Pool size must be a positive integer');
+    throw new ScheduleError(ScheduleErrorCode.InvalidPoolSize);
   }
 
   const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${mysterySetId}`;
@@ -126,15 +149,22 @@ export const dailyHeroArtworkFor = (
   const heroMystery = mysterySet.mysteries[heroMysteryIndex];
 
   if (heroMystery === undefined) {
-    throw new RangeError('Mystery set must not be empty');
+    throw new ScheduleError(ScheduleErrorCode.EmptyMysterySet);
   }
 
   const heroArtwork =
     heroMystery.artworks[dailyMysteryIndex(today, heroMystery.title, heroMystery.artworks.length)];
 
   if (heroArtwork === undefined) {
-    throw new RangeError('Mystery must carry at least one artwork');
+    throw new ScheduleError(ScheduleErrorCode.MysteryWithoutArtwork);
   }
 
   return heroArtwork;
+};
+
+export const useDailyHeroArtwork = (mysterySetId: string): ResolvedArtwork => {
+  const reading = useReading();
+  const [selectionCatalog] = useState(reading.catalog);
+  const selected = dailyHeroArtworkFor(new Date(), selectionCatalog.mysterySetById(mysterySetId));
+  return reading.catalog.artworkById(selected.id);
 };

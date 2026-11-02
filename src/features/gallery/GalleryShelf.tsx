@@ -1,6 +1,7 @@
 import { resolveArtAsset } from '../../assets/art.ts';
-import type { ResolvedArtwork } from '../../content/catalog.ts';
 import { Shelf } from '../../components/layout.tsx';
+import type { ResolvedArtwork } from '../../content/catalog.ts';
+import { useReading } from '../../content/reading.ts';
 import { CITATION_CLASS_NAME } from '../../styles.ts';
 
 const CAPTION_CLASS_NAME = `wrap-break-word ${CITATION_CLASS_NAME}`;
@@ -22,6 +23,7 @@ type GalleryArtworkCardProps = {
 };
 
 function GalleryArtworkCard({ artwork, onOpenArtwork, registerButton }: GalleryArtworkCardProps) {
+  const { wording } = useReading();
   return (
     <li className="flex aspect-4/5 w-[clamp(18rem,30cqi,var(--container-sm))] shrink-0 self-start">
       <article className="flex size-full" data-artwork-id={artwork.id}>
@@ -32,7 +34,7 @@ function GalleryArtworkCard({ artwork, onOpenArtwork, registerButton }: GalleryA
           type="button"
         >
           <img
-            alt={`${artwork.title} by ${artwork.artist}`}
+            alt={wording.artworkAlt(artwork.title, artwork.artist)}
             className="absolute inset-0 size-full object-cover object-top transition-opacity duration-300 group-hover:opacity-90"
             decoding="async"
             draggable={false}

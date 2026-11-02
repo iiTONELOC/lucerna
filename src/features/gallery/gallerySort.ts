@@ -1,4 +1,5 @@
-import { contentCatalog, type ResolvedArtwork } from '../../content/catalog.ts';
+import { type ResolvedArtwork } from '../../content/catalog.ts';
+import { type ReadingSnapshot } from '../../content/reading.ts';
 
 export enum GallerySort {
   Mystery = 'mystery',
@@ -6,11 +7,13 @@ export enum GallerySort {
   Date = 'date',
 }
 
-export const GALLERY_SORT_LABEL: Readonly<Record<GallerySort, string>> = {
-  [GallerySort.Mystery]: 'Mystery',
-  [GallerySort.Artist]: 'Artist',
-  [GallerySort.Date]: 'Date',
-};
+export const GALLERY_SORT_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<GallerySort, string>> => ({
+  [GallerySort.Mystery]: reading.wording.gallery.byMystery,
+  [GallerySort.Artist]: reading.wording.gallery.byArtist,
+  [GallerySort.Date]: reading.wording.gallery.byDate,
+});
 
 export type GalleryGroup = {
   readonly id: string;
@@ -60,8 +63,8 @@ const unclaimedFrom = (
   return kept;
 };
 
-const mysterySetsStartingWithToday = (todaySetId: string) => {
-  const mysterySets = contentCatalog.rosary.mysterySets;
+const mysterySetsStartingWithToday = (reading: ReadingSnapshot, todaySetId: string) => {
+  const mysterySets = reading.catalog.rosary.mysterySets;
 
   return [
     ...mysterySets.filter((mysterySet) => mysterySet.id === todaySetId),
@@ -69,11 +72,11 @@ const mysterySetsStartingWithToday = (todaySetId: string) => {
   ];
 };
 
-const mysteryGroupsOf = (todaySetId: string): readonly GalleryGroup[] => {
+const mysteryGroupsOf = (reading: ReadingSnapshot, todaySetId: string): readonly GalleryGroup[] => {
   const claimed = new Set<string>();
   const groups: GalleryGroup[] = [];
 
-  for (const mysterySet of mysterySetsStartingWithToday(todaySetId)) {
+  for (const mysterySet of mysterySetsStartingWithToday(reading, todaySetId)) {
     const setArtworks = mysterySet.mysteries.flatMap((mystery) => mystery.artworks);
 
     groups.push({
@@ -83,13 +86,13 @@ const mysteryGroupsOf = (todaySetId: string): readonly GalleryGroup[] => {
     });
   }
 
-  for (const [prayerId, stageArtworks] of Object.entries(contentCatalog.rosary.prayerStageArt)) {
+  for (const [prayerId, stageArtworks] of Object.entries(reading.catalog.rosary.prayerStageArt)) {
     const kept = unclaimedFrom(stageArtworks, claimed);
 
     if (kept.length > 0) {
       groups.push({
         id: prayerId,
-        heading: contentCatalog.prayerById(prayerId).title,
+        heading: reading.catalog.prayerById(prayerId).title,
         artworks: kept,
       });
     }
@@ -118,7 +121,10 @@ const artistGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryG
   }));
 };
 
-const dateGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGroup[] => {
+const dateGroupsOf = (
+  reading: ReadingSnapshot,
+  artworks: readonly ResolvedArtwork[],
+): readonly GalleryGroup[] => {
   const artworksByPeriod = new Map<number, ResolvedArtwork[]>();
   const undatedArtworks: ResolvedArtwork[] = [];
 
@@ -149,7 +155,7 @@ const dateGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGro
   if (undatedArtworks.length > 0) {
     groups.push({
       id: `${GallerySort.Date}:undated`,
-      heading: 'Date unknown',
+      heading: reading.wording.gallery.dateUnknown,
       artworks: undatedArtworks,
     });
   }
@@ -158,17 +164,18 @@ const dateGroupsOf = (artworks: readonly ResolvedArtwork[]): readonly GalleryGro
 };
 
 export const galleryGroupsFor = (
+  reading: ReadingSnapshot,
   sort: GallerySort,
   artworks: readonly ResolvedArtwork[],
   todaySetId: string,
 ): readonly GalleryGroup[] => {
   if (sort === GallerySort.Mystery) {
-    return mysteryGroupsOf(todaySetId);
+    return mysteryGroupsOf(reading, todaySetId);
   }
 
   if (sort === GallerySort.Artist) {
     return artistGroupsOf(artworks);
   }
 
-  return dateGroupsOf(artworks);
+  return dateGroupsOf(reading, artworks);
 };

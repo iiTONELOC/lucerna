@@ -1,8 +1,8 @@
 import { parsePreferences, type Preferences } from './model.ts';
 
-const DATABASE_NAME = 'lucerna';
+export const DATABASE_NAME = 'lucerna';
 const DATABASE_VERSION = 1;
-const STORE_NAME = 'preferences';
+export const STORE_NAME = 'preferences';
 const PREFERENCES_KEY = 'user';
 const STORAGE_ERROR = 'Preference storage operation failed';
 
@@ -83,3 +83,42 @@ export const loadPreferences = async (): Promise<Preferences> =>
 
 export const savePreferences = (preferences: Preferences): Promise<void> =>
   writeStoredValue(PREFERENCES_KEY, preferences);
+
+const updateValue = <Value>(
+  database: IDBDatabase,
+  key: string,
+  update: (raw: unknown) => Value,
+): Promise<Value | null> =>
+  new Promise((resolve, reject) => {
+    const transaction = database.transaction(STORE_NAME, 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(key);
+    let value: Value | null = null;
+    request.onsuccess = () => {
+      try {
+        value = update(request.result);
+        store.put(value, key);
+      } catch {
+        transaction.abort();
+      }
+    };
+    request.onerror = () => reject(toStorageError(request.error));
+    transaction.oncomplete = () => resolve(value);
+    transaction.onerror = () => reject(toStorageError(transaction.error));
+    transaction.onabort = () => reject(toStorageError(transaction.error));
+  });
+
+export const updateStoredValue = async <Value>(
+  key: string,
+  update: (raw: unknown) => Value,
+): Promise<Value | null> => {
+  let database: IDBDatabase | null = null;
+  try {
+    database = await openDatabase();
+    return database === null ? null : await updateValue(database, key, update);
+  } catch {
+    return null;
+  } finally {
+    database?.close();
+  }
+};

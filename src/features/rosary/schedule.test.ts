@@ -4,6 +4,7 @@ import { LiturgicalSeason } from '../../content/schema.ts';
 import {
   dailyMysteryIndex,
   easterSundayOf,
+  ScheduleError,
   liturgicalSeasonOf,
   scheduledMysterySetId,
 } from './schedule.ts';
@@ -39,7 +40,7 @@ describe('scheduledMysterySetId', () => {
   test('rejects an invalid date', () => {
     expect(() =>
       scheduledMysterySetId(new Date(Number.NaN), contentCatalog.rosary.schedule),
-    ).toThrow('Date must be valid');
+    ).toThrow(ScheduleError);
   });
 });
 
@@ -90,11 +91,7 @@ describe('dailyMysteryIndex', () => {
   });
 
   test('rejects invalid input', () => {
-    expect(() => dailyMysteryIndex(new Date(Number.NaN), 'glorious', 5)).toThrow(
-      'Date must be valid',
-    );
-    expect(() => dailyMysteryIndex(new Date(), 'glorious', 0)).toThrow(
-      'Pool size must be a positive integer',
-    );
+    expect(() => dailyMysteryIndex(new Date(Number.NaN), 'glorious', 5)).toThrow(ScheduleError);
+    expect(() => dailyMysteryIndex(new Date(), 'glorious', 0)).toThrow(ScheduleError);
   });
 });

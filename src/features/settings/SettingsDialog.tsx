@@ -1,19 +1,27 @@
 import {
-  BODY_CLASS_NAME,
-  CITATION_CLASS_NAME,
-  EYEBROW_CLASS_NAME,
-  NAV_CLASS_NAME,
-} from '../../styles.ts';
-import {
   useEffect,
   useRef,
   useState,
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type PointerEvent as ReactPointerEvent,
   type RefObject,
 } from 'react';
+import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
+import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
+import {
+  BIBLE_CHOICES,
+  LANGUAGE_CHOICES,
+  LanguageChoice,
+  deviceLanguageTags,
+  editionOf,
+  languageName,
+  languageOf,
+} from '../../content/language.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
+import { ReflectionStatus } from '../../content/schema.ts';
+import { useDialogOpen, useReturnFocus } from '../../shared/focus.ts';
 import {
   BeadMaterial,
   OpeningDuration,
@@ -32,71 +40,104 @@ import {
   type PreferenceKey,
   type Preferences,
 } from '../../state/preferences/model.ts';
-import { APP_DESCRIPTION } from '../../appMetadata.ts';
-import { ReaderSample } from '../library/ReaderSurface.tsx';
-import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
-import { RedLetterNoticeText } from '../../components/RedLetterNotice.tsx';
-import { contentCatalog } from '../../content/catalog.ts';
-import { useDialogOpen, useReturnFocus } from '../../shared/focus.ts';
-import { enumLabel } from '../../shared/text.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
-import { SettingsScope, SettingsTab } from './model.ts';
+import {
+  BODY_CLASS_NAME,
+  CITATION_CLASS_NAME,
+  CLOSE_BUTTON_CLASS_NAME,
+  EYEBROW_CLASS_NAME,
+  NAV_CLASS_NAME,
+} from '../../styles.ts';
+import { BIBLE_EDITION_LABEL } from '../library/model.ts';
+import { ReaderSample } from '../library/ReaderSurface.tsx';
 import { AboutSettings, type AboutSettingsProps } from './AboutSettings.tsx';
 import { DiagnosticsSettings } from './DiagnosticsSettings.tsx';
+import { SettingsScope, SettingsTab } from './model.ts';
+import { KeyName } from '../../shared/keyboard.ts';
 
 const SETTINGS_TITLE_ID = 'settings-title';
 const SETTINGS_CARD_MINIMUM_HEIGHT = 320;
 const SETTINGS_CARD_MAXIMUM_VIEWPORT_SHARE = 0.85;
 const SETTINGS_CARD_KEYBOARD_STEP = 24;
-const UPDATE_CHECKS_LABEL: Readonly<Record<UpdateChecks, string>> = {
-  [UpdateChecks.OnLoad]: 'When it opens',
-  [UpdateChecks.WhileOpen]: 'Also while open',
-};
-const UPDATE_CHECKS_DESCRIPTION: Readonly<Record<UpdateChecks, string>> = {
-  [UpdateChecks.OnLoad]: 'Lucerna looks for a new version once, as it starts.',
-  [UpdateChecks.WhileOpen]: 'If Lucerna is installed, the app also looks every twenty minutes.',
-};
+const UPDATE_CHECKS_LABEL = (reading: ReadingSnapshot): Readonly<Record<UpdateChecks, string>> => ({
+  [UpdateChecks.OnLoad]: reading.wording.settings.whenOpens,
+  [UpdateChecks.WhileOpen]: reading.wording.settings.alsoWhileOpen,
+});
+const UPDATE_CHECKS_DESCRIPTION = (
+  reading: ReadingSnapshot,
+): Readonly<Record<UpdateChecks, string>> => ({
+  [UpdateChecks.OnLoad]: reading.wording.settings.onLoadNote,
+  [UpdateChecks.WhileOpen]: reading.wording.settings.whileOpenNote,
+});
 const READING_SPEED_ID = 'reading-speed';
+const READING_SPEED_LABEL = (reading: ReadingSnapshot): ReadonlyMap<number, string> =>
+  new Map([
+    [ReadingSpeed.Unhurried, reading.wording.settings.speeds.unhurried],
+    [ReadingSpeed.Steady, reading.wording.settings.speeds.steady],
+    [ReadingSpeed.Brisk, reading.wording.settings.speeds.brisk],
+  ]);
+const readingSpeedName = (reading: ReadingSnapshot, readingSpeed: number): string =>
+  READING_SPEED_LABEL(reading).get(readingSpeed) ?? reading.wording.settings.custom;
+const TEXT_SCALE_LABEL = (reading: ReadingSnapshot): Readonly<Record<TextScale, string>> => ({
+  [TextScale.Small]: reading.wording.settings.textScales.small,
+  [TextScale.Standard]: reading.wording.settings.textScales.standard,
+  [TextScale.Comfortable]: reading.wording.settings.textScales.comfortable,
+  [TextScale.Large]: reading.wording.settings.textScales.large,
+  [TextScale.ExtraLarge]: reading.wording.settings.textScales.extraLarge,
+  [TextScale.Maximum]: reading.wording.settings.textScales.maximum,
+});
 const TEXT_SCALE_VALUES: readonly TextScale[] = Object.values(TextScale);
 
-const READER_FACE_LABEL: Readonly<Record<ReaderFace, string>> = {
-  [ReaderFace.Garamond]: 'Garamond',
-  [ReaderFace.Sans]: 'Sans serif',
-};
 const TAB_CLASS_NAME = `min-h-11 border-b-2 border-transparent px-1 ${BODY_CLASS_NAME} text-muted transition-colors hover:text-foreground aria-selected:border-accent aria-selected:text-accent-current focus-ring`;
 
-const SETTINGS_TAB_LABEL: Readonly<Record<SettingsTab, string>> = {
-  [SettingsTab.Rosary]: 'Rosary',
-  [SettingsTab.Library]: 'Library',
-  [SettingsTab.General]: 'General',
-  [SettingsTab.About]: 'About',
-};
+const SETTINGS_TAB_LABEL = (reading: ReadingSnapshot): Readonly<Record<SettingsTab, string>> => ({
+  [SettingsTab.Rosary]: reading.wording.views.rosary,
+  [SettingsTab.Library]: reading.wording.views.library,
+  [SettingsTab.General]: reading.wording.settings.general,
+  [SettingsTab.About]: reading.wording.about.title,
+});
 
 const defaultTabOf = (scope: SettingsScope): SettingsTab =>
   scope === SettingsScope.Reader ? SettingsTab.Library : SettingsTab.Rosary;
 
-const readingSpeedLabel = (readingSpeed: number): string => {
-  const preset = READING_SPEED_PRESETS.find((value) => value === readingSpeed);
+const readingSpeedLabel = (reading: ReadingSnapshot, readingSpeed: number): string => {
   const multiplier = String(Number(readingSpeed.toFixed(2)));
 
-  return `${preset === undefined ? 'Custom' : ReadingSpeed[preset]} · ${multiplier}×`;
+  return `${readingSpeedName(reading, readingSpeed)} · ${multiplier}×`;
 };
 
-const openingDurationLabel = (openingDuration: OpeningDuration): string =>
-  openingDuration === OpeningDuration.Manual ? 'No timeout' : `${openingDuration} seconds`;
+const openingDurationLabel = (
+  reading: ReadingSnapshot,
+  openingDuration: OpeningDuration,
+): string =>
+  openingDuration === OpeningDuration.Manual
+    ? reading.wording.settings.noTimeout
+    : reading.wording.settings.seconds(openingDuration);
+
+const openingDurationNote = (reading: ReadingSnapshot, openingDuration: OpeningDuration): string =>
+  openingDuration === OpeningDuration.Manual
+    ? reading.wording.settings.waits
+    : reading.wording.settings.continuesOnOwn;
+
+const languageChoiceLabel = (reading: ReadingSnapshot, choice: LanguageChoice): string =>
+  choice === LanguageChoice.System
+    ? reading.wording.settings.followSystem
+    : languageName(languageOf(choice, deviceLanguageTags()));
 
 const THEME_VALUES: readonly Theme[] = [Theme.EternalLight, Theme.Parchment, Theme.System];
 
-const THEME_LABEL: Readonly<Record<Theme, string>> = {
-  [Theme.EternalLight]: 'Dark',
-  [Theme.Parchment]: 'Parchment',
-  [Theme.System]: 'Follow system',
-};
+const THEME_LABEL = (reading: ReadingSnapshot): Readonly<Record<Theme, string>> => ({
+  [Theme.EternalLight]: reading.wording.settings.dark,
+  [Theme.Parchment]: reading.wording.settings.parchment,
+  [Theme.System]: reading.wording.settings.followSystem,
+});
 
-const ROSARY_DISPLAY_LABEL: Readonly<Record<RosaryDisplay, string>> = {
-  [RosaryDisplay.FullRosary]: 'Full rosary',
-  [RosaryDisplay.CurrentDecade]: 'Current decade',
-};
+const ROSARY_DISPLAY_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<RosaryDisplay, string>> => ({
+  [RosaryDisplay.FullRosary]: reading.wording.settings.fullRosary,
+  [RosaryDisplay.CurrentDecade]: reading.wording.prayer.currentDecade,
+});
 
 function SettingsNote({ children }: { readonly children: ReactNode }) {
   return <p className={`pt-2 ${CITATION_CLASS_NAME} text-muted`}>{children}</p>;
@@ -117,32 +158,6 @@ function SettingsGroup({
   );
 }
 
-type SwitchChoiceProps = {
-  readonly label: string;
-  readonly description: string;
-  readonly value: boolean;
-  readonly onChange: (next: boolean) => void;
-};
-
-function SwitchChoice({ label, description, value, onChange }: SwitchChoiceProps) {
-  return (
-    <label className="grid min-h-14 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 border-t border-hairline py-3">
-      <span className={`${BODY_CLASS_NAME} text-foreground`}>{label}</span>
-      <span className={`${CITATION_CLASS_NAME} text-muted`}>{description}</span>
-      <input
-        checked={value}
-        className="peer sr-only"
-        onChange={(event) => onChange(event.currentTarget.checked)}
-        type="checkbox"
-      />
-      <span
-        aria-hidden="true"
-        className="relative col-start-2 row-span-2 row-start-1 h-5 w-9 rounded-full bg-border transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-foreground after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-4 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
-      />
-    </label>
-  );
-}
-
 type CardDrag = {
   readonly pointerId: number;
   readonly startY: number;
@@ -155,85 +170,65 @@ const clampCardHeight = (height: number): number =>
     window.innerHeight * SETTINGS_CARD_MAXIMUM_VIEWPORT_SHARE,
   );
 
-type CardResizeContext = {
-  readonly dialogRef: RefObject<HTMLDialogElement | null>;
-  readonly dragRef: RefObject<CardDrag | null>;
-  readonly setCardHeight: (height: number) => void;
-};
-
-const beginCardResize = (
-  context: CardResizeContext,
-  event: ReactPointerEvent<HTMLElement>,
-): void => {
-  const dialog = context.dialogRef.current;
-
-  if (dialog === null) {
-    return;
-  }
-
-  context.dragRef.current = {
-    pointerId: event.pointerId,
-    startY: event.clientY,
-    startHeight: dialog.getBoundingClientRect().height,
-  };
-  event.currentTarget.setPointerCapture(event.pointerId);
-};
-
-const nudgeCardResize = (
-  context: CardResizeContext,
-  event: ReactKeyboardEvent<HTMLElement>,
-): void => {
-  if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
-    return;
-  }
-
-  event.preventDefault();
-  const step = event.key === 'ArrowUp' ? SETTINGS_CARD_KEYBOARD_STEP : -SETTINGS_CARD_KEYBOARD_STEP;
-  const current = context.dialogRef.current?.getBoundingClientRect().height;
-
-  if (current !== undefined) {
-    context.setCardHeight(clampCardHeight(current + step));
-  }
-};
-
-const cardResizeHandlersOf = (context: CardResizeContext) => {
-  const finishResize = (event: ReactPointerEvent<HTMLElement>): void => {
-    if (context.dragRef.current?.pointerId === event.pointerId) {
-      context.dragRef.current = null;
-    }
-  };
-
-  return {
-    onKeyDown: (event: ReactKeyboardEvent<HTMLElement>) => nudgeCardResize(context, event),
-    onPointerCancel: finishResize,
-    onPointerDown: (event: ReactPointerEvent<HTMLElement>) => beginCardResize(context, event),
-    onPointerMove: (event: ReactPointerEvent<HTMLElement>) => {
-      const drag = context.dragRef.current;
-
-      if (drag !== null && drag.pointerId === event.pointerId) {
-        context.setCardHeight(clampCardHeight(drag.startHeight + drag.startY - event.clientY));
-      }
-    },
-    onPointerUp: finishResize,
-  };
+const CARD_KEY_STEP: Readonly<Record<string, number>> = {
+  ArrowUp: SETTINGS_CARD_KEYBOARD_STEP,
+  ArrowDown: -SETTINGS_CARD_KEYBOARD_STEP,
 };
 
 const useCardResize = (dialogRef: RefObject<HTMLDialogElement | null>) => {
   const [cardHeight, setCardHeight] = useState<number | null>(null);
   const dragRef = useRef<CardDrag | null>(null);
+  const resize = (height: number): void => setCardHeight(clampCardHeight(height));
   const cardStyle: CSSProperties | undefined =
     cardHeight === null ? undefined : { height: `${String(cardHeight)}px`, maxHeight: 'none' };
+  const finishResize = (event: ReactPointerEvent<HTMLElement>): void => {
+    if (dragRef.current?.pointerId === event.pointerId) {
+      dragRef.current = null;
+    }
+  };
 
   return {
     cardStyle,
-    handleProps: cardResizeHandlersOf({ dialogRef, dragRef, setCardHeight }),
+    handleProps: {
+      onKeyDown: (event: ReactKeyboardEvent<HTMLElement>) => {
+        const step = CARD_KEY_STEP[event.key];
+        const current = dialogRef.current?.getBoundingClientRect().height;
+
+        if (step !== undefined) {
+          event.preventDefault();
+        }
+
+        if (step !== undefined && current !== undefined) {
+          resize(current + step);
+        }
+      },
+      onPointerCancel: finishResize,
+      onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
+        const dialog = dialogRef.current;
+
+        if (dialog !== null) {
+          const startHeight = dialog.getBoundingClientRect().height;
+          dragRef.current = { pointerId: event.pointerId, startY: event.clientY, startHeight };
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }
+      },
+      onPointerMove: (event: ReactPointerEvent<HTMLElement>) => {
+        const drag = dragRef.current;
+
+        if (drag?.pointerId === event.pointerId) {
+          resize(drag.startHeight + drag.startY - event.clientY);
+        }
+      },
+      onPointerUp: finishResize,
+    },
   };
 };
 
 function ResizeHandle({ handleProps }: { readonly handleProps: object }) {
+  const { wording } = useReading();
   return (
     <div
-      aria-label="Resize settings"
+      aria-label={wording.settings.resize}
       aria-orientation="horizontal"
       className="flex min-h-11 flex-1 cursor-row-resize touch-none items-center justify-center outline-none focus-ring"
       role="separator"
@@ -269,6 +264,7 @@ function SettingsHeader({
   readonly headingRef: RefObject<HTMLHeadingElement | null>;
   readonly onClose: () => void;
 }) {
+  const { wording } = useReading();
   return (
     <header className="flex shrink-0 items-center gap-4 border-b border-hairline px-5 lg:px-8">
       <h2
@@ -277,14 +273,14 @@ function SettingsHeader({
         ref={headingRef}
         tabIndex={-1}
       >
-        Settings
+        {wording.navigation.settings}
       </h2>
       <ResizeHandle handleProps={handleProps} />
       <button
-        aria-label="Close settings"
-        className="flex size-11 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-foreground focus-ring"
+        aria-label={wording.settings.close}
+        className={CLOSE_BUTTON_CLASS_NAME}
         onClick={onClose}
-        title="Close settings"
+        title={wording.settings.close}
         type="button"
       >
         ×
@@ -304,6 +300,7 @@ function TextScaleGroup({
   readonly onChange: (next: TextScale) => void;
   readonly value: TextScale;
 }) {
+  const reading = useReading();
   const textScaleIndex = TEXT_SCALE_VALUES.indexOf(value);
 
   return (
@@ -314,7 +311,7 @@ function TextScaleGroup({
         </span>
         <input
           aria-label={legend}
-          aria-valuetext={enumLabel(TextScale, value)}
+          aria-valuetext={TEXT_SCALE_LABEL(reading)[value]}
           className="focus-ring h-11 w-full cursor-pointer accent-accent"
           max={TEXT_SCALE_VALUES.length - 1}
           min={0}
@@ -333,7 +330,7 @@ function TextScaleGroup({
           A
         </span>
         <output className={`col-span-3 text-center ${CITATION_CLASS_NAME} text-muted`}>
-          {enumLabel(TextScale, value)}
+          {TEXT_SCALE_LABEL(reading)[value]}
         </output>
       </div>
       {children}
@@ -342,104 +339,111 @@ function TextScaleGroup({
 }
 
 function TextScaleSettings() {
+  const { wording } = useReading();
   const { preferences, setPreference } = usePreferences();
 
   return (
     <TextScaleGroup
-      legend="App text size"
+      legend={wording.settings.appTextSize}
       onChange={(textScale) => setPreference('textScale', textScale)}
       value={preferences.textScale}
     >
-      <SettingsNote>Applies to all app text.</SettingsNote>
-      <p className={`pt-2 ${BODY_CLASS_NAME} text-secondary`}>{APP_DESCRIPTION}</p>
+      <SettingsNote>{wording.settings.appliesAll}</SettingsNote>
+      <p className={`pt-2 ${BODY_CLASS_NAME} text-secondary`}>{wording.about.description}</p>
     </TextScaleGroup>
   );
 }
 
 type EnumPreferenceKey =
-  'openingDuration' | 'readerFace' | 'readerGround' | 'rosaryDisplay' | 'theme' | 'updateChecks';
+  | 'bibleChoice'
+  | 'language'
+  | 'openingDuration'
+  | 'readerFace'
+  | 'readerGround'
+  | 'rosaryDisplay'
+  | 'theme'
+  | 'updateChecks';
 
-function PreferenceChoices<Key extends EnumPreferenceKey>({
-  label,
-  labelOf,
-  preferenceKey,
-  values,
-}: {
-  readonly label: string;
+type ChoiceSettingProps<Key extends EnumPreferenceKey> = {
+  readonly children?: ReactNode;
   readonly labelOf: (value: Preferences[Key]) => string;
+  readonly legend: string;
+  readonly noteOf?: (value: Preferences[Key]) => ReactNode;
   readonly preferenceKey: Key;
   readonly values: readonly Preferences[Key][];
-}) {
+};
+
+function ChoiceSetting<Key extends EnumPreferenceKey>({
+  children,
+  labelOf,
+  legend,
+  noteOf,
+  preferenceKey,
+  values,
+}: ChoiceSettingProps<Key>) {
   const { preferences, setPreference } = usePreferences();
+  const selected = preferences[preferenceKey];
 
   return (
-    <ChoiceGroup
-      label={label}
-      labelOf={labelOf}
-      onSelect={(value) => setPreference(preferenceKey, value)}
-      selected={preferences[preferenceKey]}
-      values={values}
-    />
-  );
-}
-
-function ReaderFaceSettings() {
-  return (
-    <SettingsGroup legend="Reading font">
-      <PreferenceChoices
-        label="Reading font"
-        labelOf={(readerFace) => READER_FACE_LABEL[readerFace]}
-        preferenceKey="readerFace"
-        values={Object.values(ReaderFace)}
+    <SettingsGroup legend={legend}>
+      <ChoiceGroup
+        label={legend}
+        labelOf={labelOf}
+        onSelect={(value) => setPreference(preferenceKey, value)}
+        selected={selected}
+        values={values}
       />
-    </SettingsGroup>
-  );
-}
-
-function ReaderGroundSettings() {
-  return (
-    <SettingsGroup legend="Reading page">
-      <PreferenceChoices
-        label="Reading page"
-        labelOf={(readerGround) => enumLabel(ReaderGround, readerGround)}
-        preferenceKey="readerGround"
-        values={Object.values(ReaderGround)}
-      />
-      <SettingsNote>Applies to book pages only.</SettingsNote>
+      {children}
+      {noteOf === undefined ? null : <SettingsNote>{noteOf(selected)}</SettingsNote>}
     </SettingsGroup>
   );
 }
 
 function RedLetterSettings() {
+  const reading = useReading();
   return (
-    <SettingsGroup legend="Scripture">
+    <SettingsGroup legend={reading.wording.library.scripture}>
       <PreferenceSwitch
-        description="Show the words of Christ in red in the Bible and the mystery readings."
-        label="Words of Christ in red"
+        description={reading.wording.settings.redLetterNote}
+        label={reading.wording.references.redLetter}
         preferenceKey="showRedLetter"
       />
       <SettingsNote>
-        <RedLetterNoticeText notice={contentCatalog.bible.redLetter.notice} />
+        <RedLetterNoticeText notice={reading.catalog.bible.redLetter.notice} />
       </SettingsNote>
     </SettingsGroup>
   );
 }
 
 function ReaderSettings() {
+  const reading = useReading();
   const { preferences, setPreference } = usePreferences();
 
   return (
     <div>
       <TextScaleGroup
-        legend="Reading text size"
+        legend={reading.wording.settings.readingTextSize}
         onChange={(textScale) => setPreference('readerTextScale', textScale)}
         value={preferences.readerTextScale}
       />
-      <ReaderFaceSettings />
-      <ReaderGroundSettings />
-      <SettingsGroup legend="Reading preview">
+      <ChoiceSetting
+        labelOf={(face) =>
+          face === ReaderFace.Garamond ? 'Garamond' : reading.wording.settings.sansSerif
+        }
+        legend={reading.wording.settings.readingFont}
+        preferenceKey="readerFace"
+        values={Object.values(ReaderFace)}
+      />
+      <ChoiceSetting
+        labelOf={(ground) => reading.wording.settings[ground]}
+        legend={reading.wording.settings.readingPage}
+        noteOf={() => reading.wording.settings.appliesBooks}
+        preferenceKey="readerGround"
+        values={Object.values(ReaderGround)}
+      />
+      <SettingsGroup legend={reading.wording.settings.readingPreview}>
         <div className="pt-3">
-          <ReaderSample>{APP_DESCRIPTION}</ReaderSample>
+          <ReaderSample>{reading.wording.about.description}</ReaderSample>
         </div>
       </SettingsGroup>
       <RedLetterSettings />
@@ -447,47 +451,41 @@ function ReaderSettings() {
   );
 }
 
-function OpeningScreenSettings() {
-  const { preferences } = usePreferences();
+function LanguageSettings() {
+  const reading = useReading();
+  const marking = reading.catalog.aiTranslation;
 
   return (
-    <SettingsGroup legend="Opening screen timeout">
-      <PreferenceChoices
-        label="Opening screen timeout"
-        labelOf={openingDurationLabel}
-        preferenceKey="openingDuration"
-        values={Object.values(OpeningDuration)}
-      />
-      <SettingsNote>
-        {preferences.openingDuration === OpeningDuration.Manual
-          ? 'Waits until you select Continue.'
-          : 'Continues on its own after the selected delay.'}
-      </SettingsNote>
-    </SettingsGroup>
-  );
-}
-
-function AppearanceSettings() {
-  return (
-    <SettingsGroup legend="App appearance">
-      <PreferenceChoices
-        label="App appearance"
-        labelOf={(theme) => THEME_LABEL[theme]}
-        preferenceKey="theme"
-        values={THEME_VALUES}
-      />
-      <SettingsNote>Follow system uses your device’s light or dark appearance.</SettingsNote>
-    </SettingsGroup>
+    <ChoiceSetting
+      labelOf={languageChoiceLabel.bind(undefined, reading)}
+      legend={reading.wording.settings.language}
+      preferenceKey="language"
+      values={LANGUAGE_CHOICES}
+    >
+      {marking === null ? null : (
+        <>
+          <PreferenceSwitch
+            description={reading.wording.settings.aiTranslationsNote}
+            label={reading.wording.settings.aiTranslations}
+            preferenceKey="aiTranslations"
+          />
+          <SettingsNote>
+            <RedLetterNoticeText notice={marking.notice} />
+          </SettingsNote>
+        </>
+      )}
+    </ChoiceSetting>
   );
 }
 
 function ReadingSpeedPresets() {
+  const reading = useReading();
   const { preferences, setPreference } = usePreferences();
 
   return (
     <ChoiceGroup
-      label="Reading speed presets"
-      labelOf={(readingSpeed) => enumLabel(ReadingSpeed, readingSpeed)}
+      label={reading.wording.settings.speedPresets}
+      labelOf={readingSpeedName.bind(undefined, reading)}
       onSelect={(readingSpeed) => setPreference('readingSpeed', readingSpeed)}
       selected={preferences.readingSpeed}
       values={READING_SPEED_PRESETS}
@@ -496,6 +494,7 @@ function ReadingSpeedPresets() {
 }
 
 function ReadingSpeedSlider() {
+  const reading = useReading();
   const { preferences, setPreference } = usePreferences();
 
   return (
@@ -505,7 +504,7 @@ function ReadingSpeedSlider() {
       </span>
       <input
         aria-labelledby={READING_SPEED_ID}
-        aria-valuetext={readingSpeedLabel(preferences.readingSpeed)}
+        aria-valuetext={readingSpeedLabel(reading, preferences.readingSpeed)}
         className="focus-ring h-11 w-full cursor-pointer accent-accent"
         max={READING_SPEED_MAXIMUM}
         min={READING_SPEED_MINIMUM}
@@ -518,50 +517,33 @@ function ReadingSpeedSlider() {
         2×
       </span>
       <output className={`col-span-3 text-center ${CITATION_CLASS_NAME} text-muted`}>
-        {readingSpeedLabel(preferences.readingSpeed)}
+        {readingSpeedLabel(reading, preferences.readingSpeed)}
       </output>
     </div>
   );
 }
 
 function GuidedPlaybackSettings() {
+  const { wording } = useReading();
   return (
-    <SettingsGroup legend="Guided prayer">
+    <SettingsGroup legend={wording.settings.guidedPrayer}>
       <p className={`pt-2 ${BODY_CLASS_NAME} text-foreground`} id={READING_SPEED_ID}>
-        Reading speed
+        {wording.settings.readingSpeed}
       </p>
       <ReadingSpeedPresets />
       <ReadingSpeedSlider />
-      <SettingsNote>
-        Guided prayer moves on by itself after time to read each text; higher speeds allow less
-        time.
-      </SettingsNote>
-    </SettingsGroup>
-  );
-}
-
-function RosaryDisplaySettings() {
-  return (
-    <SettingsGroup legend="Rosary display">
-      <PreferenceChoices
-        label="Rosary display"
-        labelOf={(display) => ROSARY_DISPLAY_LABEL[display]}
-        preferenceKey="rosaryDisplay"
-        values={Object.values(RosaryDisplay)}
-      />
-      <SettingsNote>
-        Current decade shows the beads being prayed, with a small map of the whole rosary.
-      </SettingsNote>
+      <SettingsNote>{wording.settings.guidedNote}</SettingsNote>
     </SettingsGroup>
   );
 }
 
 function RosaryBeadsSettings() {
+  const { wording } = useReading();
   const { preferences, resolvedTheme, setPreference } = usePreferences();
   const material = effectiveBeadMaterial(preferences, resolvedTheme);
 
   return (
-    <SettingsGroup legend="Bead material">
+    <SettingsGroup legend={wording.settings.beadMaterial}>
       <div className="flex flex-wrap gap-5 pt-3">
         {Object.values(BeadMaterial).map((beadMaterial) => (
           <button
@@ -576,7 +558,7 @@ function RosaryBeadsSettings() {
               aria-hidden="true"
               className="size-6 rounded-full border border-(--bead-dark) bg-radial-[circle_at_30%_25%] from-(--bead-light) via-(--bead-fill) via-58% to-(--bead-dark) outline-offset-2 outline-accent transition-[outline-color] duration-150 group-aria-pressed:outline"
             />
-            <span className={CITATION_CLASS_NAME}>{enumLabel(BeadMaterial, beadMaterial)}</span>
+            <span className={CITATION_CLASS_NAME}>{wording.settings.materials[beadMaterial]}</span>
           </button>
         ))}
       </div>
@@ -588,7 +570,9 @@ type BooleanPreferenceKey = {
   readonly [Key in PreferenceKey]: Preferences[Key] extends boolean ? Key : never;
 }[PreferenceKey];
 
-type PreferenceSwitchProps = Pick<SwitchChoiceProps, 'description' | 'label'> & {
+type PreferenceSwitchProps = {
+  readonly description: string;
+  readonly label: string;
   readonly preferenceKey: BooleanPreferenceKey;
 };
 
@@ -596,12 +580,20 @@ function PreferenceSwitch({ description, label, preferenceKey }: PreferenceSwitc
   const { preferences, setPreference } = usePreferences();
 
   return (
-    <SwitchChoice
-      description={description}
-      label={label}
-      onChange={(value) => setPreference(preferenceKey, value)}
-      value={preferences[preferenceKey]}
-    />
+    <label className="grid min-h-14 cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 border-t border-hairline py-3">
+      <span className={`${BODY_CLASS_NAME} text-foreground`}>{label}</span>
+      <span className={`${CITATION_CLASS_NAME} text-muted`}>{description}</span>
+      <input
+        checked={preferences[preferenceKey]}
+        className="peer sr-only"
+        onChange={(event) => setPreference(preferenceKey, event.currentTarget.checked)}
+        type="checkbox"
+      />
+      <span
+        aria-hidden="true"
+        className="relative col-start-2 row-span-2 row-start-1 h-5 w-9 rounded-full bg-border transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-foreground after:content-[''] peer-checked:bg-accent peer-checked:after:translate-x-4 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
+      />
+    </label>
   );
 }
 
@@ -609,55 +601,49 @@ type DisplayChoice = PreferenceSwitchProps & {
   readonly playback?: Pick<PreferenceSwitchProps, 'label' | 'preferenceKey'>;
 };
 
-const PLAYBACK_CHOICE_DESCRIPTION = 'Allow time to read this text before continuing.';
+const offeringsMapped = (reading: ReadingSnapshot): boolean =>
+  reading.catalog.rosary.mysterySets.some(({ mysteries }) =>
+    mysteries.some(({ reflection }) => reflection.status === ReflectionStatus.Mapped),
+  );
 
-const DISPLAY_CHOICES: readonly DisplayChoice[] = [
+const offeringsChoice = (reading: ReadingSnapshot): DisplayChoice => ({
+  label: reading.wording.settings.decadeOfferings,
+  description: reading.wording.settings.offeringsNote,
+  preferenceKey: 'showDecadeOfferings',
+  playback: {
+    label: reading.wording.settings.includeOfferings,
+    preferenceKey: 'readDecadeOfferings',
+  },
+});
+
+const DISPLAY_CHOICES = (reading: ReadingSnapshot): readonly DisplayChoice[] => [
   {
-    label: 'Scripture readings',
-    description: 'Show the brief reading with each mystery.',
+    label: reading.wording.settings.scriptureReadings,
+    description: reading.wording.settings.scriptureReadingsNote,
     preferenceKey: 'showScriptureReadings',
   },
   {
-    label: 'Mystery fruits',
-    description: 'Show each mystery’s spiritual fruit.',
+    label: reading.wording.settings.mysteryFruits,
+    description: reading.wording.settings.fruitsNote,
     preferenceKey: 'showMysteryFruits',
-    playback: { label: 'Include fruits in guided prayer', preferenceKey: 'readMysteryFruits' },
+    playback: { label: reading.wording.settings.includeFruits, preferenceKey: 'readMysteryFruits' },
   },
   {
-    label: 'Guidance',
-    description: 'Show meditation prompts.',
+    label: reading.wording.prayer.guidance,
+    description: reading.wording.settings.guidanceNote,
     preferenceKey: 'showGuidance',
-    playback: { label: 'Include guidance in guided prayer', preferenceKey: 'readGuidance' },
+    playback: { label: reading.wording.settings.includeGuidance, preferenceKey: 'readGuidance' },
   },
+  ...(offeringsMapped(reading) ? [offeringsChoice(reading)] : []),
   {
-    label: 'Decade offerings',
-    description: 'Show St. Louis de Montfort’s offering with each mystery.',
-    preferenceKey: 'showDecadeOfferings',
-    playback: {
-      label: 'Include offerings in guided prayer',
-      preferenceKey: 'readDecadeOfferings',
-    },
-  },
-  {
-    label: 'Decorative initials',
-    description: 'Enlarge the opening letter when space allows.',
+    label: reading.wording.settings.decorativeInitials,
+    description: reading.wording.settings.initialsNote,
     preferenceKey: 'showDropCaps',
   },
 ];
 
-function PrayersSettings() {
-  return (
-    <SettingsGroup legend="Prayers">
-      <PreferenceSwitch
-        description="Include O My Jesus after each decade."
-        label="Fatima prayer"
-        preferenceKey="includeFatimaPrayer"
-      />
-    </SettingsGroup>
-  );
-}
-
 function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
+  const { wording } = useReading();
   const { preferences } = usePreferences();
   const shown = preferences[choice.preferenceKey];
 
@@ -666,7 +652,7 @@ function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
       <PreferenceSwitch {...choice} />
       {playback !== undefined && shown ? (
         <div className="pl-6">
-          <PreferenceSwitch description={PLAYBACK_CHOICE_DESCRIPTION} {...playback} />
+          <PreferenceSwitch description={wording.settings.allowTime} {...playback} />
         </div>
       ) : null}
     </>
@@ -674,39 +660,12 @@ function DisplayChoiceRow({ playback, ...choice }: DisplayChoice) {
 }
 
 function DisplaySettings() {
+  const reading = useReading();
   return (
-    <SettingsGroup legend="During prayer">
-      {DISPLAY_CHOICES.map((choice) => (
+    <SettingsGroup legend={reading.wording.settings.duringPrayer}>
+      {DISPLAY_CHOICES(reading).map((choice) => (
         <DisplayChoiceRow key={choice.preferenceKey} {...choice} />
       ))}
-    </SettingsGroup>
-  );
-}
-
-function UpdateSettings() {
-  const { preferences } = usePreferences();
-
-  return (
-    <SettingsGroup legend="Updates">
-      <PreferenceChoices
-        label="Updates"
-        labelOf={(updateChecks) => UPDATE_CHECKS_LABEL[updateChecks]}
-        preferenceKey="updateChecks"
-        values={Object.values(UpdateChecks)}
-      />
-      <SettingsNote>{UPDATE_CHECKS_DESCRIPTION[preferences.updateChecks]}</SettingsNote>
-    </SettingsGroup>
-  );
-}
-
-function LinkSettings() {
-  return (
-    <SettingsGroup legend="External links">
-      <PreferenceSwitch
-        description="Ask before opening a website outside Lucerna."
-        label="Ask before opening websites"
-        preferenceKey="confirmExternalLinks"
-      />
     </SettingsGroup>
   );
 }
@@ -718,12 +677,13 @@ function SettingsTabs({
   readonly onSelect: (tab: SettingsTab) => void;
   readonly selected: SettingsTab;
 }) {
+  const reading = useReading();
   return (
     <ChoiceGroup
       className="flex shrink-0 flex-wrap gap-x-5 border-b border-hairline px-5 lg:px-8"
       itemClassName={TAB_CLASS_NAME}
-      label="Settings sections"
-      labelOf={(tab) => SETTINGS_TAB_LABEL[tab]}
+      label={reading.wording.settings.sections}
+      labelOf={(tab) => SETTINGS_TAB_LABEL(reading)[tab]}
       onSelect={onSelect}
       selected={selected}
       tabs
@@ -733,25 +693,71 @@ function SettingsTabs({
 }
 
 function RosaryTab() {
+  const reading = useReading();
   return (
     <>
-      <PrayersSettings />
+      <SettingsGroup legend={reading.wording.references.prayers}>
+        <PreferenceSwitch
+          description={reading.wording.settings.fatimaNote}
+          label={reading.wording.settings.fatimaLabel}
+          preferenceKey="includeFatimaPrayer"
+        />
+      </SettingsGroup>
       <DisplaySettings />
       <GuidedPlaybackSettings />
-      <RosaryDisplaySettings />
+      <ChoiceSetting
+        labelOf={(display) => ROSARY_DISPLAY_LABEL(reading)[display]}
+        legend={reading.wording.settings.rosaryDisplay}
+        noteOf={() => reading.wording.settings.currentDecadeNote}
+        preferenceKey="rosaryDisplay"
+        values={Object.values(RosaryDisplay)}
+      />
       <RosaryBeadsSettings />
     </>
   );
 }
 
 function GeneralTab() {
+  const reading = useReading();
   return (
     <>
-      <AppearanceSettings />
+      <LanguageSettings />
+      <ChoiceSetting
+        labelOf={(choice) => BIBLE_EDITION_LABEL(reading)[editionOf(reading.language, choice)]}
+        legend={reading.wording.settings.bibleChoice}
+        noteOf={() => reading.wording.settings.bibleChoiceNote}
+        preferenceKey="bibleChoice"
+        values={BIBLE_CHOICES}
+      />
+      <ChoiceSetting
+        labelOf={(theme) => THEME_LABEL(reading)[theme]}
+        legend={reading.wording.settings.appAppearance}
+        noteOf={() => reading.wording.settings.followSystemNote}
+        preferenceKey="theme"
+        values={THEME_VALUES}
+      />
       <TextScaleSettings />
-      <OpeningScreenSettings />
-      <LinkSettings />
-      <UpdateSettings />
+      <ChoiceSetting
+        labelOf={openingDurationLabel.bind(undefined, reading)}
+        legend={reading.wording.settings.openingTimeout}
+        noteOf={openingDurationNote.bind(undefined, reading)}
+        preferenceKey="openingDuration"
+        values={Object.values(OpeningDuration)}
+      />
+      <SettingsGroup legend={reading.wording.settings.externalLinks}>
+        <PreferenceSwitch
+          description={reading.wording.settings.askNote}
+          label={reading.wording.settings.askLabel}
+          preferenceKey="confirmExternalLinks"
+        />
+      </SettingsGroup>
+      <ChoiceSetting
+        labelOf={(updateChecks) => UPDATE_CHECKS_LABEL(reading)[updateChecks]}
+        legend={reading.wording.settings.updates}
+        noteOf={(updateChecks) => UPDATE_CHECKS_DESCRIPTION(reading)[updateChecks]}
+        preferenceKey="updateChecks"
+        values={Object.values(UpdateChecks)}
+      />
     </>
   );
 }
@@ -777,6 +783,7 @@ type SettingsDialogProps = {
   readonly scope: SettingsScope;
   readonly onClose: () => void;
   readonly onOpenInstallGuide: () => void;
+  readonly onOpenPrivacy: () => void;
   readonly onOpenReferences: () => void;
 };
 
@@ -807,7 +814,7 @@ export function SettingsDialog(props: SettingsDialogProps) {
       }}
       onClose={handleDialogClose}
       onKeyDown={(event) => {
-        if (event.key === 'Escape') {
+        if (event.key === KeyName.Escape) {
           props.onClose();
         }
       }}
@@ -818,6 +825,7 @@ export function SettingsDialog(props: SettingsDialogProps) {
       <SettingsBody
         key={tab}
         onOpenInstallGuide={props.onOpenInstallGuide}
+        onOpenPrivacy={props.onOpenPrivacy}
         onOpenReferences={props.onOpenReferences}
         tab={tab}
       />

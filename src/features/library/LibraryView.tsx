@@ -1,24 +1,28 @@
-import type { ResolvedLibraryWork } from '../../content/catalog.ts';
-import { loadLibrary, useLoaded } from '../../content/loaders.ts';
-import { LibraryCategory } from '../../content/schema.ts';
 import { Shelf, ViewHeader } from '../../components/layout.tsx';
+import type { ResolvedLibraryWork } from '../../content/catalog.ts';
+import { readingEditionsOf, type BibleEditionId } from '../../content/language.ts';
+import { loadLibrary, useLoaded } from '../../content/loaders.ts';
+import { useReading } from '../../content/reading.ts';
+import { LibraryCategory } from '../../content/schema.ts';
+import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { CAPTION_CAPS_CLASS_NAME, NAV_CLASS_NAME } from '../../styles.ts';
-import { BIBLE_EDITION, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL } from './model.ts';
+import { BIBLE_EDITION_LABEL, BIBLE_TITLE, LIBRARY_CATEGORY_LABEL } from './model.ts';
 
 const LIBRARY_TITLE_ID = 'library-title';
 
 type LibraryViewProps = {
-  readonly onOpenBible: () => void;
+  readonly onOpenBible: (edition: BibleEditionId) => void;
   readonly onOpenWork: (workId: string) => void;
 };
 
 function LibraryHeader() {
+  const { wording } = useReading();
   return (
     <ViewHeader
       className="gap-2 pt-2"
-      eyebrow="Texts for prayer and study"
+      eyebrow={wording.library.eyebrow}
       id={LIBRARY_TITLE_ID}
-      title="The Library"
+      title={wording.library.title}
     />
   );
 }
@@ -58,17 +62,25 @@ function WorkCard({ onOpenWork, work }: WorkCardProps) {
 
 type LibraryShelfProps = {
   readonly label: string;
-  readonly onOpenBible?: () => void;
+  readonly onOpenBible?: (edition: BibleEditionId) => void;
   readonly onOpenWork: (workId: string) => void;
   readonly works: readonly ResolvedLibraryWork[];
 };
 
 function LibraryShelf({ label, onOpenBible, onOpenWork, works }: LibraryShelfProps) {
+  const reading = useReading();
   return (
     <Shelf heading={label} items={works} label={label}>
-      {onOpenBible === undefined ? null : (
-        <ShelfCard detail={BIBLE_EDITION} onOpen={onOpenBible} title={BIBLE_TITLE} />
-      )}
+      {onOpenBible === undefined
+        ? null
+        : readingEditionsOf(reading.language).map((edition) => (
+            <ShelfCard
+              key={edition}
+              detail={BIBLE_EDITION_LABEL(reading)[edition]}
+              onOpen={() => onOpenBible(edition)}
+              title={BIBLE_TITLE(reading)}
+            />
+          ))}
       {works.map((work) => (
         <WorkCard key={work.id} onOpenWork={onOpenWork} work={work} />
       ))}
@@ -77,11 +89,17 @@ function LibraryShelf({ label, onOpenBible, onOpenWork, works }: LibraryShelfPro
 }
 
 export function LibraryView({ onOpenBible, onOpenWork }: LibraryViewProps) {
-  const library = useLoaded(loadLibrary());
+  const reading = useReading();
+  const library = useLoaded(loadLibrary(reading));
+  const { preferences } = usePreferences();
   const shelves = Object.values(LibraryCategory)
     .map((category) => ({
       category,
-      works: (library?.works ?? []).filter((work) => work.category === category),
+      works: (library?.works ?? []).filter(
+        (work) =>
+          work.category === category &&
+          (work.translation === undefined || preferences.aiTranslations),
+      ),
     }))
     .filter((shelf) => shelf.works.length > 0 || shelf.category === LibraryCategory.Scripture);
 
@@ -97,7 +115,7 @@ export function LibraryView({ onOpenBible, onOpenWork }: LibraryViewProps) {
           {shelves.map((shelf) => (
             <LibraryShelf
               key={shelf.category}
-              label={LIBRARY_CATEGORY_LABEL[shelf.category]}
+              label={LIBRARY_CATEGORY_LABEL(reading)[shelf.category]}
               onOpenWork={onOpenWork}
               works={shelf.works}
               {...(shelf.category === LibraryCategory.Scripture ? { onOpenBible } : {})}

@@ -1,3 +1,4 @@
+import { useReading } from '../../content/reading.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 
@@ -10,6 +11,7 @@ export function BackButton({
   readonly label?: string;
   readonly onBack: () => void;
 }) {
+  const { wording } = useReading();
   return (
     <button
       aria-label={label}
@@ -17,7 +19,7 @@ export function BackButton({
       onClick={onBack}
       type="button"
     >
-      Back
+      {wording.common.back}
     </button>
   );
 }

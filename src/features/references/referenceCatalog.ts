@@ -1,8 +1,5 @@
-import {
-  contentCatalog,
-  type ContentCatalog,
-  type ResolvedArtwork,
-} from '../../content/catalog.ts';
+import { type ContentCatalog, type ResolvedArtwork } from '../../content/catalog.ts';
+import { type ReadingSnapshot } from '../../content/reading.ts';
 import {
   guidanceStatementsOf,
   SourceType,
@@ -72,37 +69,37 @@ const GROUP_ORDER: readonly ReferenceGroup[] = Object.freeze([
   ReferenceGroup.Rights,
 ]);
 
-export const referenceGroupLabel = (group: ReferenceGroup): string => {
+export const referenceGroupLabel = (reading: ReadingSnapshot, group: ReferenceGroup): string => {
   switch (group) {
     case ReferenceGroup.RosaryText:
-      return 'Rosary text';
+      return reading.wording.references.rosaryText;
     case ReferenceGroup.Scripture:
-      return 'Scripture';
+      return reading.wording.references.scripture;
     case ReferenceGroup.Guidance:
-      return 'Rosary Guidance';
+      return reading.wording.references.guidance;
     case ReferenceGroup.Apparatus:
-      return 'Apparatus';
+      return reading.wording.references.apparatus;
     case ReferenceGroup.Artwork:
-      return 'Artwork';
+      return reading.wording.references.artwork;
     case ReferenceGroup.Rights:
-      return 'Rights';
+      return reading.wording.references.rights;
   }
 };
 
-const groupDescription = (group: ReferenceGroup): string => {
+const groupDescription = (reading: ReadingSnapshot, group: ReferenceGroup): string => {
   switch (group) {
     case ReferenceGroup.RosaryText:
-      return 'Sources for the prayers, mystery names, weekly schedule, fruits, passage selections, and reflections.';
+      return reading.wording.references.rosaryTextDescription;
     case ReferenceGroup.Scripture:
-      return 'The Bible edition used for the readings.';
+      return reading.wording.references.scriptureDescription;
     case ReferenceGroup.Guidance:
-      return 'The instructions behind the prompts shown during prayer.';
+      return reading.wording.references.guidanceDescription;
     case ReferenceGroup.Apparatus:
-      return 'The words of Christ marking and the editions cross-referenced to prepare it.';
+      return reading.wording.references.apparatusDescription;
     case ReferenceGroup.Artwork:
-      return 'The source record and rights note for every artwork bundled with Lucerna.';
+      return reading.wording.references.artworkDescription;
     case ReferenceGroup.Rights:
-      return 'The open-access policies that govern the bundled image files.';
+      return reading.wording.references.rightsDescription;
   }
 };
 
@@ -164,6 +161,7 @@ const apparatusSources = (catalog: ContentCatalog): readonly DevotionalSource[] 
   return uniqueSources(catalog, [
     ...redLetter.witnesses.map(({ id }) => id),
     ...redLetter.tools.map(({ id }) => id),
+    ...(catalog.aiTranslation?.tools.map(({ id }) => id) ?? []),
   ]);
 };
 
@@ -207,14 +205,21 @@ const artworkRecord = (artwork: ResolvedArtwork): ReferenceRecord => ({
   title: artwork.title,
 });
 
-const artworkRecords = (catalog: ContentCatalog): readonly ReferenceRecord[] =>
+const artworkRecords = (
+  reading: ReadingSnapshot,
+  catalog: ContentCatalog,
+): readonly ReferenceRecord[] =>
   [...catalog.artworks]
     .sort((left, right) =>
-      `${left.artist} ${left.title}`.localeCompare(`${right.artist} ${right.title}`, 'en-US'),
+      `${left.artist} ${left.title}`.localeCompare(
+        `${right.artist} ${right.title}`,
+        reading.language,
+      ),
     )
     .map(artworkRecord);
 
 const recordsForGroup = (
+  reading: ReadingSnapshot,
   catalog: ContentCatalog,
   group: ReferenceGroup,
 ): readonly ReferenceRecord[] => {
@@ -228,7 +233,7 @@ const recordsForGroup = (
     case ReferenceGroup.Apparatus:
       return sourceRecords(group, apparatusSources(catalog));
     case ReferenceGroup.Artwork:
-      return artworkRecords(catalog);
+      return artworkRecords(reading, catalog);
     case ReferenceGroup.Rights:
       return sourceRecords(
         group,
@@ -237,15 +242,19 @@ const recordsForGroup = (
   }
 };
 
-export const referenceSectionsFrom = (catalog: ContentCatalog): readonly ReferenceSection[] =>
+export const referenceSectionsFrom = (
+  reading: ReadingSnapshot,
+  catalog: ContentCatalog,
+): readonly ReferenceSection[] =>
   GROUP_ORDER.map((group) => ({
-    description: groupDescription(group),
+    description: groupDescription(reading, group),
     group,
-    label: referenceGroupLabel(group),
-    records: recordsForGroup(catalog, group),
+    label: referenceGroupLabel(reading, group),
+    records: recordsForGroup(reading, catalog, group),
   }));
 
-export const referenceSections = referenceSectionsFrom(contentCatalog);
+export const referenceSections = (reading: ReadingSnapshot) =>
+  referenceSectionsFrom(reading, reading.catalog);
 
 export const artworkReferenceTarget = (artwork: ResolvedArtwork): ArtworkReferenceTarget => ({
   artworkId: artwork.id,

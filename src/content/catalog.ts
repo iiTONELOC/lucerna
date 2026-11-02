@@ -1,9 +1,9 @@
-import generatedBibleIndex from '../generated/bible/douay-rheims/index.json' with { type: 'json' };
-import generatedContent from '../generated/devotional-content.json' with { type: 'json' };
 import { CodedError } from '../shared/codedError.ts';
+import { CURRENT_EDITION_CONTENT } from './currentLanguage.ts';
 import {
   bibleIndexFrom,
   devotionalContentFrom,
+  type AiTranslation,
   type Artwork,
   type BibleBookSummary,
   type BibleIndex,
@@ -90,13 +90,17 @@ export type ResolvedLibrary = {
   readonly workById: (id: string) => ResolvedLibraryWork;
 };
 
-export type ResolvedRedLetter = {
+export type ResolvedToolMarking = {
   readonly notice: string;
-  readonly witnesses: readonly DevotionalSource[];
   readonly tools: readonly DevotionalSource[];
 };
 
+export type ResolvedRedLetter = ResolvedToolMarking & {
+  readonly witnesses: readonly DevotionalSource[];
+};
+
 export type ResolvedBible = {
+  readonly directory: BibleIndex['edition'];
   readonly source: DevotionalSource;
   readonly redLetter: ResolvedRedLetter;
   readonly books: readonly BibleBookSummary[];
@@ -108,6 +112,7 @@ export type ContentCatalog = {
   readonly artworks: readonly ResolvedArtwork[];
   readonly rosary: ResolvedRosary;
   readonly bible: ResolvedBible;
+  readonly aiTranslation: ResolvedToolMarking | null;
   readonly sourceById: (id: string) => DevotionalSource;
   readonly prayerById: (id: string) => ResolvedPrayer;
   readonly artworkById: (id: string) => ResolvedArtwork;
@@ -204,15 +209,23 @@ export const resolveLibrary = (
   };
 };
 
-const resolvedBibleFrom = (
+const resolvedToolMarkingFrom = (
+  marking: AiTranslation,
+  sourceById: (id: string) => DevotionalSource,
+): ResolvedToolMarking => ({
+  notice: marking.notice,
+  tools: marking.toolSourceIds.map(sourceById),
+});
+
+export const resolvedBibleFrom = (
   bible: BibleIndex,
   sourceById: (id: string) => DevotionalSource,
 ): ResolvedBible => ({
+  directory: bible.edition,
   source: sourceById(bible.sourceId),
   redLetter: {
-    notice: bible.redLetter.notice,
+    ...resolvedToolMarkingFrom(bible.redLetter, sourceById),
     witnesses: bible.redLetter.witnessSourceIds.map(sourceById),
-    tools: bible.redLetter.toolSourceIds.map(sourceById),
   },
   books: bible.books,
 });
@@ -255,6 +268,10 @@ export const createContentCatalog = (
       prayerStageArt: resolvedStageArtFrom(content.rosary.prayerStageArt, artworkById),
     },
     bible: resolvedBibleFrom(bible, sourceById),
+    aiTranslation:
+      content.aiTranslation === undefined
+        ? null
+        : resolvedToolMarkingFrom(content.aiTranslation, sourceById),
     sourceById,
     prayerById,
     artworkById,
@@ -263,6 +280,6 @@ export const createContentCatalog = (
 };
 
 export const contentCatalog = createContentCatalog(
-  devotionalContentFrom(generatedContent),
-  bibleIndexFrom(generatedBibleIndex),
+  devotionalContentFrom(CURRENT_EDITION_CONTENT.devotional),
+  bibleIndexFrom(CURRENT_EDITION_CONTENT.bibleIndex),
 );

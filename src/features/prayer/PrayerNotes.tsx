@@ -1,24 +1,26 @@
 import { useState, type CSSProperties, type RefObject } from 'react';
-import { contentCatalog } from '../../content/catalog.ts';
 import { Chevron } from '../../components/icons/Chevron.tsx';
 import { ChevronDirection } from '../../components/icons/model.ts';
-import { classNames } from '../../shared/classNames.ts';
-import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
 import { CitationLink } from '../../components/links/CitationLink.tsx';
+import { AiTranslationMark, type MarkToggle } from '../../components/marks/Marks.tsx';
+import { useReading } from '../../content/reading.ts';
+import type { MysteryReflection } from '../../content/schema.ts';
+import { classNames } from '../../shared/classNames.ts';
+import { useLandscape } from '../../shared/useLandscape.ts';
+import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
 import {
   guidanceReferenceTarget,
   reflectionReferenceTarget,
   rosaryTextReferenceTarget,
   type ReferenceTarget,
 } from '../references/referenceCatalog.ts';
-import { offeringLabelOf, type MysteryFruit } from './prayerSession.ts';
-import { FRUIT_LABEL } from './progression.ts';
 import { GuidedPlaybackPhase } from './playbackSequence.ts';
-import type { NotesCollision } from './useNotesCollision.ts';
-import type { MysteryReflection } from '../../content/schema.ts';
+import { GUIDANCE_TRANSLATED, offeringLabelOf, type MysteryFruit } from './prayerSession.ts';
 import type { PrayerStep } from './progression.ts';
+import { FRUIT_LABEL } from './progression.ts';
 import type { GuidedPlayback } from './useGuidedPlayback.ts';
-import { useLandscape } from '../../shared/useLandscape.ts';
+import type { NotesCollision } from './useNotesCollision.ts';
+import { PENDANT_CLEARANCE_CLASS_NAME } from './usePendantOverhang.ts';
 
 const NOTE_BODY_CLASS_NAME = `${CITATION_CLASS_NAME} min-w-0 text-secondary`;
 
@@ -30,6 +32,7 @@ const ON_ART_NOTE_CLASS_NAME =
   'flex w-fit max-w-prose flex-col rounded-lg bg-black/55 p-0.5 text-shadow-lg text-shadow-black/80 backdrop-blur-xs';
 
 export type AuxiliaryPlaybackNotesProps = {
+  readonly aiNotice: MarkToggle;
   readonly guidedPlayback: GuidedPlayback;
   readonly offering: MysteryReflection | null;
   readonly onArt?: boolean | undefined;
@@ -50,6 +53,7 @@ const hasAuxiliaryNotes = (selection: AuxiliaryNoteSelection): boolean =>
   auxiliaryNoteCountOf(selection) > 0;
 
 type NoteLineProps = {
+  readonly aiNotice: MarkToggle;
   readonly illuminated: boolean;
   readonly label: string;
   readonly phase: GuidedPlaybackPhase;
@@ -57,9 +61,11 @@ type NoteLineProps = {
   readonly attribution?: string;
   readonly onArt: boolean;
   readonly onOpenAttribution?: () => void;
+  readonly translated: boolean;
 };
 
 function NoteLine({
+  aiNotice,
   illuminated,
   label,
   phase,
@@ -67,6 +73,7 @@ function NoteLine({
   attribution,
   onArt,
   onOpenAttribution,
+  translated,
 }: NoteLineProps) {
   return (
     <p
@@ -81,6 +88,7 @@ function NoteLine({
           <>
             {' '}
             <CitationLink label={attribution} onArt={onArt} onOpen={onOpenAttribution} />
+            {translated ? <AiTranslationMark {...aiNotice} /> : null}
           </>
         )}
       </span>
@@ -89,38 +97,45 @@ function NoteLine({
 }
 
 export function FruitLine({
+  aiNotice,
   fruit,
   illuminated,
   onArt,
   onOpenReference,
 }: {
+  readonly aiNotice: MarkToggle;
   readonly fruit: MysteryFruit;
   readonly illuminated: boolean;
   readonly onArt: boolean;
   readonly onOpenReference: (target: ReferenceTarget) => void;
 }) {
+  const reading = useReading();
   return (
-    <p
-      className={classNames(
-        SUBTITLE_CLASS_NAME +
-          ' w-fit max-w-full rounded-sm border-2 border-transparent px-2 py-0.5 text-center font-semibold transition-colors duration-300 landscape:mt-1 data-[playback-active=true]:border-accent-current motion-reduce:transition-none',
-        onArt ? 'text-on-art-accent' : 'text-accent-current',
-      )}
-      data-playback-active={illuminated ? 'true' : 'false'}
-      data-playback-phase={GuidedPlaybackPhase.Fruit}
-    >
-      <span>{FRUIT_LABEL}</span>
-      <span>{' · ' + fruit.text}</span>{' '}
-      <CitationLink
-        label={contentCatalog.sourceById(fruit.sourceId).work}
-        onArt={onArt}
-        onOpen={() => onOpenReference(rosaryTextReferenceTarget(fruit.sourceId))}
-      />
-    </p>
+    <div className="flex max-w-full flex-col gap-2">
+      <p
+        className={classNames(
+          SUBTITLE_CLASS_NAME +
+            ' w-fit max-w-full rounded-sm border-2 border-transparent px-2 py-0.5 text-center font-semibold transition-colors duration-300 landscape:mt-1 data-[playback-active=true]:border-accent-current motion-reduce:transition-none',
+          onArt ? 'text-on-art-accent' : 'text-accent-current',
+        )}
+        data-playback-active={illuminated ? 'true' : 'false'}
+        data-playback-phase={GuidedPlaybackPhase.Fruit}
+      >
+        <span>{FRUIT_LABEL(reading)}</span>
+        <span>{' · ' + fruit.text}</span>{' '}
+        <CitationLink
+          label={reading.catalog.sourceById(fruit.sourceId).work}
+          onArt={onArt}
+          onOpen={() => onOpenReference(rosaryTextReferenceTarget(fruit.sourceId))}
+        />
+        {fruit.translated ? <AiTranslationMark {...aiNotice} /> : null}
+      </p>
+    </div>
   );
 }
 
 function AuxiliaryPlaybackNotes({
+  aiNotice,
   guidedPlayback,
   offering,
   onArt = false,
@@ -128,15 +143,18 @@ function AuxiliaryPlaybackNotes({
   showGuidance,
   step,
 }: AuxiliaryPlaybackNotesProps) {
+  const reading = useReading();
   const guidance = step.guidance;
 
   return (
     <>
       {showGuidance && guidance !== undefined ? (
         <NoteLine
-          attribution={contentCatalog.sourceById(guidance.sourceId).work}
+          aiNotice={aiNotice}
+          attribution={reading.catalog.sourceById(guidance.sourceId).work}
           illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Guidance}
-          label="Guidance"
+          label={reading.wording.prayer.guidance}
+          translated={GUIDANCE_TRANSLATED(reading)}
           onArt={onArt}
           onOpenAttribution={() => onOpenReference(guidanceReferenceTarget(guidance))}
           phase={GuidedPlaybackPhase.Guidance}
@@ -145,12 +163,14 @@ function AuxiliaryPlaybackNotes({
       ) : null}
       {offering?.text === undefined ? null : (
         <NoteLine
-          attribution={contentCatalog.sourceById(offering.sourceId).work}
+          aiNotice={aiNotice}
+          attribution={reading.catalog.sourceById(offering.sourceId).work}
           illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Offering}
-          label={offeringLabelOf(offering)}
+          label={offeringLabelOf(reading, offering)}
           onArt={onArt}
           onOpenAttribution={() => onOpenReference(reflectionReferenceTarget(offering))}
           phase={GuidedPlaybackPhase.Offering}
+          translated={offering.translation !== undefined}
           text={offering.text}
         />
       )}
@@ -238,7 +258,8 @@ export function ArtworkNotes({
       className={classNames(
         collision.collides && single && 'invisible',
         collapsed ? 'z-40' : 'z-10',
-        'absolute inset-x-0 bottom-(--strand-clearance) flex pl-4 pr-[max(1rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))] sm:pl-6 sm:pr-[max(1.5rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))]',
+        'absolute inset-x-0 bottom-(--strand-clearance) flex',
+        PENDANT_CLEARANCE_CLASS_NAME,
       )}
     >
       {collapsed ? (

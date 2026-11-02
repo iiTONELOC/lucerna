@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { COPYRIGHT_NOTICE } from '../../appMetadata.ts';
 import lucernaMark from '../../assets/brand/lucerna-mark.svg';
+import { QUIET_LINK_CLASS_NAME, SupportLink } from '../../components/links/SupportLink.tsx';
+import { useReading } from '../../content/reading.ts';
+import type { SplashVerse } from '../../content/schema.ts';
+import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 import { OpeningDuration } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import {
@@ -9,20 +13,21 @@ import {
   SUBTITLE_CLASS_NAME,
   UNDERLINE_LINK_CLASS_NAME,
 } from '../../styles.ts';
-import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 import { useInstalled } from '../install/useInstalled.ts';
-import { selectOpeningVerse, type SplashVerse } from './splashModel.ts';
+import { selectOpeningVerse } from './splashModel.ts';
 
 const SPLASH_TITLE_ID = 'splash-title';
 type SplashProps = {
   readonly applicationReady: boolean;
   readonly onDismiss: () => void;
   readonly onOpenInstallGuide: () => void;
+  readonly onOpenPrivacy: () => void;
 };
 
 type DismissProps = Pick<SplashProps, 'applicationReady' | 'onDismiss'>;
 
 const INSTALL_LINK_CLASS_NAME = `min-h-11 ${UNDERLINE_LINK_CLASS_NAME} ${SUBTITLE_CLASS_NAME}`;
+const FOOTER_LINK_CLASS_NAME = `inline-flex min-h-11 items-center ${QUIET_LINK_CLASS_NAME}`;
 
 const automaticHoldMilliseconds = (openingDuration: OpeningDuration): number | null =>
   openingDuration === OpeningDuration.Manual
@@ -68,6 +73,7 @@ function OpeningVerse({ verse }: { readonly verse: SplashVerse }) {
 }
 
 function ContinueButton({ applicationReady, onDismiss }: DismissProps) {
+  const { wording } = useReading();
   return (
     <button
       aria-live="polite"
@@ -76,15 +82,51 @@ function ContinueButton({ applicationReady, onDismiss }: DismissProps) {
       onClick={onDismiss}
       type="button"
     >
-      {applicationReady ? 'Continue' : 'Preparing Lucerna'}
+      {applicationReady ? wording.splash.continue : wording.splash.preparing}
     </button>
   );
 }
 
-export function Splash({ applicationReady, onDismiss, onOpenInstallGuide }: SplashProps) {
+function SplashFooter({
+  onOpenInstallGuide,
+  onOpenPrivacy,
+}: Pick<SplashProps, 'onOpenInstallGuide' | 'onOpenPrivacy'>) {
+  const { wording } = useReading();
+  const installed = useInstalled();
+
+  return (
+    <footer className="flex shrink-0 flex-col items-center gap-2 px-6 pb-3 text-center font-display text-legal leading-legal tracking-legal text-muted">
+      {installed ? null : (
+        <button
+          className={INSTALL_LINK_CLASS_NAME}
+          onClick={onOpenInstallGuide}
+          title={wording.install.title}
+          type="button"
+        >
+          {wording.install.title}
+        </button>
+      )}
+      <p className="flex flex-wrap items-center justify-center gap-x-2">
+        <span>{COPYRIGHT_NOTICE}</span>
+        <span aria-hidden="true">·</span>
+        <SupportLink className={FOOTER_LINK_CLASS_NAME} />
+        <span aria-hidden="true">·</span>
+        <button className={FOOTER_LINK_CLASS_NAME} onClick={onOpenPrivacy} type="button">
+          {wording.privacy.link}
+        </button>
+      </p>
+    </footer>
+  );
+}
+
+export function Splash({
+  applicationReady,
+  onDismiss,
+  onOpenInstallGuide,
+  onOpenPrivacy,
+}: SplashProps) {
   const [verse] = useState(selectOpeningVerse);
   const isManual = useAutomaticDismiss({ applicationReady, onDismiss });
-  const installed = useInstalled();
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden pt-safe-top pb-safe-bottom bg-background text-foreground">
@@ -109,19 +151,7 @@ export function Splash({ applicationReady, onDismiss, onOpenInstallGuide }: Spla
           <ContinueButton applicationReady={applicationReady} onDismiss={onDismiss} />
         ) : null}
       </section>
-      <footer className="flex shrink-0 flex-col items-center gap-2 px-6 pb-3 text-center font-display text-legal leading-legal tracking-legal text-muted">
-        {installed ? null : (
-          <button
-            className={INSTALL_LINK_CLASS_NAME}
-            onClick={onOpenInstallGuide}
-            title="How to add Lucerna to your device"
-            type="button"
-          >
-            How to add Lucerna to your device
-          </button>
-        )}
-        {COPYRIGHT_NOTICE}
-      </footer>
+      <SplashFooter onOpenInstallGuide={onOpenInstallGuide} onOpenPrivacy={onOpenPrivacy} />
     </main>
   );
 }

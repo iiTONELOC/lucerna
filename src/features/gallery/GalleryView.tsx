@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChoiceGroup } from '../../components/ChoiceGroup.tsx';
 import { ViewHeader } from '../../components/layout.tsx';
-import { contentCatalog } from '../../content/catalog.ts';
-import { scheduledMysterySetId } from '../rosary/schedule.ts';
+import { useReading } from '../../content/reading.ts';
 import { CITATION_CLASS_NAME, SUBTITLE_CLASS_NAME } from '../../styles.ts';
+import { scheduledMysterySetId } from '../rosary/schedule.ts';
+import { GalleryShelf } from './GalleryShelf.tsx';
 import {
   GALLERY_SORT_LABEL,
   galleryGroupsFor,
   GallerySort,
   type GalleryGroup,
 } from './gallerySort.ts';
-import { GalleryShelf } from './GalleryShelf.tsx';
 
 const GALLERY_TITLE_ID = 'gallery-title';
 
@@ -21,13 +21,14 @@ type GalleryViewProps = {
 };
 
 function GalleryHeader() {
+  const { wording } = useReading();
   return (
     <ViewHeader
       className="gap-2 pt-2"
-      eyebrow="Art for contemplation"
+      eyebrow={wording.gallery.eyebrow}
       id={GALLERY_TITLE_ID}
-      lede="Works gathered for prayer and contemplation."
-      title="The Lucerna Collection"
+      lede={wording.gallery.lede}
+      title={wording.gallery.title}
     />
   );
 }
@@ -40,18 +41,19 @@ type SortControlProps = {
 const SORT_CHOICE_CLASS_NAME = `min-h-11 ${SUBTITLE_CLASS_NAME} text-muted transition-colors hover:text-accent aria-pressed:text-accent-current aria-pressed:underline aria-pressed:decoration-accent-current aria-pressed:underline-offset-8 focus-ring`;
 
 function SortControl({ sort, onSelectSort }: SortControlProps) {
+  const reading = useReading();
   return (
     <ChoiceGroup
       className="flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-1"
       itemClassName={SORT_CHOICE_CLASS_NAME}
-      label="View by"
-      labelOf={(candidate) => GALLERY_SORT_LABEL[candidate]}
+      label={reading.wording.gallery.viewBy}
+      labelOf={(candidate) => GALLERY_SORT_LABEL(reading)[candidate]}
       onSelect={onSelectSort}
       selected={sort}
       values={Object.values(GallerySort)}
     >
       <span aria-hidden="true" className={`${CITATION_CLASS_NAME} shrink-0 text-muted italic`}>
-        View by
+        {reading.wording.gallery.viewBy}
       </span>
     </ChoiceGroup>
   );
@@ -66,11 +68,12 @@ type GallerySectionProps = {
 type ArtworkButtonRegistrar = (artworkId: string, button: HTMLButtonElement | null) => void;
 
 function GallerySection({ group, onOpenArtwork, registerButton }: GallerySectionProps) {
+  const { wording } = useReading();
   return (
     <GalleryShelf
       artworks={group.artworks}
       heading={group.heading}
-      label={group.heading ?? 'The Lucerna Collection'}
+      label={group.heading ?? wording.gallery.title}
       onOpenArtwork={onOpenArtwork}
       registerButton={registerButton}
     />
@@ -78,9 +81,10 @@ function GallerySection({ group, onOpenArtwork, registerButton }: GallerySection
 }
 
 const useGalleryOrganization = () => {
+  const reading = useReading();
   const [sort, setSort] = useState(GallerySort.Mystery);
-  const todaySetId = scheduledMysterySetId(new Date(), contentCatalog.rosary.schedule);
-  const groups = galleryGroupsFor(sort, contentCatalog.artworks, todaySetId);
+  const todaySetId = scheduledMysterySetId(new Date(), reading.catalog.rosary.schedule);
+  const groups = galleryGroupsFor(reading, sort, reading.catalog.artworks, todaySetId);
 
   return { groups, setSort, sort };
 };

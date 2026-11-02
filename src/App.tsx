@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { InstallGuide } from './features/install/InstallGuide.tsx';
 import { showInstallPrompt, useInstallPrompt } from './features/install/installPrompt.ts';
+import { PRIVACY_HASH, PrivacyPolicy } from './features/privacy/PrivacyPolicy.tsx';
 import { PwaUpdate } from './features/pwa/PwaUpdate.tsx';
 import { useOfflineReady } from './features/pwa/useOfflineReady.ts';
 import { Splash } from './features/splash/Splash.tsx';
@@ -32,6 +33,7 @@ const useAppShell = (): AppShellComponent | null => {
 function App() {
   const [isSplashVisible, setIsSplashVisible] = useState(true);
   const [installGuideOpen, setInstallGuideOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(() => window.location.hash === PRIVACY_HASH);
   const promptAvailable = useInstallPrompt();
   const offlineReady = useOfflineReady();
   const AppShell = useAppShell();
@@ -46,18 +48,28 @@ function App() {
     setInstallGuideOpen(true);
   };
 
+  const closePrivacy = (): void => {
+    setPrivacyOpen(false);
+
+    if (window.location.hash === PRIVACY_HASH) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+    }
+  };
+
   return (
     <div className="h-dvh w-full overflow-hidden pl-safe-left pr-safe-right">
       {installGuideOpen ? <InstallGuide onBack={() => setInstallGuideOpen(false)} /> : null}
-      <div className="h-full" hidden={installGuideOpen}>
+      {privacyOpen ? <PrivacyPolicy onBack={closePrivacy} /> : null}
+      <div className="h-full" hidden={installGuideOpen || privacyOpen}>
         {isSplashVisible || AppShell === null ? (
           <Splash
             applicationReady={applicationReady}
             onDismiss={() => setIsSplashVisible(false)}
             onOpenInstallGuide={addToDevice}
+            onOpenPrivacy={() => setPrivacyOpen(true)}
           />
         ) : (
-          <AppShell onOpenInstallGuide={addToDevice} />
+          <AppShell onOpenInstallGuide={addToDevice} onOpenPrivacy={() => setPrivacyOpen(true)} />
         )}
       </div>
       <PwaUpdate />

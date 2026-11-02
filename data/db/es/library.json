@@ -1,0 +1,10 @@
+{
+  "works": [
+    {
+      "sourceId": "de-montfort-secret",
+      "category": "devotions",
+      "translation": "ai",
+      "translationPath": "data/db/es/library/de-montfort-secret.json"
+    }
+  ]
+}

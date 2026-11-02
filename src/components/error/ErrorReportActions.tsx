@@ -1,14 +1,22 @@
 import { useState } from 'react';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import { ACCENT_BUTTON_CLASS_NAME, QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 import { diagnosticEmailHref, persistErrorDiagnostics } from './diagnostics.ts';
 
 enum CopyStatus {
-  Failed = 'Copy failed',
-  Idle = 'Copy diagnostics',
-  Succeeded = 'Copied',
+  Failed = 'failed',
+  Idle = 'idle',
+  Succeeded = 'succeeded',
 }
 
+const COPY_LABELS = (reading: ReadingSnapshot): Readonly<Record<CopyStatus, string>> => ({
+  [CopyStatus.Failed]: reading.wording.errors.copyFailed,
+  [CopyStatus.Idle]: reading.wording.errors.copyDiagnostics,
+  [CopyStatus.Succeeded]: reading.wording.errors.copied,
+});
+
 export function ErrorReportActions({ diagnostics }: { readonly diagnostics: string }) {
+  const reading = useReading();
   const [copyStatus, setCopyStatus] = useState(CopyStatus.Idle);
 
   const copyDiagnostics = async (): Promise<void> => {
@@ -27,14 +35,14 @@ export function ErrorReportActions({ diagnostics }: { readonly diagnostics: stri
         href={diagnosticEmailHref(diagnostics)}
         onClick={() => persistErrorDiagnostics(diagnostics)}
       >
-        Email diagnostics
+        {reading.wording.errors.emailDiagnostics}
       </a>
       <button
         className={`${QUIET_BUTTON_CLASS_NAME} px-4`}
         onClick={() => void copyDiagnostics()}
         type="button"
       >
-        {copyStatus}
+        {COPY_LABELS(reading)[copyStatus]}
       </button>
     </div>
   );

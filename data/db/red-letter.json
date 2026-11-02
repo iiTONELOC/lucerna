@@ -1,9 +1,11 @@
 {
-  "sourceId": "douay-rheims-challoner",
+  "sourceIds": ["douay-rheims-challoner"],
   "witnessSourceIds": ["world-english-bible", "king-james-version"],
   "toolSourceIds": ["claude-fable-5"],
   "provenance": "Words of Christ spans are transferred with AI assistance (Claude Fable 5, by Anthropic) from the public-domain wj tagging of the World English Bible and the eBible.org KJV (both eBible.org), adjudicated verse by verse against the Challoner text. Not exhaustively reviewed; report errors to lucerna@wedefendit.com.",
-  "notice": "These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant using public-domain tagged Bible editions and have not been fully reviewed; errors are possible. Report any to lucerna@wedefendit.com.",
+  "notice": {
+    "en": "These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com."
+  },
   "books": {
     "matthew": {
       "3:15": ["Suffer it to be so now. For so it becometh us to fulfil all justice."],

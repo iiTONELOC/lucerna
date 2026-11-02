@@ -1,3 +1,4 @@
+import { BibleEditionId } from '../../content/language.ts';
 import { describe, expect, test } from 'bun:test';
 import { ReferenceGroup, type ArtworkReferenceTarget } from '../references/referenceCatalog.ts';
 import { ApplicationView } from './model.ts';
@@ -69,21 +70,29 @@ describe('navigation', () => {
     expect(shown.area).toBe(ApplicationView.Rosary);
     expect(destinationOf(shown)).toBeUndefined();
   });
+});
 
+describe('Bible navigation', () => {
   test('the Bible opens over its contents and turning keeps the contents beneath', () => {
-    const resumed = openBible(INITIAL_NAVIGATION, 'genesis');
-    const turned = turnToBook(resumed, 'exodus');
+    const edition = BibleEditionId.ClementineVulgate;
+    const resumed = openBible(INITIAL_NAVIGATION, edition, 'genesis');
+    const turned = turnToBook(resumed, edition, 'exodus');
 
     expect(destinationOf(resumed)).toEqual({
       blockIndex: null,
       bookId: 'genesis',
+      edition,
       kind: DestinationKind.BibleBook,
     });
     expect(destinationOf(turned)).toEqual({
       blockIndex: 0,
       bookId: 'exodus',
+      edition,
       kind: DestinationKind.BibleBook,
     });
-    expect(destinationOf(goBack(turned))).toEqual({ kind: DestinationKind.BibleContents });
+    expect(destinationOf(goBack(turned))).toEqual({
+      edition,
+      kind: DestinationKind.BibleContents,
+    });
   });
 });

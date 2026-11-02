@@ -7,6 +7,33 @@ import {
   type BuildArtifact,
 } from './pwaBuild.ts';
 import { addIntegrityToAssetTags, integrityFrom } from './subresourceIntegrity.ts';
+import { editionAssetPrefixOf, LANGUAGES, LATIN_EDITION_ID } from '../src/content/language.ts';
+import { CodedError } from '../src/shared/codedError.ts';
+
+enum PwaBuildErrorCode {
+  MissingArtifact = 'missing-artifact',
+  InvalidManifest = 'invalid-manifest',
+  InvalidManifestIcons = 'invalid-manifest-icons',
+  ServiceWorkerFailed = 'service-worker-failed',
+  ServiceWorkerMissing = 'service-worker-missing',
+}
+
+const PWA_BUILD_ERROR_MESSAGE: Readonly<Record<PwaBuildErrorCode, string>> = {
+  [PwaBuildErrorCode.MissingArtifact]: 'Required PWA build artifact is missing',
+  [PwaBuildErrorCode.InvalidManifest]: 'Lucerna web manifest is invalid',
+  [PwaBuildErrorCode.InvalidManifestIcons]: 'Lucerna web manifest icons are invalid',
+  [PwaBuildErrorCode.ServiceWorkerFailed]: 'Lucerna service-worker build failed',
+  [PwaBuildErrorCode.ServiceWorkerMissing]: 'Lucerna service-worker output is missing',
+};
+
+class PwaBuildError extends CodedError<PwaBuildErrorCode> {
+  constructor(
+    code: PwaBuildErrorCode,
+    readonly path?: string,
+  ) {
+    super('PwaBuildError', code, PWA_BUILD_ERROR_MESSAGE[code]);
+  }
+}
 
 enum RequiredArtifact {
   AppleTouchIcon = 'icons/lucerna-180.png',
@@ -21,7 +48,20 @@ type BuildMetadata = {
   readonly artifacts: readonly string[];
   readonly buildId: string;
   readonly precacheUrls: readonly string[];
+  readonly editionSets: Readonly<Record<string, readonly string[]>>;
 };
+
+const EDITION_PREFIXES: readonly string[] = LANGUAGES.map((language) =>
+  editionAssetPrefixOf(language, LATIN_EDITION_ID),
+);
+
+const editionSetsFrom = (urls: readonly string[]): Readonly<Record<string, readonly string[]>> =>
+  Object.fromEntries(
+    EDITION_PREFIXES.map((prefix) => [
+      prefix,
+      urls.filter((url) => url.startsWith(`./assets/${prefix}`)),
+    ]),
+  );
 
 type ManifestIcon = {
   readonly src: string;
@@ -41,19 +81,19 @@ const buildMetadataOutput = new URL('build-meta.json', outputDirectory);
 
 const requireArtifact = async (path: RequiredArtifact): Promise<void> => {
   if (!(await Bun.file(new URL(path, outputDirectory)).exists())) {
-    throw new Error(`Required PWA build artifact is missing: ${path}`);
+    throw new PwaBuildError(PwaBuildErrorCode.MissingArtifact, path);
   }
 };
 
 const webManifestFrom = (value: unknown): WebManifest => {
   if (typeof value !== 'object' || value === null || !('icons' in value)) {
-    throw new TypeError('Lucerna web manifest is invalid');
+    throw new PwaBuildError(PwaBuildErrorCode.InvalidManifest);
   }
 
   const { icons } = value;
 
   if (!Array.isArray(icons)) {
-    throw new TypeError('Lucerna web manifest icons are invalid');
+    throw new PwaBuildError(PwaBuildErrorCode.InvalidManifestIcons);
   }
 
   const parsedIcons: ManifestIcon[] = [];
@@ -65,7 +105,7 @@ const webManifestFrom = (value: unknown): WebManifest => {
       !('src' in icon) ||
       typeof icon.src !== 'string'
     ) {
-      throw new TypeError('Lucerna web manifest icons are invalid');
+      throw new PwaBuildError(PwaBuildErrorCode.InvalidManifestIcons);
     }
 
     parsedIcons.push({ ...icon, src: icon.src });
@@ -140,11 +180,15 @@ const buildPwa = async (): Promise<void> => {
   const artifacts = await Promise.all(artifactPaths.map(loadArtifact));
   const identityArtifacts = selectIdentityArtifacts(artifacts);
   const buildId = createBuildId(identityArtifacts);
-  const precacheUrls = createPrecacheUrls(identityArtifacts.map(({ path }) => path));
+  const shippedUrls = createPrecacheUrls(identityArtifacts.map(({ path }) => path));
+  const editionSets = editionSetsFrom(shippedUrls);
+  const editionUrls = new Set(Object.values(editionSets).flat());
+  const precacheUrls = shippedUrls.filter((url) => !editionUrls.has(url));
   const serviceWorkerBuild = await Bun.build({
     define: {
       __LUCERNA_BUILD_ID__: JSON.stringify(buildId),
       __LUCERNA_PRECACHE_URLS__: JSON.stringify(precacheUrls),
+      __LUCERNA_EDITION_SETS__: JSON.stringify(editionSets),
     },
     entrypoints: [serviceWorkerEntry.pathname],
     format: 'iife',
@@ -159,17 +203,18 @@ const buildPwa = async (): Promise<void> => {
       console.error(log);
     }
 
-    throw new Error('Lucerna service-worker build failed');
+    throw new PwaBuildError(PwaBuildErrorCode.ServiceWorkerFailed);
   }
 
   if (!(await Bun.file(serviceWorkerOutput).exists())) {
-    throw new Error('Lucerna service-worker output is missing');
+    throw new PwaBuildError(PwaBuildErrorCode.ServiceWorkerMissing);
   }
 
   const metadata: BuildMetadata = {
     artifacts: identityArtifacts.map(({ path }) => path),
     buildId,
     precacheUrls,
+    editionSets,
   };
   await Bun.write(buildMetadataOutput, `${JSON.stringify(metadata, null, 2)}\n`);
   console.log(`PWA build ${buildId} contains ${precacheUrls.length} offline assets.`);

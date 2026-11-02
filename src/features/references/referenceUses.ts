@@ -1,6 +1,10 @@
-import { contentCatalog, type ResolvedMysterySet } from '../../content/catalog.ts';
-import { guidanceStatementsOf, type GuidanceStatement } from '../../content/schema.ts';
-import { capitalize } from '../../shared/text.ts';
+import { type ResolvedMysterySet, type ResolvedToolMarking } from '../../content/catalog.ts';
+import { type ReadingSnapshot } from '../../content/reading.ts';
+import {
+  guidanceStatementsOf,
+  type DevotionalSource,
+  type GuidanceStatement,
+} from '../../content/schema.ts';
 import { scriptureLocationOf, type BibleVerseLocation } from '../library/model.ts';
 import { FRUIT_LABEL, PrayerId, PrayerStartKind, type PrayerStart } from '../prayer/progression.ts';
 import { Weekday } from '../rosary/schedule.ts';
@@ -11,19 +15,38 @@ import {
 } from './referenceCatalog.ts';
 
 export enum ReferenceUseKind {
-  Prayers = 'Prayers',
-  Schedule = 'Weekly schedule',
-  SeasonalSundays = 'Seasonal Sundays',
-  SetNames = 'Mystery sets',
-  Mysteries = 'Mysteries',
-  MysteryNames = 'Mystery names',
-  Fruits = 'Fruits',
-  PassageSelections = 'Passage selections',
-  Readings = 'Readings',
-  Reflections = 'Reflections',
-  Guidance = 'Guidance',
-  RedLetter = 'Words of Christ in red',
+  Prayers = 'prayers',
+  Schedule = 'schedule',
+  SeasonalSundays = 'seasonal-sundays',
+  SetNames = 'set-names',
+  Mysteries = 'mysteries',
+  MysteryNames = 'mystery-names',
+  Fruits = 'fruits',
+  PassageSelections = 'passage-selections',
+  Readings = 'readings',
+  Reflections = 'reflections',
+  Guidance = 'guidance',
+  RedLetter = 'red-letter',
+  AiTranslation = 'ai-translation',
 }
+
+export const REFERENCE_USE_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<ReferenceUseKind, string>> => ({
+  [ReferenceUseKind.Prayers]: reading.wording.references.prayers,
+  [ReferenceUseKind.Schedule]: reading.wording.references.schedule,
+  [ReferenceUseKind.SeasonalSundays]: reading.wording.references.seasonalSundays,
+  [ReferenceUseKind.SetNames]: reading.wording.references.setNames,
+  [ReferenceUseKind.Mysteries]: reading.wording.references.mysteries,
+  [ReferenceUseKind.MysteryNames]: reading.wording.references.mysteryNames,
+  [ReferenceUseKind.Fruits]: reading.wording.references.fruits,
+  [ReferenceUseKind.PassageSelections]: reading.wording.references.passageSelections,
+  [ReferenceUseKind.Readings]: reading.wording.references.readings,
+  [ReferenceUseKind.Reflections]: reading.wording.references.reflections,
+  [ReferenceUseKind.Guidance]: reading.wording.prayer.guidance,
+  [ReferenceUseKind.RedLetter]: reading.wording.references.redLetter,
+  [ReferenceUseKind.AiTranslation]: reading.wording.settings.aiTranslated,
+});
 
 export const COMPACT_USE_KINDS: ReadonlySet<ReferenceUseKind> = new Set([
   ReferenceUseKind.Prayers,
@@ -81,10 +104,11 @@ type ResolvedMystery = ResolvedMysterySet['mysteries'][number];
 
 const DETAIL_SEPARATOR = ' · ';
 
-export const sectionsLabel = (sections: readonly string[]): string =>
-  `${sections.length === 1 ? 'Section' : 'Sections'} ${sections.join(', ')}`;
+export const sectionsLabel = (reading: ReadingSnapshot, sections: readonly string[]): string =>
+  reading.wording.references.sections(sections);
 
-const fruitLine = (fruit: string): string => [FRUIT_LABEL, fruit].join(DETAIL_SEPARATOR);
+const fruitLine = (reading: ReadingSnapshot, fruit: string): string =>
+  [FRUIT_LABEL(reading), fruit].join(DETAIL_SEPARATOR);
 
 const prayerIdOf = (id: string): PrayerId | undefined =>
   Object.values(PrayerId).find((prayerId) => prayerId === id);
@@ -98,10 +122,11 @@ const flat = (rows: readonly ReferenceUseRow[]): readonly ReferenceUseGroup[] =>
   rows.length === 0 ? [] : [{ rows }];
 
 const prayerRows = (
+  reading: ReadingSnapshot,
   cited: (prayerId: string, sourceId: string) => boolean,
   featuredArtworkId?: string,
 ): readonly ReferenceUseRow[] =>
-  contentCatalog.prayers.flatMap((prayer) => {
+  reading.catalog.prayers.flatMap((prayer) => {
     const prayerId = prayerIdOf(prayer.id);
 
     if (prayerId === undefined || !cited(prayer.id, prayer.sourceId)) {
@@ -119,31 +144,31 @@ const prayerRows = (
     ];
   });
 
-const scheduleRows = (sourceId: string): readonly ReferenceUseRow[] => {
-  const schedule = contentCatalog.rosary.schedule;
+const scheduleRows = (reading: ReadingSnapshot, sourceId: string): readonly ReferenceUseRow[] => {
+  const schedule = reading.catalog.rosary.schedule;
 
   return schedule.sourceId === sourceId
     ? Object.values(Weekday).map((weekday) => ({
         action: showSet(schedule[weekday]),
-        detail: contentCatalog.mysterySetById(schedule[weekday]).name,
+        detail: reading.catalog.mysterySetById(schedule[weekday]).name,
         key: weekday,
-        title: capitalize(weekday),
+        title: reading.wording.weekdays[weekday],
       }))
     : [];
 };
 
-const seasonalRows = (sourceId: string): readonly ReferenceUseRow[] =>
-  contentCatalog.rosary.schedule.seasonalSundays
+const seasonalRows = (reading: ReadingSnapshot, sourceId: string): readonly ReferenceUseRow[] =>
+  reading.catalog.rosary.schedule.seasonalSundays
     .filter((rule) => rule.sourceId === sourceId)
     .map((rule) => ({
       action: showSet(rule.mysterySetId),
-      detail: capitalize(rule.season),
+      detail: reading.wording.seasons[rule.season],
       key: rule.season,
-      title: contentCatalog.mysterySetById(rule.mysterySetId).name,
+      title: reading.catalog.mysterySetById(rule.mysterySetId).name,
     }));
 
-const setNameRows = (sourceId: string): readonly ReferenceUseRow[] =>
-  contentCatalog.rosary.mysterySets
+const setNameRows = (reading: ReadingSnapshot, sourceId: string): readonly ReferenceUseRow[] =>
+  reading.catalog.rosary.mysterySets
     .filter((mysterySet) => mysterySet.nameSourceId === sourceId)
     .map((mysterySet) => ({
       action: showSet(mysterySet.id),
@@ -178,8 +203,11 @@ const prayMystery = (mystery: ResolvedMystery, featuredArtworkId?: string): Refe
   },
 });
 
-const readingRow = (mystery: ResolvedMystery): Partial<ReferenceUseRow> => {
-  const location = scriptureLocationOf(mystery.scripture);
+const readingRow = (
+  reading: ReadingSnapshot,
+  mystery: ResolvedMystery,
+): Partial<ReferenceUseRow> => {
+  const location = scriptureLocationOf(reading, mystery.scripture);
 
   return location === null
     ? {}
@@ -202,21 +230,23 @@ const reflectionRow = (mystery: ResolvedMystery): Partial<ReferenceUseRow> => {
 };
 
 const mysteryFace = (
+  reading: ReadingSnapshot,
   mystery: ResolvedMystery,
   kind: ReferenceUseKind,
   featuredArtworkId?: string,
 ): Partial<ReferenceUseRow> => {
   switch (kind) {
     case ReferenceUseKind.Mysteries: {
-      const fruit = featuredArtworkId === undefined ? fruitLine(mystery.fruit) : mystery.fruit;
+      const fruit =
+        featuredArtworkId === undefined ? fruitLine(reading, mystery.fruit) : mystery.fruit;
       return { detail: [fruit, mystery.scripture.reference].join(DETAIL_SEPARATOR) };
     }
     case ReferenceUseKind.Fruits:
-      return { detail: fruitLine(mystery.fruit) };
+      return { detail: fruitLine(reading, mystery.fruit) };
     case ReferenceUseKind.PassageSelections:
       return { detail: mystery.scripture.reference };
     case ReferenceUseKind.Readings:
-      return { detail: mystery.scripture.reference, ...readingRow(mystery) };
+      return { detail: mystery.scripture.reference, ...readingRow(reading, mystery) };
     case ReferenceUseKind.Reflections:
       return reflectionRow(mystery);
     default:
@@ -225,11 +255,12 @@ const mysteryFace = (
 };
 
 const mysteryRow = (
+  reading: ReadingSnapshot,
   mystery: ResolvedMystery,
   kind: ReferenceUseKind,
   featuredArtworkId?: string,
 ): ReferenceUseRow => {
-  const face = mysteryFace(mystery, kind, featuredArtworkId);
+  const face = mysteryFace(reading, mystery, kind, featuredArtworkId);
 
   return {
     key: `${mystery.set}:${String(mystery.ordinal)}`,
@@ -240,20 +271,21 @@ const mysteryRow = (
 };
 
 const mysteryGroups = (
+  reading: ReadingSnapshot,
   includes: (mystery: ResolvedMystery) => boolean,
   kind: ReferenceUseKind,
   featuredArtworkId?: string,
 ): readonly ReferenceUseGroup[] =>
-  contentCatalog.rosary.mysterySets.flatMap((mysterySet) => {
+  reading.catalog.rosary.mysterySets.flatMap((mysterySet) => {
     const rows = mysterySet.mysteries
       .filter(includes)
-      .map((mystery) => mysteryRow(mystery, kind, featuredArtworkId));
+      .map((mystery) => mysteryRow(reading, mystery, kind, featuredArtworkId));
 
     return rows.length === 0 ? [] : [{ label: mysterySet.name, mysterySetId: mysterySet.id, rows }];
   });
 
-const guidanceRows = (sourceId: string): readonly ReferenceUseRow[] =>
-  guidanceStatementsOf(contentCatalog.rosary.guidance).flatMap((guidance: GuidanceStatement) =>
+const guidanceRows = (reading: ReadingSnapshot, sourceId: string): readonly ReferenceUseRow[] =>
+  guidanceStatementsOf(reading.catalog.rosary.guidance).flatMap((guidance: GuidanceStatement) =>
     guidance.sourceRefs
       .filter((reference) => reference.sourceId === sourceId)
       .map((reference) => ({
@@ -266,55 +298,73 @@ const guidanceRows = (sourceId: string): readonly ReferenceUseRow[] =>
         title: reference.locator,
         ...(reference.sections === undefined
           ? {}
-          : { trailing: sectionsLabel(reference.sections) }),
+          : { trailing: sectionsLabel(reading, reference.sections) }),
       })),
   );
 
-const redLetterRows = (sourceId: string): readonly ReferenceUseRow[] => {
-  const redLetter = contentCatalog.bible.redLetter;
-  const sources = [...redLetter.witnesses, ...redLetter.tools];
+const toolRow = (source: DevotionalSource): ReferenceUseRow => ({
+  action: {
+    kind: ReferenceUseActionKind.OpenReference,
+    target: apparatusReferenceTarget(source.id),
+  },
+  detail: [source.author, source.note].filter(Boolean).join(DETAIL_SEPARATOR),
+  key: source.id,
+  title: source.work,
+  trailing: source.approval,
+});
 
-  if (!sources.some(({ id }) => id === sourceId)) {
-    return [];
-  }
+const markingRows = (
+  sourceId: string,
+  { notice, tools }: ResolvedToolMarking,
+  action?: ReferenceUseAction,
+): readonly ReferenceUseRow[] =>
+  tools.some(({ id }) => id === sourceId)
+    ? [
+        { key: 'notice', title: notice, ...(action === undefined ? {} : { action }) },
+        ...tools.filter(({ id }) => id !== sourceId).map(toolRow),
+      ]
+    : [];
 
-  return [
-    {
-      action: { kind: ReferenceUseActionKind.OpenBible },
-      key: 'red-letter',
-      title: redLetter.notice,
-    },
-    ...sources
-      .filter(({ id }) => id !== sourceId)
-      .map((source): ReferenceUseRow => ({
-        action: {
-          kind: ReferenceUseActionKind.OpenReference,
-          target: apparatusReferenceTarget(source.id),
-        },
-        detail: [source.author, source.note].filter(Boolean).join(DETAIL_SEPARATOR),
-        key: source.id,
-        title: source.work,
-        trailing: source.approval,
-      })),
-  ];
+const redLetterRows = (reading: ReadingSnapshot, sourceId: string): readonly ReferenceUseRow[] => {
+  const { notice, tools, witnesses } = reading.catalog.bible.redLetter;
+
+  return markingRows(
+    sourceId,
+    { notice, tools: [...witnesses, ...tools] },
+    { kind: ReferenceUseActionKind.OpenBible },
+  );
 };
 
-const groupsOf = (kind: ReferenceUseKind, sourceId: string): readonly ReferenceUseGroup[] => {
+const aiTranslationRows = (
+  reading: ReadingSnapshot,
+  sourceId: string,
+): readonly ReferenceUseRow[] =>
+  reading.catalog.aiTranslation === null
+    ? []
+    : markingRows(sourceId, reading.catalog.aiTranslation);
+
+const groupsOf = (
+  reading: ReadingSnapshot,
+  kind: ReferenceUseKind,
+  sourceId: string,
+): readonly ReferenceUseGroup[] => {
   switch (kind) {
     case ReferenceUseKind.Prayers:
-      return flat(prayerRows((_, prayerSourceId) => prayerSourceId === sourceId));
+      return flat(prayerRows(reading, (_, prayerSourceId) => prayerSourceId === sourceId));
     case ReferenceUseKind.Schedule:
-      return flat(scheduleRows(sourceId));
+      return flat(scheduleRows(reading, sourceId));
     case ReferenceUseKind.SeasonalSundays:
-      return flat(seasonalRows(sourceId));
+      return flat(seasonalRows(reading, sourceId));
     case ReferenceUseKind.SetNames:
-      return flat(setNameRows(sourceId));
+      return flat(setNameRows(reading, sourceId));
     case ReferenceUseKind.Guidance:
-      return flat(guidanceRows(sourceId));
+      return flat(guidanceRows(reading, sourceId));
     case ReferenceUseKind.RedLetter:
-      return flat(redLetterRows(sourceId));
+      return flat(redLetterRows(reading, sourceId));
+    case ReferenceUseKind.AiTranslation:
+      return flat(aiTranslationRows(reading, sourceId));
     default:
-      return mysteryGroups((mystery) => mysterySourceOf(mystery, kind) === sourceId, kind);
+      return mysteryGroups(reading, (mystery) => mysterySourceOf(mystery, kind) === sourceId, kind);
   }
 };
 
@@ -323,9 +373,12 @@ const sectionsOf = (
 ): readonly ReferenceUseSection[] =>
   entries.filter(([, groups]) => groups.length > 0).map(([kind, groups]) => ({ groups, kind }));
 
-export const usesOfSource = (sourceId: string): readonly ReferenceUseSection[] => {
+export const usesOfSource = (
+  reading: ReadingSnapshot,
+  sourceId: string,
+): readonly ReferenceUseSection[] => {
   const sections = sectionsOf(
-    Object.values(ReferenceUseKind).map((kind) => [kind, groupsOf(kind, sourceId)]),
+    Object.values(ReferenceUseKind).map((kind) => [kind, groupsOf(reading, kind, sourceId)]),
   );
   const namesMysteries = sections.some(({ kind }) => kind === ReferenceUseKind.MysteryNames);
 
@@ -334,8 +387,11 @@ export const usesOfSource = (sourceId: string): readonly ReferenceUseSection[] =
     : sections;
 };
 
-export const usesOfArtwork = (artworkId: string): readonly ReferenceUseSection[] => {
-  const stagePrayerIds = Object.entries(contentCatalog.rosary.prayerStageArt)
+export const usesOfArtwork = (
+  reading: ReadingSnapshot,
+  artworkId: string,
+): readonly ReferenceUseSection[] => {
+  const stagePrayerIds = Object.entries(reading.catalog.rosary.prayerStageArt)
     .filter(([, pool]) => pool.some(({ id }) => id === artworkId))
     .map(([prayerId]) => prayerId);
 
@@ -343,6 +399,7 @@ export const usesOfArtwork = (artworkId: string): readonly ReferenceUseSection[]
     [
       ReferenceUseKind.Mysteries,
       mysteryGroups(
+        reading,
         (mystery) => mystery.artworks.some(({ id }) => id === artworkId),
         ReferenceUseKind.Mysteries,
         artworkId,
@@ -350,7 +407,7 @@ export const usesOfArtwork = (artworkId: string): readonly ReferenceUseSection[]
     ],
     [
       ReferenceUseKind.Prayers,
-      flat(prayerRows((prayerId) => stagePrayerIds.includes(prayerId), artworkId)),
+      flat(prayerRows(reading, (prayerId) => stagePrayerIds.includes(prayerId), artworkId)),
     ],
   ]);
 };

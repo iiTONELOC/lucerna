@@ -1,3 +1,4 @@
+import { useReading } from '../../content/reading.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { ACCENT_BUTTON_CLASS_NAME } from '../../styles.ts';
 import { ViewHeader } from '../layout.tsx';
@@ -16,21 +17,23 @@ type ErrorViewProps = {
 const ERROR_TITLE_ID = 'error-title';
 
 function RetryButton({ onRetry }: { readonly onRetry: (() => void) | undefined }) {
+  const { wording } = useReading();
   return onRetry === undefined ? null : (
     <button className={ACCENT_BUTTON_CLASS_NAME} onClick={onRetry} type="button">
-      Try again
+      {wording.errors.tryAgain}
     </button>
   );
 }
 
 export function ErrorView({
-  title = 'Something went wrong',
-  message = 'Lucerna could not finish this view.',
+  title,
+  message,
   details,
   diagnostics,
   onRetry,
   className,
 }: ErrorViewProps) {
+  const { wording } = useReading();
   const diagnosticDetails = diagnostics ?? details;
   return (
     <main
@@ -46,14 +49,14 @@ export function ErrorView({
       >
         <ViewHeader
           className="gap-4"
-          eyebrow="Error"
+          eyebrow={wording.errors.eyebrow}
           id={ERROR_TITLE_ID}
-          lede={message}
-          title={title}
+          lede={message ?? wording.errors.message}
+          title={title ?? wording.errors.title}
         />
 
         {diagnosticDetails === undefined ? null : (
-          <DiagnosticDetails details={diagnosticDetails} summary="Diagnostic details" />
+          <DiagnosticDetails details={diagnosticDetails} summary={wording.errors.details} />
         )}
         {diagnostics === undefined ? null : <ErrorReportActions diagnostics={diagnostics} />}
         <RetryButton onRetry={onRetry} />

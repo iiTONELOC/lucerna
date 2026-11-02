@@ -4,6 +4,9 @@ import { CENTERPIECE_RING_SCALE, PENDANT_BEAD_COUNT, type DrapeGeometry } from '
 
 const OVERHANG_GAP_PIXELS = 4;
 
+export const PENDANT_CLEARANCE_CLASS_NAME =
+  'pl-4 pr-[max(1rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))] sm:pl-6 sm:pr-[max(1.5rem,calc(100cqw*(1-var(--drape-pendant-left))-var(--artwork-inset)+0.5rem))]';
+
 export type PendantOverhangRefs = {
   readonly drape: RefObject<HTMLDivElement | null>;
   readonly reading: RefObject<HTMLElement | null>;

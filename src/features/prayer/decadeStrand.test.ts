@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { contentCatalog } from '../../content/catalog.ts';
+import { INITIAL_READING } from '../../content/reading.ts';
 import { decadeStrandOf, strandTargetOf } from './decadeStrand.ts';
 import { BeadKind, beadSlotsOf, createDrapeGeometry } from './drape.ts';
 import { createProgression, StepAnchor } from './progression.ts';
@@ -13,7 +14,9 @@ if (mysterySet === undefined) {
 
 const geometry = createDrapeGeometry(
   beadSlotsOf(
-    createProgression(mysterySet, contentCatalog.rosary.guidance, { includeFatimaPrayer: true }),
+    createProgression(INITIAL_READING, mysterySet, contentCatalog.rosary.guidance, {
+      includeFatimaPrayer: true,
+    }),
   ),
 );
 

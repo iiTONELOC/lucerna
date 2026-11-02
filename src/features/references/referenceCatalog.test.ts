@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { contentCatalog } from '../../content/catalog.ts';
+import { INITIAL_READING } from '../../content/reading.ts';
 import {
   apparatusReferenceTarget,
   guidanceReferenceTarget,
@@ -7,7 +8,7 @@ import {
   referenceSectionsFrom,
 } from './referenceCatalog.ts';
 
-const sections = referenceSectionsFrom(contentCatalog);
+const sections = referenceSectionsFrom(INITIAL_READING, contentCatalog);
 
 const sectionSourceIds = (group: ReferenceGroup): readonly string[] | undefined =>
   sections.find((section) => section.group === group)?.records.map(({ target }) => target.sourceId);

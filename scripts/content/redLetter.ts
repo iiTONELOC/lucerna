@@ -1,9 +1,9 @@
-import type { BibleRedLetter, ScriptureRedSpan } from '../../src/content/schema.ts';
+import type { Language } from '../../src/content/language.ts';
+import type { AiTranslation, BibleRedLetter, ScriptureRedSpan } from '../../src/content/schema.ts';
 import { recordFrom } from '../../src/content/shape.ts';
 import { buildFailure, ContentBuildErrorCode } from './records.ts';
 
-export const RED_LETTER_DATABASE = 'data/db/red-letter.json';
-export const BIBLE_SOURCE_ID = 'douay-rheims-challoner';
+const RED_LETTER_DATABASE = 'red-letter';
 
 export type RedLetterEntry = 'all' | readonly string[];
 
@@ -37,48 +37,66 @@ const redLetterEntryFrom = (value: unknown, context: string): RedLetterEntry => 
 
 export type RedLetterBooks = ReadonlyMap<string, ReadonlyMap<string, RedLetterEntry>>;
 
-const sourceIdsFrom = (value: unknown, context: string): readonly string[] => {
-  const items = Array.isArray(value) ? value : redLetterError(context);
+type MarkingFailure = (context: string) => never;
+
+const sourceIdsFrom = (
+  value: unknown,
+  context: string,
+  failure: MarkingFailure,
+): readonly string[] => {
+  const items = Array.isArray(value) ? value : failure(context);
   const sourceIds: string[] = [];
 
   for (const item of items) {
     if (typeof item !== 'string' || item.length === 0) {
-      return redLetterError(context);
+      return failure(context);
     }
 
     sourceIds.push(item);
   }
 
   if (sourceIds.length === 0) {
-    return redLetterError(context);
+    return failure(context);
   }
 
   return sourceIds;
 };
 
-const noticeFrom = (value: unknown): string => {
+const noticeFrom = (value: unknown, failure: MarkingFailure): string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
-    return redLetterError('notice');
+    return failure('notice');
   }
 
   return value;
 };
 
-export const redLetterMarkingFrom = (value: unknown): BibleRedLetter => {
+export const toolMarkingFrom = (
+  database: Record<string, unknown>,
+  failure: MarkingFailure,
+): AiTranslation => ({
+  notice: noticeFrom(database['notice'], failure),
+  toolSourceIds: sourceIdsFrom(database['toolSourceIds'], 'toolSourceIds', failure),
+});
+
+export const redLetterMarkingFrom = (value: unknown, language: Language): BibleRedLetter => {
   const database = recordFrom(value, RED_LETTER_DATABASE);
+  const notices = recordFrom(database['notice'], `${RED_LETTER_DATABASE}.notice`);
 
   return {
-    notice: noticeFrom(database['notice']),
-    witnessSourceIds: sourceIdsFrom(database['witnessSourceIds'], 'witnessSourceIds'),
-    toolSourceIds: sourceIdsFrom(database['toolSourceIds'], 'toolSourceIds'),
+    ...toolMarkingFrom({ ...database, notice: notices[language] }, redLetterError),
+    witnessSourceIds: sourceIdsFrom(
+      database['witnessSourceIds'],
+      'witnessSourceIds',
+      redLetterError,
+    ),
   };
 };
 
-export const redLetterBooksFrom = (value: unknown): RedLetterBooks => {
+export const redLetterBooksFrom = (value: unknown, sourceId: string): RedLetterBooks => {
   const database = recordFrom(value, RED_LETTER_DATABASE);
 
-  if (database['sourceId'] !== BIBLE_SOURCE_ID) {
-    return redLetterError('sourceId');
+  if (!sourceIdsFrom(database['sourceIds'], 'sourceIds', redLetterError).includes(sourceId)) {
+    return redLetterError('sourceIds');
   }
 
   const books = new Map<string, ReadonlyMap<string, RedLetterEntry>>();

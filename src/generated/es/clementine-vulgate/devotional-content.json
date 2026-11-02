@@ -1,0 +1,2874 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "id": "claude-fable-5",
+      "work": "Claude Fable 5",
+      "author": "Anthropic",
+      "approval": "servicio comercial de IA",
+      "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+      "type": "apparatus",
+      "note": "Herramienta de IA usada para el cotejo de las palabras de Cristo."
+    },
+    {
+      "id": "claude-opus-5-5",
+      "work": "Claude Opus 5.5",
+      "author": "Anthropic",
+      "approval": "servicio comercial de IA",
+      "url": "https://www.anthropic.com/claude",
+      "type": "apparatus",
+      "note": "Herramienta de IA usada para las traducciones al español de la interfaz, los frutos, la guía y la política de privacidad."
+    },
+    {
+      "id": "clementine-vulgate",
+      "work": "Biblia Vulgata Clementina (1598), con la Glosa ordinaria (edición Migne, 1880)",
+      "author": "San Jerónimo; edición latVUC de eBible.org",
+      "approval": "dominio público",
+      "url": "https://ebible.org/find/details.php?id=latVUC",
+      "type": "bible",
+      "path": "data/library/bibles/clementine-vulgate"
+    },
+    {
+      "id": "de-montfort-secret",
+      "work": "El secreto admirable del Santísimo Rosario",
+      "author": "San Luis María Grignion de Montfort",
+      "approval": "dominio público en EE. UU.; los derechos de autor de la edición estadounidense de 1954 requerían renovación en 1981/1982 y no se halló ningún registro en la base de datos de renovaciones de derechos de autor de Stanford",
+      "url": "https://www.sanpiodapietrelcina.org/english/secret.htm",
+      "type": "text",
+      "path": "data/library/texts/de-montfort-secret/secret-of-the-rosary.txt",
+      "translator": "Mary Barbour",
+      "publisher": "Montfort Fathers, Bay Shore, N.Y.",
+      "published": "1954",
+      "citationUrl": "https://www.ecatholic2000.com/montfort/rosary/rosary.shtml",
+      "renewalSearchUrl": "https://exhibits.stanford.edu/copyrightrenewals/catalog?search_field=search&q=%22Secret+of+the+Rosary%22"
+    },
+    {
+      "id": "douay-rheims-challoner",
+      "work": "Biblia Douay-Rheims, revisión de Challoner (DRC 1750)",
+      "author": "Revisión de Challoner",
+      "approval": "dominio público",
+      "url": "https://github.com/BibleCorps/ENG-B-DRC1750-pd-PSFM",
+      "type": "bible",
+      "path": "data/library/bibles/douay-rheims"
+    },
+    {
+      "id": "gpt-6-astra",
+      "work": "GPT-6 Astra",
+      "author": "OpenAI",
+      "approval": "servicio comercial de IA",
+      "url": "https://openai.com",
+      "type": "apparatus",
+      "note": "Herramienta de IA usada para traducir al español El secreto admirable del Santísimo Rosario y para revisar todas las traducciones al español."
+    },
+    {
+      "id": "holy-see-compendium-es",
+      "work": "Compendio del Catecismo de la Iglesia Católica",
+      "author": "La Santa Sede",
+      "approval": "Libreria Editrice Vaticana, 2005; oraciones litúrgicas comunes",
+      "url": "https://www.vatican.va/archive/compendium_ccc/documents/archive_2005_compendium-ccc_sp.html",
+      "type": "prayer"
+    },
+    {
+      "id": "holy-see-emigrants-rosary-es",
+      "work": "Rosario de los Emigrantes e Itinerantes",
+      "author": "Pontificio Consejo para la Pastoral de los Emigrantes e Itinerantes",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/roman_curia/pontifical_councils/migrants/Rosario/rc_pc_migrants_rosario_sp.html",
+      "type": "prayer"
+    },
+    {
+      "id": "holy-see-glorious",
+      "work": "Los misterios del Rosario: misterios gloriosos (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_gloriosi_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-glorious-es",
+      "work": "Misterios Gloriosos - Los Misterios del Santo Rosario",
+      "author": "La Santa Sede",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_gloriosi_sp.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-howto",
+      "work": "Cómo rezar el Rosario, en la página Los misterios del Rosario (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-joyful",
+      "work": "Los misterios del Rosario: misterios gozosos (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_gaudiosi_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-joyful-es",
+      "work": "Misterios Gozosos - Los misterios del Rosario",
+      "author": "La Santa Sede",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_gaudiosi_sp.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-luminous",
+      "work": "Los misterios del Rosario: misterios luminosos (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_luminosi_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-luminous-es",
+      "work": "Misterios Luminosos - Los Misterios del Santo Rosario",
+      "author": "La Santa Sede",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_luminosi_sp.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-mysteries",
+      "work": "Los misterios del Rosario (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-mysteries-es",
+      "work": "Los Misterios del Santo Rosario",
+      "author": "La Santa Sede",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_sp.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-sorrowful",
+      "work": "Los misterios del Rosario: misterios dolorosos (página en inglés)",
+      "author": "La Santa Sede",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_dolorosi_en.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "holy-see-sorrowful-es",
+      "work": "Misterios Dolorosos - Los Misterios del Santo Rosario",
+      "author": "La Santa Sede",
+      "approval": "oración litúrgica común",
+      "url": "https://www.vatican.va/special/rosary/documents/misteri_dolorosi_sp.html",
+      "type": "liturgical"
+    },
+    {
+      "id": "king-james-version",
+      "work": "Biblia del rey Jacobo (texto de Blayney de 1769)",
+      "author": "Iglesia de Inglaterra, edición de eBible.org",
+      "approval": "dominio público",
+      "url": "https://ebible.org/kjv/",
+      "type": "bible",
+      "note": "Cotejada con la Douay-Rheims para marcar las palabras de Cristo; no es el texto de las lecturas."
+    },
+    {
+      "id": "met-open-access",
+      "work": "Museo Metropolitano de Arte — Acceso abierto",
+      "author": "Museo Metropolitano de Arte",
+      "approval": "CC0 / dominio público",
+      "url": "https://www.metmuseum.org/about-the-met/policies-and-documents/open-access",
+      "type": "art"
+    },
+    {
+      "id": "nga-open-access",
+      "work": "Galería Nacional de Arte — Acceso abierto",
+      "author": "Galería Nacional de Arte, Washington",
+      "approval": "CC0 / dominio público",
+      "url": "https://www.nga.gov/notices/open-access-policy.html",
+      "type": "art"
+    },
+    {
+      "id": "rosarium-virginis-mariae",
+      "work": "Rosarium Virginis Mariae (2002)",
+      "author": "Papa Juan Pablo II",
+      "approval": "magisterio (carta apostólica)",
+      "url": "https://www.vatican.va/content/john-paul-ii/en/apost_letters/2002/documents/hf_jp-ii_apl_20021016_rosarium-virginis-mariae.html",
+      "type": "magisterial"
+    },
+    {
+      "id": "rosary-center-howto",
+      "work": "Cómo rezar el Rosario",
+      "author": "Rosary Center & Confraternity (frailes dominicos, O.P.)",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.rosarycenter.org/how-to-pray-the-rosary/",
+      "type": "liturgical"
+    },
+    {
+      "id": "rosary-center-prayers",
+      "work": "Oraciones del Rosario (forma tradicional en inglés)",
+      "author": "Rosary Center & Confraternity (frailes dominicos, O.P.)",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.rosarycenter.org/how-to-pray-the-rosary-prayers-of-the-rosary",
+      "type": "prayer"
+    },
+    {
+      "id": "scio-de-san-miguel",
+      "work": "Scío de San Miguel",
+      "author": "Latin Prayer",
+      "approval": "dominio público",
+      "url": "https://latinprayer.org/es/biblia/",
+      "type": "bible",
+      "path": "data/library/bibles/scio"
+    },
+    {
+      "id": "traditional-catholic-prayers-howto",
+      "work": "Cómo rezar el Rosario",
+      "author": "Traditional Catholic Prayers",
+      "approval": "página de referencia; no se incluye ningún contenido de la página",
+      "url": "https://traditionalcatholicprayers.com/2019/11/15/how-to-pray-the-rosary/",
+      "type": "liturgical"
+    },
+    {
+      "id": "usccb-fruits",
+      "work": "Cómo rezar el Rosario (frutos de los misterios)",
+      "author": "USCCB",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.usccb.org/how-to-pray-the-rosary",
+      "type": "liturgical"
+    },
+    {
+      "id": "usccb-howto",
+      "work": "Cómo rezar el Rosario",
+      "author": "USCCB",
+      "approval": "litúrgico de dominio público",
+      "url": "https://www.usccb.org/how-to-pray-the-rosary",
+      "type": "liturgical"
+    },
+    {
+      "id": "wikimedia-cc-by-2.0",
+      "work": "Wikimedia Commons — fotografía CC BY 2.0",
+      "author": "Wikimedia Commons",
+      "approval": "Fotografía CC BY 2.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra",
+      "url": "https://creativecommons.org/licenses/by/2.0/",
+      "type": "art"
+    },
+    {
+      "id": "wikimedia-cc-by-3.0",
+      "work": "Wikimedia Commons — fotografía CC BY 3.0",
+      "author": "Wikimedia Commons",
+      "approval": "Fotografía CC BY 3.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra",
+      "url": "https://creativecommons.org/licenses/by/3.0/",
+      "type": "art"
+    },
+    {
+      "id": "wikimedia-cc-by-sa-2.0",
+      "work": "Wikimedia Commons — fotografía CC BY-SA 2.0",
+      "author": "Wikimedia Commons",
+      "approval": "Fotografía CC BY-SA 2.0 de una obra de dominio público; el fotógrafo figura en la ficha de la obra",
+      "url": "https://creativecommons.org/licenses/by-sa/2.0/",
+      "type": "art"
+    },
+    {
+      "id": "wikimedia-pd-art",
+      "work": "Wikimedia Commons — PD-Art",
+      "author": "Wikimedia Commons",
+      "approval": "PD-Art / dominio público",
+      "url": "https://commons.wikimedia.org/",
+      "type": "art"
+    },
+    {
+      "id": "world-english-bible",
+      "work": "World English Bible (WEB)",
+      "author": "Revisión de eBible.org de la ASV de 1901",
+      "approval": "dominio público",
+      "url": "https://ebible.org/web/",
+      "type": "bible",
+      "note": "Cotejada con la Douay-Rheims para marcar las palabras de Cristo; no es el texto de las lecturas."
+    }
+  ],
+  "prayers": [
+    {
+      "id": "sign-of-the-cross",
+      "title": "Señal de la Cruz",
+      "text": "En el nombre del Padre y del Hijo y del Espíritu Santo. Amén.",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "apostles-creed",
+      "title": "Símbolo de los Apóstoles",
+      "text": "Creo en Dios, Padre Todopoderoso, Creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, Nuestro Señor, Que fue concebido por obra y gracia del Espíritu Santo, nació de Santa María Virgen, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado, descendió a los infiernos, al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "our-father",
+      "title": "Padre nuestro",
+      "text": "Padre nuestro que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu Reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "hail-mary",
+      "title": "Ave María",
+      "text": "Dios te salve, María, llena eres de gracia; el Señor es contigo. Bendita Tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros, pecadores, ahora y en la hora de nuestra muerte. Amén",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "glory-be",
+      "title": "Gloria al Padre",
+      "text": "Gloria al Padre y al Hijo y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén.",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "fatima-prayer",
+      "title": "Oh Jesús mío",
+      "text": "Oh Jesús mío, perdona nuestros pecados, líbranos del fuego del infierno, lleva al cielo a todas las almas, especialmente a las más necesitadas de tu misericordia.",
+      "sourceId": "holy-see-emigrants-rosary-es"
+    },
+    {
+      "id": "hail-holy-queen",
+      "title": "Salve",
+      "text": "Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra; Dios te salve. A ti llamamos los desterrados hijos de Eva; a ti suspiramos, gimiendo y llorando en este valle de lágrimas. Ea, pues, Señora, abogada nuestra, vuelve a nosotros esos tus ojos misericordiosos; y después de este destierro, muéstranos a Jesús, fruto bendito de tu vientre. ¡Oh, clementísima, oh piadosa, oh dulce Virgen María! Ruega por nosotros, Santa Madre de Dios, para que seamos dignos de alcanzar las promesas de Nuestro Señor Jesucristo.",
+      "sourceId": "holy-see-compendium-es"
+    },
+    {
+      "id": "closing-prayer",
+      "title": "Oración tras el rosario",
+      "text": "Oremos. Oh Dios, cuyo Hijo por medio de su vida, muerte y resurrección, nos otorgó los premios de la vida eterna, te rogamos que venerando humildemente los misterios del Rosario de la Santísima Virgen María, imitemos lo que contienen y consigamos lo que nos prometen. Por Jesucristo, nuestro Señor. Amén",
+      "sourceId": "holy-see-compendium-es"
+    }
+  ],
+  "artworks": [
+    {
+      "id": "agnolo-gaddi--the-trinity",
+      "artist": "Agnolo Gaddi",
+      "title": "The Trinity",
+      "date": "c. 1390-96",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/436428",
+      "file": "art/36fba79f74e2.avif",
+      "width": 667,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "41.100.33"
+    },
+    {
+      "id": "alonso-cano--virgen-del-rosario",
+      "artist": "Alonso Cano",
+      "title": "Virgen del Rosario",
+      "date": "17th c.",
+      "holder": "Málaga Cathedral",
+      "url": "https://commons.wikimedia.org/wiki/File:Virgen_del_Rosario_-_Alonso_Cano_-_catedral_de_M%C3%A1laga.jpg",
+      "file": "art/1b7d7aebf17a.avif",
+      "width": 724,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "ambrogio-lorenzetti--presentation-at-the-temple",
+      "artist": "Ambrogio Lorenzetti",
+      "title": "Presentation at the Temple",
+      "date": "1342",
+      "holder": "Uffizi, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Ambrogio%20Lorenzetti%20-%20Presentazione%20di%20Ges%C3%B9%20al%20tempio%20-%20Google%20Art%20Project.jpg",
+      "file": "art/7612681ee749.avif",
+      "width": 838,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "andrea-mantegna--the-agony-in-the-garden",
+      "artist": "Andrea Mantegna",
+      "title": "The Agony in the Garden",
+      "date": "c. 1455-56",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Mantegna%2C%20Andrea%20-%20Agony%20in%20the%20Garden%20-%20National%20Gallery%2C%20London.jpg",
+      "file": "art/baa989f3f192.avif",
+      "width": 1200,
+      "height": 929,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "andrea-previtali--salvator-mundi",
+      "artist": "Andrea Previtali",
+      "title": "Salvator Mundi",
+      "date": "1519",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Andrea_Previtali_-_Salvator_Mundi_-_Google_Art_Project.jpg",
+      "file": "art/0bfe188f2035.avif",
+      "width": 1023,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "andrea-del-verrocchio-and-leonardo-da-vinci--the-baptism-of-christ",
+      "artist": "Andrea del Verrocchio and Leonardo da Vinci",
+      "title": "The Baptism of Christ",
+      "date": "c. 1475",
+      "holder": "Uffizi, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Andrea%20del%20Verrocchio%2C%20Leonardo%20da%20Vinci%20-%20Baptism%20of%20Christ%20-%20Uffizi.jpg",
+      "file": "art/5c3e6466a8b9.avif",
+      "width": 1007,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "annibale-carracci--the-coronation-of-the-virgin",
+      "artist": "Annibale Carracci",
+      "title": "The Coronation of the Virgin",
+      "date": "after 1595",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/435853",
+      "file": "art/1ecc16d8ae79.avif",
+      "width": 1200,
+      "height": 1026,
+      "sourceId": "met-open-access",
+      "accession": "1971.155"
+    },
+    {
+      "id": "anthony-van-dyck--christ-crowned-with-thorns",
+      "artist": "Anthony van Dyck",
+      "title": "Christ Crowned with Thorns",
+      "date": "1618-20",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Anthony%20van%20Dyck%20-%20Crowning%20with%20Thorns%20-%20WGA07433.jpg",
+      "file": "art/7ccc36e7d5f8.avif",
+      "width": 1065,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "antonello-da-messina--salvator-mundi",
+      "artist": "Antonello da Messina",
+      "title": "Salvator Mundi",
+      "date": "1465",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Antonello_da_Messina_-_Salvator_Mundi_-_WGA0757.jpg",
+      "file": "art/d62b9e20a164.avif",
+      "width": 850,
+      "height": 1132,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "bartolome-esteban-murillo--the-virgin-of-the-rosary",
+      "artist": "Bartolomé Esteban Murillo",
+      "title": "The Virgin of the Rosary",
+      "date": "c. 1650-55",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Bartolom%C3%A9_Esteban_Perez_Murillo_-_Virgin_and_Child_with_a_Rosary_-_WGA16360.jpg",
+      "file": "art/f0b679647f60.avif",
+      "width": 804,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "benedetto-diana--salvator-mundi",
+      "artist": "Benedetto Diana",
+      "title": "Salvator Mundi",
+      "date": "c. 1510-20",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Benedetto_Diana_-_Salvator_Mundi_-_Google_Art_Project.jpg",
+      "file": "art/c31894ab6ffa.avif",
+      "width": 922,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "caravaggio--madonna-of-the-rosary",
+      "artist": "Caravaggio",
+      "title": "Madonna of the Rosary",
+      "date": "1607",
+      "holder": "Kunsthistorisches Museum, Vienna",
+      "url": "https://commons.wikimedia.org/wiki/File:Michelangelo_Merisi%2C_called_Caravaggio_-_Madonna_of_the_Rosary_-_Google_Art_Project.jpg",
+      "file": "art/ac1c1016a9ef.avif",
+      "width": 826,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "caravaggio--the-crowning-with-thorns",
+      "artist": "Caravaggio",
+      "title": "The Crowning with Thorns",
+      "date": "c. 1602-04",
+      "holder": "Kunsthistorisches Museum, Vienna",
+      "url": "https://commons.wikimedia.org/wiki/File:The_Crowning_with_Thorns-Caravaggio_(1602).jpg",
+      "file": "art/eaa9f5159d76.avif",
+      "width": 1200,
+      "height": 918,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "caravaggio--the-flagellation-of-christ",
+      "artist": "Caravaggio",
+      "title": "The Flagellation of Christ",
+      "date": "1607",
+      "holder": "Museo di Capodimonte, Naples",
+      "url": "https://commons.wikimedia.org/wiki/File:CaravaggioFlagellation.jpg",
+      "file": "art/595e968d1fbf.avif",
+      "width": 728,
+      "height": 950,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "cimabue--maesta",
+      "artist": "Cimabue",
+      "title": "Maestà",
+      "date": "c. 1280",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Cimabue%20-%20Maest%C3%A0%20du%20Louvre.jpg",
+      "file": "art/fc7a3b3a5aa0.avif",
+      "width": 782,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "claude-lorrain--the-sermon-on-the-mount",
+      "artist": "Claude Lorrain",
+      "title": "The Sermon on the Mount",
+      "date": "1656",
+      "holder": "The Frick Collection, New York",
+      "url": "https://commons.wikimedia.org/wiki/File:Lorrain,_Claude_-_The_Sermon_on_the_Mount_(Frick_Collection;_c._1656).jpg",
+      "file": "art/e543effa3bbf.avif",
+      "width": 1200,
+      "height": 780,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "correggio--the-holy-night-the-nativity",
+      "artist": "Correggio",
+      "title": "The Holy Night (The Nativity)",
+      "date": "c. 1528-30",
+      "holder": "Gemäldegalerie Alte Meister, Dresden",
+      "url": "https://commons.wikimedia.org/wiki/File:Correggio_-_The_Holy_Night_-_Google_Art_Project.jpg",
+      "file": "art/3f901fcb48db.avif",
+      "width": 881,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "cosimo-rosselli--the-sermon-on-the-mount",
+      "artist": "Cosimo Rosselli",
+      "title": "The Sermon on the Mount",
+      "date": "1481-82",
+      "holder": "Sistine Chapel, Vatican",
+      "url": "https://commons.wikimedia.org/wiki/File:Cosimo_Rosselli_Sermone_della_Montagna.jpg",
+      "file": "art/9ab237aa5535.avif",
+      "width": 1200,
+      "height": 702,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "diego-velazquez--christ-crucified",
+      "artist": "Diego Velázquez",
+      "title": "Christ Crucified",
+      "date": "1632",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Cristo_crucificado.jpg",
+      "file": "art/520df6d04f91.avif",
+      "width": 805,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "diego-velazquez--coronation-of-the-virgin",
+      "artist": "Diego Velázquez",
+      "title": "Coronation of the Virgin",
+      "date": "c. 1635-36",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Diego_Vel%C3%A1zquez_-_Coronation_of_the_Virgin_-_Prado.jpg",
+      "file": "art/30adf0919782.avif",
+      "width": 901,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "domenico-fetti--salvator-mundi",
+      "artist": "Domenico Fetti",
+      "title": "Salvator Mundi",
+      "date": "c. 1622-23",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/438169",
+      "file": "art/3942e73093e8.avif",
+      "width": 895,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "2007.91"
+    },
+    {
+      "id": "domenico-ghirlandaio--calling-of-the-apostles",
+      "artist": "Domenico Ghirlandaio",
+      "title": "Calling of the Apostles",
+      "date": "1481",
+      "holder": "Sistine Chapel, Vatican",
+      "url": "https://commons.wikimedia.org/wiki/File:Ghirlandaio,_Domenico_-_Calling_of_the_Apostles_-_1481.jpg",
+      "file": "art/000c792cd4f9.avif",
+      "width": 1200,
+      "height": 722,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "domenico-ghirlandaio--the-visitation",
+      "artist": "Domenico Ghirlandaio",
+      "title": "The Visitation",
+      "date": "1491",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Visitation_by_Domenico_Ghirlandaio.jpg",
+      "file": "art/56cbff6ebbb5.avif",
+      "width": 1149,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "el-greco--christ-carrying-the-cross",
+      "artist": "El Greco",
+      "title": "Christ Carrying the Cross",
+      "date": "c. 1577-87",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/459087",
+      "file": "art/10701c0fd225.avif",
+      "width": 868,
+      "height": 1200,
+      "sourceId": "met-open-access"
+    },
+    {
+      "id": "el-greco--christ-as-saviour",
+      "artist": "El Greco",
+      "title": "Christ as Saviour",
+      "date": "c. 1610-14",
+      "holder": "Museo del Greco, Toledo",
+      "url": "https://commons.wikimedia.org/wiki/File:El_Greco_-_Christ_as_Saviour_-_Google_Art_Project.jpg",
+      "file": "art/c01cac9592ec.avif",
+      "width": 940,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "el-greco--pentecost",
+      "artist": "El Greco",
+      "title": "Pentecost",
+      "date": "c. 1600",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Pentecost%C3%A9s_(El_Greco,_c._1600)_Prado.jpg",
+      "file": "art/74c4010b6217.avif",
+      "width": 553,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "el-greco--saints-peter-and-paul",
+      "artist": "El Greco",
+      "title": "Saints Peter and Paul",
+      "date": "c. 1590-1600",
+      "holder": "State Hermitage Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Greco,_El_-_Sts_Peter_and_Paul.jpg",
+      "file": "art/65658417e170.avif",
+      "width": 1025,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "el-greco--the-agony-in-the-garden",
+      "artist": "El Greco",
+      "title": "The Agony in the Garden",
+      "date": "c. 1590",
+      "holder": "Toledo Museum of Art",
+      "url": "https://commons.wikimedia.org/wiki/File:El%20Greco%20-%20The%20Agony%20in%20the%20Garden%20-%20WGA10484.jpg",
+      "file": "art/db206b3b104c.avif",
+      "width": 1129,
+      "height": 1000,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "el-greco--the-assumption-of-the-virgin",
+      "artist": "El Greco",
+      "title": "The Assumption of the Virgin",
+      "date": "1577",
+      "holder": "Art Institute of Chicago",
+      "url": "https://commons.wikimedia.org/wiki/File:Domenico%20Theotok%C3%B3poulos%2C%20called%20El%20Greco%20-%20The%20Assumption%20of%20the%20Virgin%20-%201906.99%20-%20Art%20Institute%20of%20Chicago.jpg",
+      "file": "art/18d7f5f446c9.avif",
+      "width": 602,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "1906.99"
+    },
+    {
+      "id": "el-greco--the-baptism-of-christ",
+      "artist": "El Greco",
+      "title": "The Baptism of Christ",
+      "date": "1597-1600",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:El%20bautismo%20de%20Cristo%20%28El%20Greco%2C%201597%29.jpg",
+      "file": "art/89246f641ea6.avif",
+      "width": 488,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "P000821"
+    },
+    {
+      "id": "el-greco--the-holy-trinity",
+      "artist": "El Greco",
+      "title": "The Holy Trinity",
+      "date": "1577-79",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:La_Trinidad,_Museo_Nacional_del_Prado.jpg",
+      "file": "art/7e9a5b4f4a83.avif",
+      "width": 842,
+      "height": 1200,
+      "sourceId": "wikimedia-cc-by-sa-2.0",
+      "photographer": "János Korom"
+    },
+    {
+      "id": "el-greco--the-resurrection",
+      "artist": "El Greco",
+      "title": "The Resurrection",
+      "date": "1597-1600",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:El%20Greco%20-%20The%20Resurrection%20-%20WGA10530.jpg",
+      "file": "art/c51a945065d9.avif",
+      "width": 554,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "P000825"
+    },
+    {
+      "id": "enguerrand-quarton--the-coronation-of-the-virgin",
+      "artist": "Enguerrand Quarton",
+      "title": "The Coronation of the Virgin",
+      "date": "1454",
+      "holder": "Musée Pierre-de-Luxembourg, Villeneuve-lès-Avignon",
+      "url": "https://commons.wikimedia.org/wiki/File:Enguerrand_Quarton%2C_Le_Couronnement_de_la_Vierge_(1454).jpg",
+      "file": "art/b049bda8558d.avif",
+      "width": 1200,
+      "height": 1034,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "follower-of-botticelli--the-coronation-of-the-virgin",
+      "artist": "Follower of Botticelli",
+      "title": "The Coronation of the Virgin",
+      "date": "4th quarter 15th c.",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/435731",
+      "file": "art/840629244722.avif",
+      "width": 1200,
+      "height": 800,
+      "sourceId": "met-open-access",
+      "accession": "49.7.4"
+    },
+    {
+      "id": "fra-angelico--presentation-in-the-temple",
+      "artist": "Fra Angelico",
+      "title": "Presentation in the Temple",
+      "date": "c. 1440-42",
+      "holder": "Convent of San Marco, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Presentation%20of%20Jesus%20at%20the%20Temple%20by%20Fra%20Angelico%20%28San%20Marco%20Cell%2010%29.jpg",
+      "file": "art/fd27fd4dd090.avif",
+      "width": 1036,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "fra-angelico--the-annunciation",
+      "artist": "Fra Angelico",
+      "title": "The Annunciation",
+      "date": "c. 1425-28",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:La%20Anunciaci%C3%B3n%2C%20de%20Fra%20Angelico.jpg",
+      "file": "art/ef5bfb118691.avif",
+      "width": 1200,
+      "height": 960,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "P000015"
+    },
+    {
+      "id": "fra-angelico--the-coronation-of-the-virgin",
+      "artist": "Fra Angelico",
+      "title": "The Coronation of the Virgin",
+      "date": "c. 1434-35",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Coronation_of_the_Virgin_-_Fra_Angelico_-_Louvre.jpg",
+      "file": "art/6f1676f2f1ae.avif",
+      "width": 1200,
+      "height": 1005,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "fra-angelico--the-madonna-of-humility",
+      "artist": "Fra Angelico",
+      "title": "The Madonna of Humility",
+      "date": "c. 1430",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Fra%20Angelico%2C%20The%20Madonna%20of%20Humility%2C%20c.%201430%2C%20NGA%205.jpg",
+      "file": "art/1d47c561ad27.avif",
+      "width": 898,
+      "height": 1200,
+      "sourceId": "nga-open-access",
+      "accession": "1937.1.5"
+    },
+    {
+      "id": "fra-angelico--the-sermon-on-the-mount",
+      "artist": "Fra Angelico",
+      "title": "The Sermon on the Mount",
+      "date": "c. 1440-43",
+      "holder": "Convent of San Marco, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Fra_Angelico,_Sermon_on_the_Mount,_1446-43;_Convent_of_San_Marco,_Florence.jpg",
+      "file": "art/7653f6d75c81.avif",
+      "width": 1200,
+      "height": 800,
+      "sourceId": "wikimedia-cc-by-2.0",
+      "photographer": "Prof. Mortel"
+    },
+    {
+      "id": "fra-angelico--transfiguration",
+      "artist": "Fra Angelico",
+      "title": "Transfiguration",
+      "date": "c. 1440-42",
+      "holder": "Convent of San Marco, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Transfiguration%20by%20fra%20Angelico%20%28San%20Marco%20Cell%206%29.jpg",
+      "file": "art/073ce57f4599.avif",
+      "width": 1022,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "fra-filippo-lippi--madonna-and-child-with-two-angels",
+      "artist": "Fra Filippo Lippi",
+      "title": "Madonna and Child with Two Angels",
+      "date": "c. 1460-65",
+      "holder": "Uffizi, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Fra%20Filippo%20Lippi%20-%20Madonna%20and%20Child%20with%20two%20Angels%20-%20Uffizi.jpg",
+      "file": "art/8d35a4ef6ff4.avif",
+      "width": 804,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "francesco-botticini--the-assumption-of-the-virgin",
+      "artist": "Francesco Botticini",
+      "title": "The Assumption of the Virgin",
+      "date": "c. 1475-76",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Francesco%20Botticini%20-%20The%20Assumption%20of%20the%20Virgin.jpg",
+      "file": "art/3113112f0ce5.avif",
+      "width": 1200,
+      "height": 728,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "NG1126"
+    },
+    {
+      "id": "francisco-de-zurbaran--the-crucifixion",
+      "artist": "Francisco de Zurbarán",
+      "title": "The Crucifixion",
+      "date": "1627",
+      "holder": "Art Institute of Chicago",
+      "url": "https://commons.wikimedia.org/wiki/File:Francisco%20de%20Zurbar%C3%A1n%20-%20The%20Crucifixion%20-%201954.15%20-%20Art%20Institute%20of%20Chicago.jpg",
+      "file": "art/a25f481a8e71.avif",
+      "width": 675,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "1954.15"
+    },
+    {
+      "id": "frans-francken-ii--the-sermon-on-the-mount",
+      "artist": "Frans Francken II",
+      "title": "The Sermon on the Mount",
+      "date": "1606",
+      "holder": "Location unknown",
+      "url": "https://commons.wikimedia.org/wiki/File:Francken,_Frans_II_%E2%80%94_Die_Bergpredigt_%E2%80%94_1606.jpg",
+      "file": "art/a9acc1ddd210.avif",
+      "width": 1200,
+      "height": 493,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "gentile-da-fabriano--the-coronation-of-the-virgin",
+      "artist": "Gentile da Fabriano",
+      "title": "The Coronation of the Virgin",
+      "date": "c. 1420",
+      "holder": "The J. Paul Getty Museum, Los Angeles",
+      "url": "https://commons.wikimedia.org/wiki/File:Gentile_da_Fabriano_-_Coronation_of_the_Virgin.jpg",
+      "file": "art/72626d52f283.avif",
+      "width": 906,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "gerard-david--christ-blessing",
+      "artist": "Gerard David",
+      "title": "Christ Blessing",
+      "date": "c. 1500-05",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/439327",
+      "file": "art/c21fa159be0e.avif",
+      "width": 866,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "2009.415"
+    },
+    {
+      "id": "gerard-david--the-marriage-at-cana",
+      "artist": "Gerard David",
+      "title": "The Marriage at Cana",
+      "date": "c. 1500",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Gerard%20David%20-%20The%20Marriage%20at%20Cana%20-%20WGA6020.jpg",
+      "file": "art/7abb1e96c909.avif",
+      "width": 1009,
+      "height": 755,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giambattista-tiepolo--the-institution-of-the-rosary",
+      "artist": "Giambattista Tiepolo",
+      "title": "The Institution of the Rosary",
+      "date": "1737-39",
+      "holder": "Santa Maria del Rosario (Gesuati), Venice",
+      "url": "https://commons.wikimedia.org/wiki/File:Giovanni%20Battista%20Tiepolo%20-%20The%20Institution%20of%20the%20Rosary%20-%20WGA22275.jpg",
+      "file": "art/5c7a3a11a4f6.avif",
+      "width": 829,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giampietrino--salvator-mundi",
+      "artist": "Giampietrino",
+      "title": "Salvator Mundi",
+      "date": "16th c.",
+      "holder": "Detroit Institute of Arts",
+      "url": "https://commons.wikimedia.org/wiki/File:Giampietrino,_Salvator_Mundi,_16th_century,_paint_on_wood_panel,_65.4_x_48.3_cm,_Detroit_Institute_of_Arts.jpg",
+      "file": "art/0b71092790df.avif",
+      "width": 888,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giotto--ascension",
+      "artist": "Giotto",
+      "title": "Ascension",
+      "date": "1304-06",
+      "holder": "Cappella degli Scrovegni, Padua",
+      "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2038%20Scenes%20from%20the%20Life%20of%20Christ%20-%2022.%20Ascension%20-%20WGA09226.jpg",
+      "file": "art/50348fe80e8f.avif",
+      "width": 1000,
+      "height": 927,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giotto--marriage-at-cana",
+      "artist": "Giotto",
+      "title": "Marriage at Cana",
+      "date": "1304-06",
+      "holder": "Cappella degli Scrovegni, Padua",
+      "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2024%20Scenes%20from%20the%20Life%20of%20Christ%20-%208.%20Marriage%20at%20Cana%20-%20WGA09202.jpg",
+      "file": "art/21a0e64d514b.avif",
+      "width": 1000,
+      "height": 926,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giotto--visitation",
+      "artist": "Giotto",
+      "title": "Visitation",
+      "date": "1306",
+      "holder": "Cappella degli Scrovegni, Padua",
+      "url": "https://commons.wikimedia.org/wiki/File:Giotto%20di%20Bondone%20-%20No.%2016%20Scenes%20from%20the%20Life%20of%20the%20Virgin%20-%207.%20Visitation%20-%20WGA09192.jpg",
+      "file": "art/9dae50177e4b.avif",
+      "width": 848,
+      "height": 1000,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "giovanni-bellini--presentation-of-jesus-at-the-temple",
+      "artist": "Giovanni Bellini",
+      "title": "Homage to Christ in the Temple",
+      "date": "c. 1490-1500",
+      "holder": "Kunsthistorisches Museum, Vienna",
+      "url": "https://commons.wikimedia.org/wiki/File:Presentation_of_Jesus_at_the_Temple-Bellini-KHM.jpg",
+      "file": "art/ff5200fb4a9d.avif",
+      "width": 1200,
+      "height": 926,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "GG 117"
+    },
+    {
+      "id": "giovanni-bellini--the-agony-in-the-garden",
+      "artist": "Giovanni Bellini",
+      "title": "The Agony in the Garden",
+      "date": "c. 1458-60",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Bellini,Giovanni_-_Agony_in_the_Garden_-_National_Gallery.jpg",
+      "file": "art/eac4e624b8d5.avif",
+      "width": 1200,
+      "height": 757,
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.nationalgallery.org.uk/paintings/giovanni-bellini-the-agony-in-the-garden"
+    },
+    {
+      "id": "giovanni-bellini--the-transfiguration-of-christ",
+      "artist": "Giovanni Bellini",
+      "title": "The Transfiguration of Christ",
+      "date": "c. 1478-79",
+      "holder": "Museo di Capodimonte, Naples",
+      "url": "https://commons.wikimedia.org/wiki/File:The-Transfiguration-1480-xx-Giovanni-Bellini.JPG",
+      "file": "art/6e3b4b78e369.avif",
+      "width": 1200,
+      "height": 906,
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q3997723"
+    },
+    {
+      "id": "guido-reni--la-trinita",
+      "artist": "Guido Reni",
+      "title": "La Trinità",
+      "date": "1625-26",
+      "holder": "Santissima Trinità dei Pellegrini, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:La_Trinit%C3%A0_-_Guido_Reni.jpg",
+      "file": "art/072a057948a8.avif",
+      "width": 634,
+      "height": 1193,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "guido-reni--st-michael-archangel",
+      "artist": "Guido Reni",
+      "title": "St Michael Archangel",
+      "date": "1636",
+      "holder": "S. Maria della Concezione, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:GuidoReni_MichaelDefeatsSatan.jpg",
+      "file": "art/24ec1d32480a.avif",
+      "width": 814,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "guillaume-fouace--le-sermon-sur-la-montagne",
+      "artist": "Guillaume Fouace",
+      "title": "Le Sermon sur la Montagne",
+      "date": "19th c.",
+      "holder": "Église Notre-Dame, Montfarville",
+      "url": "https://commons.wikimedia.org/wiki/File:Le_Sermon_sur_la_Montagne_de_Guillaume_Fouace,_%C3%A9glise_Notre-Dame,_Montfarville,_France.jpg",
+      "file": "art/29dd5b223b6f.avif",
+      "width": 800,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "hans-memling--the-annunciation",
+      "artist": "Hans Memling",
+      "title": "The Annunciation",
+      "date": "c. 1465-70",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/437490",
+      "file": "art/73442658b54f.avif",
+      "width": 750,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "17.190.7"
+    },
+    {
+      "id": "jacopo-tintoretto--the-last-supper",
+      "artist": "Jacopo Tintoretto",
+      "title": "The Last Supper",
+      "date": "1592-94",
+      "holder": "San Giorgio Maggiore, Venice",
+      "url": "https://commons.wikimedia.org/wiki/File:Jacopo%20Tintoretto%20-%20The%20Last%20Supper%20-%20WGA22649.jpg",
+      "file": "art/c73f7a9e6c3b.avif",
+      "width": 1200,
+      "height": 763,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "james-tissot--the-exhortation-to-the-apostles",
+      "artist": "James Tissot",
+      "title": "The Exhortation to the Apostles",
+      "date": "1886-96",
+      "holder": "Brooklyn Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Brooklyn%20Museum%20-%20The%20Exhortation%20to%20the%20Apostles%20%28Recommandation%20aux%20ap%C3%B4tres%29%20-%20James%20Tissot.jpg",
+      "file": "art/2fec32859389.avif",
+      "width": 1200,
+      "height": 898,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "james-tissot--the-lord-s-prayer-le-pater-noster",
+      "artist": "James Tissot",
+      "title": "The Lord's Prayer (Le Pater Noster)",
+      "date": "1886-96",
+      "holder": "Brooklyn Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Brooklyn%20Museum%20-%20The%20Lord%27s%20Prayer%20%28Le%20Pater%20Noster%29%20-%20James%20Tissot.jpg",
+      "file": "art/013b15a2c93c.avif",
+      "width": 921,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "james-tissot--the-sermon-of-the-beatitudes",
+      "artist": "James Tissot",
+      "title": "The Sermon of the Beatitudes",
+      "date": "1886-96",
+      "holder": "Brooklyn Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Brooklyn_Museum_-_The_Sermon_of_the_Beatitudes_(La_sermon_des_b%C3%A9atitudes)_-_James_Tissot.jpg",
+      "file": "art/ce91cdbb19ad.avif",
+      "width": 533,
+      "height": 768,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jan-brueghel-the-elder--the-sermon-on-the-mount",
+      "artist": "Jan Brueghel the Elder",
+      "title": "The Sermon on the Mount",
+      "date": "1598",
+      "holder": "The J. Paul Getty Museum",
+      "url": "https://commons.wikimedia.org/wiki/File:Jan_Brueghel_the_Elder_-_The_Sermon_on_the_Mount_-_Google_Art_Project.jpg",
+      "file": "art/e4c0b60b5d02.avif",
+      "width": 1200,
+      "height": 881,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jan-van-eyck--the-annunciation",
+      "artist": "Jan van Eyck",
+      "title": "The Annunciation",
+      "date": "c. 1434-36",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Jan%20van%20Eyck%20-%20The%20Annunciation%20-%20Google%20Art%20Project.jpg",
+      "file": "art/a9d756c8925a.avif",
+      "width": 455,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jan-van-eyck--the-madonna-in-the-church",
+      "artist": "Jan van Eyck",
+      "title": "The Madonna in the Church",
+      "date": "c. 1438-40",
+      "holder": "Gemäldegalerie, Berlin",
+      "url": "https://commons.wikimedia.org/wiki/File:Jan%20van%20Eyck%20-%20The%20Madonna%20in%20the%20Church%20-%20Google%20Art%20Project.jpg",
+      "file": "art/38d5fa42c397.avif",
+      "width": 577,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "juan-de-juanes--el-salvador",
+      "artist": "Juan de Juanes",
+      "title": "El Salvador",
+      "date": "16th c.",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:El_Salvador,_de_Juan_de_Juanes_(Museo_del_Prado).jpg",
+      "file": "art/654c9341a4c0.avif",
+      "width": 897,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "juan-de-juanes--the-last-supper",
+      "artist": "Juan de Juanes",
+      "title": "The Last Supper",
+      "date": "c. 1562",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:%C3%9Altima_Cena_-_Juan_de_Juanes.jpg",
+      "file": "art/6a0955206e73.avif",
+      "width": 1200,
+      "height": 759,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jusepe-de-ribera--saint-andrew",
+      "artist": "Jusepe de Ribera",
+      "title": "Saint Andrew",
+      "date": "c. 1630",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Jos%C3%A9_de_Ribera_-_St_Andrew_-_WGA19358.jpg",
+      "file": "art/ce32796b30e8.avif",
+      "width": 850,
+      "height": 1131,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jusepe-de-ribera--saints-peter-and-paul",
+      "artist": "Jusepe de Ribera",
+      "title": "Saints Peter and Paul",
+      "date": "1616-17",
+      "holder": "Musée des Beaux-Arts de Strasbourg",
+      "url": "https://commons.wikimedia.org/wiki/File:43_Jusepe_de_Ribera,_Saint_Pierre_et_saint_Paul,_1616-17.jpg",
+      "file": "art/6223beba0402.avif",
+      "width": 1042,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "jusepe-de-ribera--the-holy-trinity",
+      "artist": "Jusepe de Ribera",
+      "title": "The Holy Trinity",
+      "date": "c. 1635",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Jos%C3%A9_de_Ribera_-_Holy_Trinity_-_WGA19373.jpg",
+      "file": "art/48033eea3b2d.avif",
+      "width": 636,
+      "height": 810,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "leonardo-da-vinci--the-last-supper",
+      "artist": "Leonardo da Vinci",
+      "title": "The Last Supper",
+      "date": "1495-98",
+      "holder": "Santa Maria delle Grazie, Milan",
+      "url": "https://commons.wikimedia.org/wiki/File:%C3%9Altima%20Cena%20-%20Da%20Vinci%205.jpg",
+      "file": "art/3f1a87df073d.avif",
+      "width": 1200,
+      "height": 676,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "lorenzo-lotto--madonna-of-the-rosary",
+      "artist": "Lorenzo Lotto",
+      "title": "Madonna of the Rosary",
+      "date": "1539",
+      "holder": "San Domenico, Cingoli",
+      "url": "https://commons.wikimedia.org/wiki/File:13275-madonna-of-the-rosary-lorenzo-lotto.jpg",
+      "file": "art/4d0809625357.avif",
+      "width": 657,
+      "height": 970,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
+      "artist": "Ludovico Carracci",
+      "title": "An Angel Frees the Souls of Purgatory",
+      "date": "c. 1610",
+      "holder": "Pinacoteca Vaticana, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:Carracci-Purgatory.jpg",
+      "file": "art/68e5945c6f6d.avif",
+      "width": 866,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "marco-d-oggiono--salvator-mundi",
+      "artist": "Marco d'Oggiono",
+      "title": "Salvator Mundi",
+      "date": "c. 1500",
+      "holder": "Galleria Borghese, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:Marco_d%27Oggiono,_Salvator_Mundi,_c.1500,_Galleria_Borghese,_Rome.jpg",
+      "file": "art/e550322db657.avif",
+      "width": 900,
+      "height": 1195,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "masaccio--the-holy-trinity",
+      "artist": "Masaccio",
+      "title": "The Holy Trinity",
+      "date": "1425-28",
+      "holder": "Santa Maria Novella, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Masaccio,_Holy_Trinity,_1425-28,_Santa_Maria_Novella,_Florence.jpg",
+      "file": "art/f326133ca93e.avif",
+      "width": 744,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "murillo--immaculate-conception",
+      "artist": "Murillo",
+      "title": "Immaculate Conception",
+      "date": "1660-1665",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Murillo_-_Inmaculada_Concepci%C3%B3n_de_los_Venerables_o_de_Soult_(Museo_del_Prado,_1678).jpg",
+      "file": "art/8511e52926fc.avif",
+      "width": 818,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q2456003"
+    },
+    {
+      "id": "nicolas-poussin--the-assumption-of-the-virgin",
+      "artist": "Nicolas Poussin",
+      "title": "The Assumption of the Virgin",
+      "date": "c. 1630-32",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Nicolas%20Poussin%2C%20The%20Assumption%20of%20the%20Virgin%2C%20c.%201630-1632%2C%20NGA%2046470.jpg",
+      "file": "art/b0363d89548d.avif",
+      "width": 877,
+      "height": 1200,
+      "sourceId": "nga-open-access",
+      "accession": "1963.5.1"
+    },
+    {
+      "id": "paolo-veronese--christ-among-the-doctors-in-the-temple",
+      "artist": "Paolo Veronese",
+      "title": "Christ among the Doctors in the Temple",
+      "date": "c. 1560",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Paolo_Veronese_-_Jesus_among_the_Doctors_-_WGA24816.jpg",
+      "file": "art/b3804defd7d5.avif",
+      "width": 1200,
+      "height": 637,
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.wikidata.org/wiki/Q5494602"
+    },
+    {
+      "id": "paolo-veronese--the-wedding-at-cana",
+      "artist": "Paolo Veronese",
+      "title": "The Wedding at Cana",
+      "date": "1563",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Veronese,_The_Marriage_at_Cana_(1563).jpg",
+      "file": "art/848bceb441c1.avif",
+      "width": 1200,
+      "height": 808,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--immaculate-conception",
+      "artist": "Peter Paul Rubens",
+      "title": "Immaculate Conception",
+      "date": "c. 1628-29",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Peter_Paul_Rubens_-_Immaculate_Conception_(Prado).jpg",
+      "file": "art/65ef64e8078c.avif",
+      "width": 815,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--saint-james-the-apostle",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint James the Apostle",
+      "date": "c. 1612-13",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Peter_Paul_Rubens_-_St_James_the_Apostle_-_WGA20192.jpg",
+      "file": "art/fa0b9fe05d03.avif",
+      "width": 914,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--saint-john-the-apostle",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint John the Apostle",
+      "date": "c. 1612-13",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Rubens_apostel_johannes_grt.jpg",
+      "file": "art/3a80554ee541.avif",
+      "width": 898,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--saint-matthew-the-apostle",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint Matthew the Apostle",
+      "date": "c. 1612-13",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Rubens_apostel_mattheus_grt.jpg",
+      "file": "art/a3d83e1d1c3b.avif",
+      "width": 908,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--saint-matthias-the-apostle",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint Matthias the Apostle",
+      "date": "c. 1612-13",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Rubens_apostle_Matthias_grt.jpg",
+      "file": "art/4649c44cd054.avif",
+      "width": 909,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "peter-paul-rubens--saint-paul",
+      "artist": "Peter Paul Rubens",
+      "title": "Saint Paul",
+      "date": "c. 1611",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Saint%20Paul%2C%20by%20Peter%20Paul%20Rubens%20%28Museo%20del%20Prado%29.jpg",
+      "file": "art/0e5da6cb0972.avif",
+      "width": 910,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "petrus-christus--the-annunciation",
+      "artist": "Petrus Christus",
+      "title": "The Annunciation",
+      "date": "c. 1445",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/435899",
+      "file": "art/b149323093c8.avif",
+      "width": 999,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "32.100.35"
+    },
+    {
+      "id": "philippe-de-champaigne--the-annunciation",
+      "artist": "Philippe de Champaigne",
+      "title": "The Annunciation",
+      "date": "c. 1644",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/438724",
+      "file": "art/0da87dc84d1d.avif",
+      "width": 1200,
+      "height": 1173,
+      "sourceId": "met-open-access",
+      "accession": "2004.31"
+    },
+    {
+      "id": "piero-della-francesca--madonna-della-misericordia",
+      "artist": "Piero della Francesca",
+      "title": "Madonna della Misericordia",
+      "date": "1445-62",
+      "holder": "Museo Civico, Sansepolcro",
+      "url": "https://commons.wikimedia.org/wiki/File:Piero_della_francesca%2C_madonna_della_misericordia.jpg",
+      "file": "art/6fa4b3fdb7bb.avif",
+      "width": 775,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "piero-della-francesca--the-baptism-of-christ",
+      "artist": "Piero della Francesca",
+      "title": "The Baptism of Christ",
+      "date": "c. 1437-45",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Piero_della_Francesca_-_Baptism_of_Christ_-_WGA17595.jpg",
+      "file": "art/a15d17c29809.avif",
+      "width": 821,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "dateSource": "https://www.nationalgallery.org.uk/paintings/piero-della-francesca-the-baptism-of-christ"
+    },
+    {
+      "id": "piero-della-francesca--the-flagellation-of-christ",
+      "artist": "Piero della Francesca",
+      "title": "The Flagellation of Christ",
+      "date": "c. 1459-60",
+      "holder": "Galleria Nazionale delle Marche, Urbino",
+      "url": "https://commons.wikimedia.org/wiki/File:Piero%20della%20Francesca%20-%20The%20Flagellation%20-%20WGA17600.jpg",
+      "file": "art/b51a2bc6a76a.avif",
+      "width": 1200,
+      "height": 874,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "piero-della-francesca--the-resurrection",
+      "artist": "Piero della Francesca",
+      "title": "The Resurrection",
+      "date": "1460s",
+      "holder": "Museo Civico, Sansepolcro",
+      "url": "https://commons.wikimedia.org/wiki/File:Piero_della_Francesca_-_Resurrection_-_WGA17609.jpg",
+      "file": "art/da7482040a5b.avif",
+      "width": 1130,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "pietro-perugino--the-ascension-of-christ",
+      "artist": "Pietro Perugino",
+      "title": "The Ascension of Christ",
+      "date": "c. 1496-98",
+      "holder": "Musée des Beaux-Arts, Lyon",
+      "url": "https://commons.wikimedia.org/wiki/File:Pietro_Perugino_-_The_Ascension_of_Christ_-_WGA17257.jpg",
+      "file": "art/6656f452ce00.avif",
+      "width": 698,
+      "height": 930,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "pompeo-batoni--sacred-heart-of-jesus",
+      "artist": "Pompeo Batoni",
+      "title": "Sacred Heart of Jesus",
+      "date": "1767",
+      "holder": "Church of the Gesù, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:SacredHeartBatoni.jpg",
+      "file": "art/b53b9c076ceb.avif",
+      "width": 861,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--christ-falls-on-the-way-to-calvary",
+      "artist": "Raphael",
+      "title": "Christ Falls on the Way to Calvary",
+      "date": "c. 1515-16",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20Sanzio%20-%20Christ%20Falls%20on%20the%20Way%20to%20Calvary%20-%20WGA18828.jpg",
+      "file": "art/622853fb36a5.avif",
+      "width": 864,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--madonna-del-granduca",
+      "artist": "Raphael",
+      "title": "Madonna del Granduca",
+      "date": "c. 1505",
+      "holder": "Galleria Palatina, Palazzo Pitti, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20%281483-1520%29%20-%20La%20Madonna%20del%20Granduca%20-%20178%20-%20Galleria%20Palatina.jpg",
+      "file": "art/9044173e7461.avif",
+      "width": 815,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "Palatina 178"
+    },
+    {
+      "id": "raphael--madonna-della-seggiola",
+      "artist": "Raphael",
+      "title": "Madonna della Seggiola",
+      "date": "c. 1513-14",
+      "holder": "Palazzo Pitti, Florence",
+      "url": "https://commons.wikimedia.org/wiki/File:Raffaello%20Sanzio%20-%20Madonna%20della%20Seggiola%20%28Sedia%29%20-%20WGA18816.jpg",
+      "file": "art/87032cf54cbd.avif",
+      "width": 1000,
+      "height": 1000,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--the-sistine-madonna",
+      "artist": "Raphael",
+      "title": "The Sistine Madonna",
+      "date": "1513-14",
+      "holder": "Gemäldegalerie Alte Meister, Dresden",
+      "url": "https://commons.wikimedia.org/wiki/File:Raphael_-_The_Sistine_Madonna_-_Google_Art_Project.jpg",
+      "file": "art/23082e05b83d.avif",
+      "width": 876,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--the-small-cowper-madonna",
+      "artist": "Raphael",
+      "title": "The Small Cowper Madonna",
+      "date": "c. 1505",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Raphael%20-%20The%20Small%20Cowper%20Madonna%20-%20Google%20Art%20Project.jpg",
+      "file": "art/2684f02be7ef.avif",
+      "width": 879,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "raphael--the-transfiguration",
+      "artist": "Raphael",
+      "title": "The Transfiguration",
+      "date": "1516-20",
+      "holder": "Pinacoteca Vaticana, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:Rapha%C3%ABl%2C%20La%20Transfiguration%2C%201518%E2%80%931520%2C%20huile%20sur%20bois%2C%20405%20%C3%97%20278%20cm%2C%20Mus%C3%A9es%20du%20Vatican%2C%20Pinacoth%C3%A8que%2C%20inv.%204.jpg",
+      "file": "art/5e0362e628a0.avif",
+      "width": 812,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "inv. 4"
+    },
+    {
+      "id": "raphael--the-visitation",
+      "artist": "Raphael",
+      "title": "The Visitation",
+      "date": "c. 1517",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Raphael%20-%20The%20visitation.jpg",
+      "file": "art/038eee9933af.avif",
+      "width": 520,
+      "height": 719,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "rembrandt--christ-preaching-la-petite-tombe",
+      "artist": "Rembrandt",
+      "title": "Christ Preaching (La Petite Tombe)",
+      "date": "c. 1652",
+      "holder": "National Gallery of Art, Washington",
+      "url": "https://commons.wikimedia.org/wiki/File:Rembrandt%20van%20Rijn%2C%20Christ%20Preaching%20%28La%20petite%20Tombe%29%2C%20c.%201652%2C%20NGA%2043413.jpg",
+      "file": "art/02373f642a26.avif",
+      "width": 1200,
+      "height": 893,
+      "sourceId": "nga-open-access",
+      "accession": "1955.6.5"
+    },
+    {
+      "id": "rembrandt--the-hundred-guilder-print",
+      "artist": "Rembrandt",
+      "title": "The Hundred Guilder Print",
+      "date": "c. 1649",
+      "holder": "Rijksmuseum, Amsterdam",
+      "url": "https://commons.wikimedia.org/wiki/File:Rembrandt%20The%20Hundred%20Guilder%20Print.jpg",
+      "file": "art/7ae51ce1b567.avif",
+      "width": 1200,
+      "height": 872,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "RP-P-OB-602"
+    },
+    {
+      "id": "sandro-botticelli--the-annunciation",
+      "artist": "Sandro Botticelli",
+      "title": "The Annunciation",
+      "date": "c. 1490",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/459016",
+      "file": "art/ebe34711ac35.avif",
+      "width": 1200,
+      "height": 788,
+      "sourceId": "met-open-access",
+      "accession": "1975.1.74"
+    },
+    {
+      "id": "sandro-botticelli--the-mystical-nativity",
+      "artist": "Sandro Botticelli",
+      "title": "The Mystical Nativity",
+      "date": "1500",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Mystic%20Nativity%2C%20Sandro%20Botticelli.jpg",
+      "file": "art/2922fa6ed45a.avif",
+      "width": 828,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "NG1034"
+    },
+    {
+      "id": "sassoferrato--madonna-del-rosario",
+      "artist": "Sassoferrato",
+      "title": "Madonna del Rosario",
+      "date": "1643",
+      "holder": "Basilica di Santa Sabina, Rome",
+      "url": "https://commons.wikimedia.org/wiki/File:Sassoferrato%2C_madonna_del_rosario%2C_1643%2C_01.jpg",
+      "file": "art/83b0735f8ea0.avif",
+      "width": 621,
+      "height": 1200,
+      "sourceId": "wikimedia-cc-by-3.0",
+      "photographer": "Sailko"
+    },
+    {
+      "id": "sassoferrato--madonna-in-prayer",
+      "artist": "Sassoferrato",
+      "title": "Madonna in Prayer",
+      "date": "c. 1640-50",
+      "holder": "The National Gallery, London",
+      "url": "https://commons.wikimedia.org/wiki/File:Sassoferrato_-_Madonna_in_prayer_-_Google_Art_Project.jpg",
+      "file": "art/a7ab85424da8.avif",
+      "width": 967,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "spanish-painter--the-trinity-adored-by-all-saints",
+      "artist": "Spanish Painter",
+      "title": "The Trinity Adored by All Saints",
+      "date": "c. 1400",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/437743",
+      "file": "art/c0c4ef0b5900.avif",
+      "width": 1087,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "39.54"
+    },
+    {
+      "id": "taddeo-di-bartolo--christ-and-the-twelve-apostles",
+      "artist": "Taddeo di Bartolo",
+      "title": "Christ and the Twelve Apostles",
+      "date": "c. 1400",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/437774",
+      "file": "art/4f5a368fd5e1.avif",
+      "width": 1200,
+      "height": 161,
+      "sourceId": "met-open-access",
+      "accession": "1991.27.1"
+    },
+    {
+      "id": "titian--assumption-of-the-virgin-assunta",
+      "artist": "Titian",
+      "title": "Assumption of the Virgin (Assunta)",
+      "date": "1516-18",
+      "holder": "Basilica dei Frari, Venice",
+      "url": "https://commons.wikimedia.org/wiki/File:Tiziano,_l%27assunta,_1516-18.JPG",
+      "file": "art/680f5b070fbb.avif",
+      "width": 775,
+      "height": 1200,
+      "sourceId": "wikimedia-cc-by-3.0",
+      "photographer": "Sailko"
+    },
+    {
+      "id": "titian--christ-carrying-the-cross",
+      "artist": "Titian",
+      "title": "Christ Carrying the Cross",
+      "date": "c. 1565",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Titian%2C%20Christ%20Carrying%20the%20Cross.%20Oil%20on%20canvas%2C%2067%20x%2077%20cm%2C%20c.%201565.%20Madrid%2C%20Museo%20Nacional%20del%20Prado.jpg",
+      "file": "art/17b85502eafd.avif",
+      "width": 1200,
+      "height": 1036,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "P000438"
+    },
+    {
+      "id": "titian--christ-crowned-with-thorns",
+      "artist": "Titian",
+      "title": "Christ Crowned with Thorns",
+      "date": "c. 1542-43",
+      "holder": "Musée du Louvre, Paris",
+      "url": "https://commons.wikimedia.org/wiki/File:Titian%20-%20The%20Crowning%20with%20Thorns%20%281545%29.jpg",
+      "file": "art/8e81745b0155.avif",
+      "width": 657,
+      "height": 1100,
+      "sourceId": "wikimedia-pd-art",
+      "accession": "INV 748"
+    },
+    {
+      "id": "titian--pentecost",
+      "artist": "Titian",
+      "title": "Pentecost",
+      "date": "1546",
+      "holder": "Santa Maria della Salute, Venice",
+      "url": "https://commons.wikimedia.org/wiki/File:Tiziano%20Pentecost%C3%A9s.jpg",
+      "file": "art/b9b0b1988505.avif",
+      "width": 854,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "titian--the-trinity-in-glory-la-gloria",
+      "artist": "Titian",
+      "title": "The Trinity in Glory (La Gloria)",
+      "date": "1551-54",
+      "holder": "Museo del Prado, Madrid",
+      "url": "https://commons.wikimedia.org/wiki/File:Titian_-_The_Trinity_in_Glory_-_WGA22817.jpg",
+      "file": "art/113108a2e589.avif",
+      "width": 821,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "william-holman-hunt--the-finding-of-the-saviour-in-the-temple",
+      "artist": "William Holman Hunt",
+      "title": "The Finding of the Saviour in the Temple",
+      "date": "1854-55",
+      "holder": "Birmingham Museum and Art Gallery",
+      "url": "https://commons.wikimedia.org/wiki/File:William%20Holman%20Hunt%20-%20The%20Finding%20of%20the%20Saviour%20in%20the%20Temple%20-%20Google%20Art%20Project.jpg",
+      "file": "art/75d8f5db0dac.avif",
+      "width": 1200,
+      "height": 735,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "william-adolphe-bouguereau--pieta",
+      "artist": "William-Adolphe Bouguereau",
+      "title": "Pietà",
+      "date": "1876",
+      "holder": "Private collection",
+      "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Pieta%20%281876%29.jpg",
+      "file": "art/1377221d7c7d.avif",
+      "width": 764,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "william-adolphe-bouguereau--song-of-the-angels",
+      "artist": "William-Adolphe Bouguereau",
+      "title": "Song of the Angels",
+      "date": "1881",
+      "holder": "Forest Lawn Museum, Glendale",
+      "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20Song%20of%20the%20Angels%20%281881%29.jpg",
+      "file": "art/e17fda8763fc.avif",
+      "width": 821,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "william-adolphe-bouguereau--the-flagellation-of-our-lord",
+      "artist": "William-Adolphe Bouguereau",
+      "title": "The Flagellation of Our Lord",
+      "date": "1880",
+      "holder": "Musée des Beaux-Arts de La Rochelle",
+      "url": "https://commons.wikimedia.org/wiki/File:William-Adolphe%20Bouguereau%20%281825-1905%29%20-%20The%20Flagellation%20of%20Our%20Lord%20Jesus%20Christ%20%281880%29.jpg",
+      "file": "art/68cc4fcdf50e.avif",
+      "width": 839,
+      "height": 1200,
+      "sourceId": "wikimedia-pd-art"
+    },
+    {
+      "id": "workshop-of-el-greco--saint-andrew",
+      "artist": "Workshop of El Greco",
+      "title": "Saint Andrew",
+      "date": "c. 1610",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/436577",
+      "file": "art/5840ebe22b67.avif",
+      "width": 722,
+      "height": 1200,
+      "sourceId": "met-open-access",
+      "accession": "61.101.8"
+    },
+    {
+      "id": "workshop-of-hans-memling--salvator-mundi",
+      "artist": "Workshop of Hans Memling",
+      "title": "Salvator Mundi",
+      "date": "1480-85",
+      "holder": "The Metropolitan Museum of Art",
+      "url": "https://www.metmuseum.org/art/collection/search/437061",
+      "file": "art/8426b5e2e28f.avif",
+      "width": 1200,
+      "height": 1193,
+      "sourceId": "met-open-access",
+      "accession": "32.100.54"
+    }
+  ],
+  "rosary": {
+    "devotion": "rosary",
+    "schedule": {
+      "sunday": "glorious",
+      "monday": "joyful",
+      "tuesday": "sorrowful",
+      "wednesday": "glorious",
+      "thursday": "luminous",
+      "friday": "sorrowful",
+      "saturday": "joyful",
+      "sourceId": "holy-see-mysteries",
+      "seasonalSundays": [
+        {
+          "season": "advent",
+          "mysterySetId": "joyful",
+          "sourceId": "usccb-howto"
+        },
+        {
+          "season": "christmas",
+          "mysterySetId": "joyful",
+          "sourceId": "rosary-center-howto"
+        },
+        {
+          "season": "lent",
+          "mysterySetId": "sorrowful",
+          "sourceId": "usccb-howto"
+        }
+      ]
+    },
+    "prayerIds": [
+      "sign-of-the-cross",
+      "apostles-creed",
+      "our-father",
+      "hail-mary",
+      "glory-be",
+      "fatima-prayer",
+      "hail-holy-queen",
+      "closing-prayer"
+    ],
+    "mysterySets": [
+      {
+        "id": "joyful",
+        "ordinal": 1,
+        "name": "Misterios Gozosos",
+        "nameSourceId": "holy-see-mysteries-es",
+        "mysteries": [
+          {
+            "set": "joyful",
+            "ordinal": 1,
+            "title": "La Encarnación del Hijo de Dios",
+            "titleSourceId": "holy-see-joyful-es",
+            "fruit": "Humildad",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 1,26-27",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 1,
+              "verseStart": 26,
+              "verseEnd": 27,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-joyful",
+              "text": "In mense autem sexto, missus est angelus Gabriel a Deo in civitatem Galilææ, cui nomen Nazareth, ad virginem desponsatam viro, cui nomen erat Joseph, de domo David: et nomen virginis Maria."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.joyful.1",
+              "locator": "First Method, paragraph 156, First decade",
+              "sourceTitle": "Incarnation",
+              "theme": "humility of heart",
+              "text": "Te ofrecemos, Señor Jesús, esta primera decena en honor de tu Encarnación. Por este misterio y por la intercesión de tu santa Madre, te pedimos la humildad de corazón.",
+              "blockIndex": 649,
+              "translation": "ai"
+            },
+            "artIds": [
+              "hans-memling--the-annunciation",
+              "jan-van-eyck--the-annunciation",
+              "fra-angelico--the-annunciation",
+              "sandro-botticelli--the-annunciation",
+              "petrus-christus--the-annunciation",
+              "philippe-de-champaigne--the-annunciation"
+            ]
+          },
+          {
+            "set": "joyful",
+            "ordinal": 2,
+            "title": "La Visitación de Nuestra Señora a su prima Santa Isabel",
+            "titleSourceId": "holy-see-joyful-es",
+            "fruit": "Amor al prójimo",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 1,39-42",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 1,
+              "verseStart": 39,
+              "verseEnd": 42,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-joyful",
+              "text": "Exsurgens autem Maria in diebus illis, abiit in montana cum festinatione, in civitatem Juda: et intravit in domum Zachariæ, et salutavit Elisabeth. Et factum est, ut audivit salutationem Mariæ Elisabeth, exsultavit infans in utero ejus: et repleta est Spiritu Sancto Elisabeth: et exclamavit voce magna, et dixit: Benedicta tu inter mulieres, et benedictus fructus ventris tui."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.joyful.2",
+              "locator": "First Method, paragraph 156, Second decade",
+              "sourceTitle": "Visitation",
+              "theme": "perfect love of neighbor",
+              "text": "Te ofrecemos, Señor Jesús, esta segunda decena en honor de la Visitación de tu santa Madre a su prima santa Isabel. Por este misterio y por la intercesión de María, te pedimos un amor perfecto al prójimo.",
+              "blockIndex": 652,
+              "translation": "ai"
+            },
+            "artIds": [
+              "domenico-ghirlandaio--the-visitation",
+              "raphael--the-visitation",
+              "giotto--visitation"
+            ]
+          },
+          {
+            "set": "joyful",
+            "ordinal": 3,
+            "title": "El Nacimiento del Hijo de Dios en el portal de Belén",
+            "titleSourceId": "holy-see-joyful-es",
+            "fruit": "Pobreza",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 2,1-7",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 2,
+              "verseStart": 1,
+              "verseEnd": 7,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-joyful",
+              "text": "Factum est autem in diebus illis, exiit edictum a Cæsare Augusto ut describeretur universus orbis. Hæc descriptio prima facta est a præside Syriæ Cyrino: et ibant omnes ut profiterentur singuli in suam civitatem. Ascendit autem et Joseph a Galilæa de civitate Nazareth in Judæam, in civitatem David, quæ vocatur Bethlehem: eo quod esset de domo et familia David, ut profiteretur cum Maria desponsata sibi uxore prægnante. Factum est autem, cum essent ibi, impleti sunt dies ut pareret. Et peperit filium suum primogenitum, et pannis eum involvit, et reclinavit eum in præsepio: quia non erat eis locus in diversorio."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.joyful.3",
+              "locator": "First Method, paragraph 156, Third decade",
+              "sourceTitle": "Birth of Jesus",
+              "theme": "detachment from the world, love of poverty, and love of the poor",
+              "text": "Te ofrecemos, Niño Jesús, esta tercera decena en honor de tu santo Nacimiento. Por este misterio y por la intercesión de tu Santísima Madre, te pedimos el desprendimiento de las cosas de este mundo, el amor a la pobreza y el amor a los pobres.",
+              "blockIndex": 655,
+              "translation": "ai"
+            },
+            "artIds": [
+              "correggio--the-holy-night-the-nativity",
+              "sandro-botticelli--the-mystical-nativity"
+            ]
+          },
+          {
+            "set": "joyful",
+            "ordinal": 4,
+            "title": "La presentación de Jesús en el Templo",
+            "titleSourceId": "holy-see-joyful-es",
+            "fruit": "Pureza de corazón y de cuerpo",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 2,21-24",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 2,
+              "verseStart": 21,
+              "verseEnd": 24,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-joyful",
+              "text": "Et postquam consummati sunt dies octo, ut circumcideretur puer, vocatum est nomen ejus Jesus, quod vocatum est ab angelo priusquam in utero conciperetur. Et postquam impleti sunt dies purgationis ejus secundum legem Moysi, tulerunt illum in Jerusalem, ut sisterent eum Domino, sicut scriptum est in lege Domini: Quia omne masculinum adaperiens vulvam, sanctum Domino vocabitur: et ut darent hostiam secundum quod dictum est in lege Domini, par turturum, aut duos pullos columbarum."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.joyful.4",
+              "locator": "First Method, paragraph 156, Fourth decade",
+              "sourceTitle": "Presentation in the temple",
+              "theme": "wisdom and purity of heart and body",
+              "text": "Te ofrecemos, oh, Señor Jesús, esta cuarta decena en honor de tu Presentación en el templo por manos de María. Por este misterio y por la intercesión de tu Santísima Madre, te pedimos el don de la sabiduría y la pureza de corazón y de cuerpo.",
+              "blockIndex": 658,
+              "translation": "ai"
+            },
+            "artIds": [
+              "giovanni-bellini--presentation-of-jesus-at-the-temple",
+              "ambrogio-lorenzetti--presentation-at-the-temple",
+              "fra-angelico--presentation-in-the-temple"
+            ]
+          },
+          {
+            "set": "joyful",
+            "ordinal": 5,
+            "title": "El Niño Jesús perdido y hallado en el Templo",
+            "titleSourceId": "holy-see-joyful-es",
+            "fruit": "Devoción a Jesús",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 2,41-47",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 2,
+              "verseStart": 41,
+              "verseEnd": 47,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-joyful",
+              "text": "Et ibant parentes ejus per omnes annos in Jerusalem, in die solemni Paschæ. Et cum factus esset annorum duodecim, ascendentibus illis Jerosolymam secundum consuetudinem diei festi, consummatisque diebus, cum redirent, remansit puer Jesus in Jerusalem, et non cognoverunt parentes ejus. Existimantes autem illum esse in comitatu, venerunt iter diei, et requirebant eum inter cognatos et notos. Et non invenientes, regressi sunt in Jerusalem, requirentes eum. Et factum est, post triduum invenerunt illum in templo sedentem in medio doctorum, audientem illos, et interrogantem eos. Stupebant autem omnes qui eum audiebant, super prudentia et responsis ejus."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.joyful.5",
+              "locator": "First Method, paragraph 156, Fifth decade",
+              "sourceTitle": "Finding of Jesus in the temple",
+              "theme": "conversion of sinners and return to Christ",
+              "text": "Te ofrecemos, Señor Jesús, esta quinta decena para honrar el momento en que María te encontró en el templo entre los doctores, después de haberte perdido. Por este misterio y por la intercesión de tu Santísima Madre, te pedimos que nos conviertas a nosotros y a todos los pecadores, herejes, cismáticos y paganos.",
+              "blockIndex": 661,
+              "translation": "ai"
+            },
+            "artIds": [
+              "paolo-veronese--christ-among-the-doctors-in-the-temple",
+              "william-holman-hunt--the-finding-of-the-saviour-in-the-temple"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "luminous",
+        "ordinal": 2,
+        "name": "Misterios Luminosos",
+        "nameSourceId": "holy-see-mysteries-es",
+        "mysteries": [
+          {
+            "set": "luminous",
+            "ordinal": 1,
+            "title": "El Bautismo en el Jordán",
+            "titleSourceId": "holy-see-luminous-es",
+            "fruit": "Apertura al Espíritu Santo",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 3,16-17",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 3,
+              "verseStart": 16,
+              "verseEnd": 17,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-luminous",
+              "text": "Baptizatus autem Jesus, confestim ascendit de aqua, et ecce aperti sunt ei cæli: et vidit Spiritum Dei descendentem sicut columbam, et venientem super se. Et ecce vox de cælis dicens: Hic est Filius meus dilectus, in quo mihi complacui."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "summary-subpoint",
+              "sectionId": "third-method.summary.finding-in-the-temple.4",
+              "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 4th Hail Mary",
+              "sourceTitle": "His baptism by St. John Baptist",
+              "theme": "the baptism of Christ",
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "Su bautismo por san Juan Bautista.",
+              "blockIndex": 832,
+              "translation": "ai"
+            },
+            "artIds": [
+              "piero-della-francesca--the-baptism-of-christ",
+              "andrea-del-verrocchio-and-leonardo-da-vinci--the-baptism-of-christ",
+              "el-greco--the-baptism-of-christ"
+            ]
+          },
+          {
+            "set": "luminous",
+            "ordinal": 2,
+            "title": "Las bodas de Caná",
+            "titleSourceId": "holy-see-luminous-es",
+            "fruit": "A Jesús por María",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Juan 2,1-5",
+              "book": "John",
+              "bookId": "john",
+              "chapter": 2,
+              "verseStart": 1,
+              "verseEnd": 5,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-luminous",
+              "text": "Et die tertia nuptiæ factæ sunt in Cana Galilææ, et erat mater Jesu ibi. Vocatus est autem et Jesus, et discipuli ejus, ad nuptias. Et deficiente vino, dicit mater Jesu ad eum: Vinum non habent. Et dicit ei Jesus: Quid mihi et tibi est, mulier? nondum venit hora mea. Dicit mater ejus ministris: Quodcumque dixerit vobis, facite."
+            },
+            "reflection": {
+              "status": "candidate",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "summary-broad-candidate",
+              "sectionId": "third-method.summary.finding-in-the-temple.6",
+              "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 6th Hail Mary",
+              "sourceTitle": "His astounding miracles",
+              "theme": "Christ revealing his glory through miracles",
+              "note": "No explicit Cana reference appears in the De Montfort text; this is a broad miracle-theme candidate."
+            },
+            "artIds": [
+              "paolo-veronese--the-wedding-at-cana",
+              "gerard-david--the-marriage-at-cana",
+              "giotto--marriage-at-cana"
+            ]
+          },
+          {
+            "set": "luminous",
+            "ordinal": 3,
+            "title": "El anuncio del Reino de Dios",
+            "titleSourceId": "holy-see-luminous-es",
+            "fruit": "Conversión",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Marcos 1,15",
+              "book": "Mark",
+              "bookId": "mark",
+              "chapter": 1,
+              "verseStart": 15,
+              "verseEnd": 15,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-luminous",
+              "text": "Et dicens: Quoniam impletum est tempus, et appropinquavit regnum Dei: pœnitemini, et credite Evangelio."
+            },
+            "reflection": {
+              "status": "candidate",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "summary-broad-candidate",
+              "sectionId": "third-method.summary.finding-in-the-temple.5",
+              "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 5th Hail Mary",
+              "sourceTitle": "His wonderful preaching",
+              "theme": "Christ preaching conversion and the kingdom",
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering."
+            },
+            "artIds": [
+              "fra-angelico--the-sermon-on-the-mount",
+              "cosimo-rosselli--the-sermon-on-the-mount",
+              "jan-brueghel-the-elder--the-sermon-on-the-mount",
+              "claude-lorrain--the-sermon-on-the-mount",
+              "james-tissot--the-sermon-of-the-beatitudes",
+              "frans-francken-ii--the-sermon-on-the-mount",
+              "guillaume-fouace--le-sermon-sur-la-montagne"
+            ]
+          },
+          {
+            "set": "luminous",
+            "ordinal": 4,
+            "title": "La Transfiguración",
+            "titleSourceId": "holy-see-luminous-es",
+            "fruit": "Deseo de santidad",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 17,1-2",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 17,
+              "verseStart": 1,
+              "verseEnd": 2,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-luminous",
+              "text": "Et post dies sex assumit Jesus Petrum, et Jacobum, et Joannem fratrem ejus, et ducit illos in montem excelsum seorsum: et transfiguratus est ante eos. Et resplenduit facies ejus sicut sol: vestimenta autem ejus facta sunt alba sicut nix."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "summary-subpoint",
+              "sectionId": "third-method.summary.finding-in-the-temple.8",
+              "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 8th Hail Mary",
+              "sourceTitle": "His marvellous transfiguration",
+              "theme": "the Transfiguration of Christ",
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "Su maravillosa transfiguración.",
+              "blockIndex": 840,
+              "translation": "ai"
+            },
+            "artIds": [
+              "giovanni-bellini--the-transfiguration-of-christ",
+              "raphael--the-transfiguration",
+              "fra-angelico--transfiguration"
+            ]
+          },
+          {
+            "set": "luminous",
+            "ordinal": 5,
+            "title": "La institución de la Eucaristía",
+            "titleSourceId": "holy-see-luminous-es",
+            "fruit": "Adoración",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 26,26",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 26,
+              "verseStart": 26,
+              "verseEnd": 26,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-luminous",
+              "text": "Cœnantibus autem eis, accepit Jesus panem, et benedixit, ac fregit, deditque discipulis suis, et ait: Accipite, et comedite: hoc est corpus meum."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "summary-subpoint",
+              "sectionId": "third-method.summary.finding-in-the-temple.10",
+              "locator": "Third Method, Summary, The Finding of Jesus in the Temple, 10th Hail Mary",
+              "sourceTitle": "The institution of the Holy Eucharist",
+              "theme": "the institution of the Eucharist",
+              "note": "De Montfort predates the Luminous Mysteries; this is a public-ministry subpoint, not a native decade offering.",
+              "text": "La institución de la Sagrada Eucaristía.",
+              "blockIndex": 844,
+              "translation": "ai"
+            },
+            "artIds": [
+              "juan-de-juanes--the-last-supper",
+              "leonardo-da-vinci--the-last-supper",
+              "jacopo-tintoretto--the-last-supper"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sorrowful",
+        "ordinal": 3,
+        "name": "Misterios Dolorosos",
+        "nameSourceId": "holy-see-mysteries-es",
+        "mysteries": [
+          {
+            "set": "sorrowful",
+            "ordinal": 1,
+            "title": "La oración en el Huerto",
+            "titleSourceId": "holy-see-sorrowful-es",
+            "fruit": "Obediencia a la voluntad de Dios",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 26,36-39",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 26,
+              "verseStart": 36,
+              "verseEnd": 39,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-sorrowful",
+              "text": "Tunc venit Jesus cum illis in villam, quæ dicitur Gethsemani, et dixit discipulis suis: Sedete hic donec vadam illuc, et orem. Et assumpto Petro, et duobus filiis Zebedæi, cœpit contristari et mœstus esse. Tunc ait illis: Tristis est anima mea usque ad mortem: sustinete hic, et vigilate mecum. Et progressus pusillum, procidit in faciem suam, orans, et dicens: Pater mi, si possibile est, transeat a me calix iste: verumtamen non sicut ego volo, sed sicut tu."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.sorrowful.1",
+              "locator": "First Method, paragraph 157, Sixth decade",
+              "sourceTitle": "Agony in the garden of Olives",
+              "theme": "sorrow for sin and conformity to the will of God",
+              "text": "Te ofrecemos, Señor Jesús, esta sexta decena en honor de tu intensa Agonía en el huerto de los Olivos. Por este misterio y por la intercesión de tu santa Madre, te pedimos un dolor perfecto de nuestros pecados y una perfecta conformidad con tu santa voluntad.",
+              "blockIndex": 665,
+              "translation": "ai"
+            },
+            "artIds": [
+              "giovanni-bellini--the-agony-in-the-garden",
+              "andrea-mantegna--the-agony-in-the-garden",
+              "el-greco--the-agony-in-the-garden"
+            ]
+          },
+          {
+            "set": "sorrowful",
+            "ordinal": 2,
+            "title": "La flagelación de Jesús atado a la columna",
+            "titleSourceId": "holy-see-sorrowful-es",
+            "fruit": "Mortificación",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 27,26",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 27,
+              "verseStart": 26,
+              "verseEnd": 26,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-sorrowful",
+              "text": "Tunc dimisit illis Barabbam: Jesum autem flagellatum tradidit eis ut crucifigeretur."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.sorrowful.2",
+              "locator": "First Method, paragraph 157, Seventh decade",
+              "sourceTitle": "Scourging",
+              "theme": "mortification of the senses",
+              "text": "Te ofrecemos, Señor Jesús, esta séptima decena en honor de tu cruel Flagelación. Por este misterio y por la intercesión de tu santa Madre, te pedimos la gracia de mortificar nuestros sentidos.",
+              "blockIndex": 668,
+              "translation": "ai"
+            },
+            "artIds": [
+              "caravaggio--the-flagellation-of-christ",
+              "piero-della-francesca--the-flagellation-of-christ",
+              "william-adolphe-bouguereau--the-flagellation-of-our-lord"
+            ]
+          },
+          {
+            "set": "sorrowful",
+            "ordinal": 3,
+            "title": "La coronación de espinas",
+            "titleSourceId": "holy-see-sorrowful-es",
+            "fruit": "Valentía",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Mateo 27,27-29",
+              "book": "Matthew",
+              "bookId": "matthew",
+              "chapter": 27,
+              "verseStart": 27,
+              "verseEnd": 29,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-sorrowful",
+              "text": "Tunc milites præsidis suscipientes Jesum in prætorium, congregaverunt ad eum universam cohortem: et exuentes eum, chlamydem coccineam circumdederunt ei, et plectentes coronam de spinis, posuerunt super caput ejus, et arundinem in dextera ejus. Et genu flexo ante eum, illudebant ei, dicentes: Ave rex Judæorum."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.sorrowful.3",
+              "locator": "First Method, paragraph 157, Eighth decade",
+              "sourceTitle": "Crowning with Thorns",
+              "theme": "contempt of the world",
+              "text": "Te ofrecemos, Señor Jesús, esta octava decena en honor de tu Coronación de espinas. Por este misterio y por la intercesión de tu santa Madre, te pedimos un profundo desprecio del mundo.",
+              "blockIndex": 671,
+              "translation": "ai"
+            },
+            "artIds": [
+              "caravaggio--the-crowning-with-thorns",
+              "titian--christ-crowned-with-thorns",
+              "anthony-van-dyck--christ-crowned-with-thorns"
+            ]
+          },
+          {
+            "set": "sorrowful",
+            "ordinal": 4,
+            "title": "Jesús con la Cruz a cuestas camino del Calvario",
+            "titleSourceId": "holy-see-sorrowful-es",
+            "fruit": "Paciencia",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Marcos 15,21-22",
+              "book": "Mark",
+              "bookId": "mark",
+              "chapter": 15,
+              "verseStart": 21,
+              "verseEnd": 22,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-sorrowful",
+              "text": "Et angariaverunt prætereuntem quempiam, Simonem Cyrenæum venientem de villa, patrem Alexandri et Rufi, ut tolleret crucem ejus. Et perducunt illum in Golgotha locum: quod est interpretatum Calvariæ locus."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.sorrowful.4",
+              "locator": "First Method, paragraph 157, Ninth decade",
+              "sourceTitle": "Carrying the Cross",
+              "theme": "patience in carrying the cross",
+              "text": "Te ofrecemos, Señor Jesús, esta novena decena en honor de tu Cruz a cuestas. Por este misterio y por la intercesión de tu santa Madre, te pedimos una gran paciencia para llevar nuestra cruz en pos de ti todos los días de nuestra vida.",
+              "blockIndex": 674,
+              "translation": "ai"
+            },
+            "artIds": [
+              "el-greco--christ-carrying-the-cross",
+              "raphael--christ-falls-on-the-way-to-calvary",
+              "titian--christ-carrying-the-cross"
+            ]
+          },
+          {
+            "set": "sorrowful",
+            "ordinal": 5,
+            "title": "La crucifixión y muerte de Jesús",
+            "titleSourceId": "holy-see-sorrowful-es",
+            "fruit": "Dolor por nuestros pecados",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 23,33-46",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 23,
+              "verseStart": 33,
+              "verseEnd": 46,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-sorrowful",
+              "text": "Et postquam venerunt in locum qui vocatur Calvariæ, ibi crucifixerunt eum: et latrones, unum a dextris, et alterum a sinistris. Jesus autem dicebat: Pater, dimitte illis: non enim sciunt quid faciunt. Dividentes vero vestimenta ejus, miserunt sortes. Et stabat populus spectans, et deridebant eum principes cum eis, dicentes: Alios salvos fecit, se salvum faciat, si hic est Christus Dei electus. Illudebant autem ei et milites accedentes, et acetum offerentes ei, et dicentes: Si tu es rex Judæorum, salvum te fac. Erat autem et superscriptio scripta super eum litteris græcis, et latinis, et hebraicis: Hic est rex Judæorum. Unus autem de his, qui pendebant, latronibus, blasphemabat eum, dicens: Si tu es Christus, salvum fac temetipsum et nos. Respondens autem alter increpabat eum, dicens: Neque tu times Deum, quod in eadem damnatione es. Et nos quidem juste, nam digna factis recipimus: hic vero nihil mali gessit. Et dicebat ad Jesum: Domine, memento mei cum veneris in regnum tuum. Et dixit illi Jesus: Amen dico tibi: hodie mecum eris in paradiso. Erat autem fere hora sexta, et tenebræ factæ sunt in universam terram usque ad horam nonam. Et obscuratus est sol, et velum templi scissum est medium. Et clamans voce magna Jesus ait: Pater, in manus tuas commendo spiritum meum. Et hæc dicens, expiravit."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.sorrowful.5",
+              "locator": "First Method, paragraph 157, Tenth decade",
+              "sourceTitle": "Crucifixion on Mount Calvary",
+              "theme": "horror of sin, love for the Cross, and grace of a holy death",
+              "text": "Te ofrecemos, Señor Jesús, esta décima decena en honor de tu Crucifixión en el monte Calvario. Por este misterio y por la intercesión de tu santa Madre, te pedimos un gran horror al pecado, amor a la Cruz y la gracia de una muerte santa para nosotros y para quienes se encuentran ahora en su última agonía.",
+              "blockIndex": 677,
+              "translation": "ai"
+            },
+            "artIds": [
+              "diego-velazquez--christ-crucified",
+              "francisco-de-zurbaran--the-crucifixion"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "glorious",
+        "ordinal": 4,
+        "name": "Misterios Gloriosos",
+        "nameSourceId": "holy-see-mysteries-es",
+        "mysteries": [
+          {
+            "set": "glorious",
+            "ordinal": 1,
+            "title": "La resurrección del Hijo de Dios",
+            "titleSourceId": "holy-see-glorious-es",
+            "fruit": "Fe",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 24,1-5",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 24,
+              "verseStart": 1,
+              "verseEnd": 5,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-glorious",
+              "text": "Una autem sabbati valde diluculo venerunt ad monumentum, portantes quæ paraverant aromata: et invenerunt lapidem revolutum a monumento. Et ingressæ non invenerunt corpus Domini Jesu. Et factum est, dum mente consternatæ essent de isto, ecce duo viri steterunt secus illas in veste fulgenti. Cum timerent autem, et declinarent vultum in terram, dixerunt ad illas: Quid quæritis viventem cum mortuis?"
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.glorious.1",
+              "locator": "First Method, paragraph 158, Eleventh decade",
+              "sourceTitle": "Resurrection",
+              "theme": "lively faith",
+              "text": "Te ofrecemos, Señor Jesús, esta undécima decena en honor de tu triunfante Resurrección. Por este misterio y por la intercesión de tu santa Madre, te pedimos una fe viva.",
+              "blockIndex": 681,
+              "translation": "ai"
+            },
+            "artIds": [
+              "piero-della-francesca--the-resurrection",
+              "el-greco--the-resurrection"
+            ]
+          },
+          {
+            "set": "glorious",
+            "ordinal": 2,
+            "title": "La Ascensión del Señor al cielo",
+            "titleSourceId": "holy-see-glorious-es",
+            "fruit": "Esperanza",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Marcos 16,19",
+              "book": "Mark",
+              "bookId": "mark",
+              "chapter": 16,
+              "verseStart": 19,
+              "verseEnd": 19,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-glorious",
+              "text": "Et Dominus quidem Jesus postquam locutus est eis, assumptus est in cælum, et sedet a dextris Dei."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.glorious.2",
+              "locator": "First Method, paragraph 158, Twelfth decade",
+              "sourceTitle": "Ascension",
+              "theme": "firm hope and longing for heaven",
+              "text": "Te ofrecemos, Señor Jesús, esta duodécima decena en honor de tu gloriosa Ascensión. Por este misterio y por la intercesión de tu santa Madre, te pedimos una esperanza firme y un gran anhelo del cielo.",
+              "blockIndex": 684,
+              "translation": "ai"
+            },
+            "artIds": [
+              "pietro-perugino--the-ascension-of-christ",
+              "giotto--ascension"
+            ]
+          },
+          {
+            "set": "glorious",
+            "ordinal": 3,
+            "title": "La venida del Espíritu Santo",
+            "titleSourceId": "holy-see-glorious-es",
+            "fruit": "Sabiduría",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Hechos de los Apóstoles 2,1-4",
+              "book": "Acts",
+              "bookId": "acts-of-the-apostles",
+              "chapter": 2,
+              "verseStart": 1,
+              "verseEnd": 4,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-glorious",
+              "text": "Et cum complerentur dies Pentecostes, erant omnes pariter in eodem loco: et factus est repente de cælo sonus, tamquam advenientis spiritus vehementis, et replevit totam domum ubi erant sedentes. Et apparuerunt illis dispertitæ linguæ tamquam ignis, seditque supra singulos eorum: et repleti sunt omnes Spiritu Sancto, et cœperunt loqui variis linguis, prout Spiritus Sanctus dabat eloqui illis."
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.glorious.3",
+              "locator": "First Method, paragraph 158, Thirteenth decade",
+              "sourceTitle": "Pentecost",
+              "theme": "holy wisdom and the practice of truth",
+              "text": "Te ofrecemos, oh, Espíritu Santo, esta decimotercera decena en honor del misterio de Pentecostés. Por este misterio y por la intercesión de María, tu Santísima Esposa, te pedimos tu santa sabiduría para conocer, saborear y practicar tu verdad, y compartirla con todos.",
+              "blockIndex": 687,
+              "translation": "ai"
+            },
+            "artIds": ["el-greco--pentecost", "titian--pentecost"]
+          },
+          {
+            "set": "glorious",
+            "ordinal": 4,
+            "title": "La Asunción de María al cielo",
+            "titleSourceId": "holy-see-glorious-es",
+            "fruit": "Devoción a María",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Lucas 1,48-49",
+              "book": "Luke",
+              "bookId": "luke",
+              "chapter": 1,
+              "verseStart": 48,
+              "verseEnd": 49,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-glorious",
+              "text": "Quia respexit humilitatem ancillæ suæ: ecce enim ex hoc beatam me dicent omnes generationes, quia fecit mihi magna qui potens est: et sanctum nomen ejus,"
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.glorious.4",
+              "locator": "First Method, paragraph 158, Fourteenth decade",
+              "sourceTitle": "Assumption",
+              "theme": "true devotion to Mary and a happy death",
+              "text": "Te ofrecemos, Señor Jesús, esta decimocuarta decena en honor de la Inmaculada Concepción de tu santa Madre y de su Asunción al cielo en cuerpo y alma. Por estos dos misterios y por su intercesión, te pedimos el don de una verdadera devoción a ella para vivir bien y tener una muerte feliz.",
+              "blockIndex": 690,
+              "translation": "ai"
+            },
+            "artIds": [
+              "titian--assumption-of-the-virgin-assunta",
+              "el-greco--the-assumption-of-the-virgin",
+              "nicolas-poussin--the-assumption-of-the-virgin",
+              "francesco-botticini--the-assumption-of-the-virgin"
+            ]
+          },
+          {
+            "set": "glorious",
+            "ordinal": 5,
+            "title": "La coronación de María como Reina y Señora de todo lo creado",
+            "titleSourceId": "holy-see-glorious-es",
+            "fruit": "Gracia de una buena muerte",
+            "fruitSourceId": "usccb-fruits",
+            "fruitTranslation": "ai",
+            "scripture": {
+              "reference": "Apocalipsis 12,1",
+              "book": "Apocalypse",
+              "bookId": "apocalypse",
+              "bookAlias": "Revelation",
+              "chapter": 12,
+              "verseStart": 1,
+              "verseEnd": 1,
+              "sourceId": "clementine-vulgate",
+              "selectionSourceId": "holy-see-glorious",
+              "text": "Et signum magnum apparuit in cælo: mulier amicta sole, et luna sub pedibus ejus, et in capite ejus corona stellarum duodecim:"
+            },
+            "reflection": {
+              "status": "mapped",
+              "sourceId": "de-montfort-secret",
+              "mappingType": "direct-decade-offering",
+              "sectionId": "first-method.glorious.5",
+              "locator": "First Method, paragraph 158, Fifteenth decade",
+              "sourceTitle": "Crowning in glory of Mary",
+              "theme": "perseverance, increase in virtue, and the eternal crown",
+              "text": "Te ofrecemos, Señor Jesús, esta decimoquinta y última decena en honor de la Coronación gloriosa de tu santa Madre en el cielo. Por este misterio y por su intercesión, te pedimos perseverar y crecer en la virtud hasta el momento de nuestra muerte, y recibir después la corona eterna que nos está preparada. Pedimos la misma gracia para todos los justos y todos nuestros bienhechores.",
+              "blockIndex": 693,
+              "translation": "ai"
+            },
+            "artIds": [
+              "diego-velazquez--coronation-of-the-virgin",
+              "enguerrand-quarton--the-coronation-of-the-virgin",
+              "fra-angelico--the-coronation-of-the-virgin",
+              "gentile-da-fabriano--the-coronation-of-the-virgin",
+              "annibale-carracci--the-coronation-of-the-virgin",
+              "follower-of-botticelli--the-coronation-of-the-virgin"
+            ]
+          }
+        ]
+      }
+    ],
+    "prayerStageArt": {
+      "sign-of-the-cross": [
+        "workshop-of-hans-memling--salvator-mundi",
+        "antonello-da-messina--salvator-mundi",
+        "domenico-fetti--salvator-mundi",
+        "el-greco--christ-as-saviour",
+        "juan-de-juanes--el-salvador",
+        "marco-d-oggiono--salvator-mundi",
+        "andrea-previtali--salvator-mundi",
+        "benedetto-diana--salvator-mundi",
+        "giampietrino--salvator-mundi",
+        "gerard-david--christ-blessing"
+      ],
+      "apostles-creed": [
+        "taddeo-di-bartolo--christ-and-the-twelve-apostles",
+        "workshop-of-el-greco--saint-andrew",
+        "peter-paul-rubens--saint-james-the-apostle",
+        "peter-paul-rubens--saint-john-the-apostle",
+        "peter-paul-rubens--saint-matthew-the-apostle",
+        "peter-paul-rubens--saint-matthias-the-apostle",
+        "jusepe-de-ribera--saint-andrew",
+        "el-greco--pentecost",
+        "el-greco--saints-peter-and-paul",
+        "jusepe-de-ribera--saints-peter-and-paul",
+        "peter-paul-rubens--saint-paul"
+      ],
+      "our-father": [
+        "fra-angelico--the-sermon-on-the-mount",
+        "cosimo-rosselli--the-sermon-on-the-mount",
+        "jan-brueghel-the-elder--the-sermon-on-the-mount",
+        "claude-lorrain--the-sermon-on-the-mount",
+        "domenico-ghirlandaio--calling-of-the-apostles",
+        "james-tissot--the-sermon-of-the-beatitudes",
+        "frans-francken-ii--the-sermon-on-the-mount",
+        "guillaume-fouace--le-sermon-sur-la-montagne",
+        "rembrandt--christ-preaching-la-petite-tombe",
+        "james-tissot--the-lord-s-prayer-le-pater-noster",
+        "rembrandt--the-hundred-guilder-print",
+        "james-tissot--the-exhortation-to-the-apostles"
+      ],
+      "hail-mary": [
+        "hans-memling--the-annunciation",
+        "sandro-botticelli--the-annunciation",
+        "petrus-christus--the-annunciation",
+        "philippe-de-champaigne--the-annunciation",
+        "murillo--immaculate-conception",
+        "sassoferrato--madonna-in-prayer",
+        "raphael--the-sistine-madonna",
+        "annibale-carracci--the-coronation-of-the-virgin",
+        "follower-of-botticelli--the-coronation-of-the-virgin",
+        "peter-paul-rubens--immaculate-conception",
+        "fra-filippo-lippi--madonna-and-child-with-two-angels",
+        "raphael--the-small-cowper-madonna",
+        "raphael--madonna-della-seggiola"
+      ],
+      "glory-be": [
+        "agnolo-gaddi--the-trinity",
+        "masaccio--the-holy-trinity",
+        "el-greco--the-holy-trinity",
+        "titian--the-trinity-in-glory-la-gloria",
+        "jusepe-de-ribera--the-holy-trinity",
+        "guido-reni--la-trinita",
+        "spanish-painter--the-trinity-adored-by-all-saints"
+      ],
+      "fatima-prayer": [
+        "pompeo-batoni--sacred-heart-of-jesus",
+        "ludovico-carracci--an-angel-frees-the-souls-of-purgatory",
+        "guido-reni--st-michael-archangel",
+        "william-adolphe-bouguereau--pieta",
+        "william-adolphe-bouguereau--song-of-the-angels"
+      ],
+      "hail-holy-queen": [
+        "piero-della-francesca--madonna-della-misericordia",
+        "enguerrand-quarton--the-coronation-of-the-virgin",
+        "fra-angelico--the-coronation-of-the-virgin",
+        "gentile-da-fabriano--the-coronation-of-the-virgin",
+        "francesco-botticini--the-assumption-of-the-virgin",
+        "jan-van-eyck--the-madonna-in-the-church",
+        "cimabue--maesta",
+        "fra-angelico--the-madonna-of-humility",
+        "raphael--madonna-del-granduca"
+      ],
+      "closing-prayer": [
+        "caravaggio--madonna-of-the-rosary",
+        "lorenzo-lotto--madonna-of-the-rosary",
+        "bartolome-esteban-murillo--the-virgin-of-the-rosary",
+        "sassoferrato--madonna-del-rosario",
+        "alonso-cano--virgen-del-rosario",
+        "giambattista-tiepolo--the-institution-of-the-rosary"
+      ]
+    },
+    "guidance": {
+      "settings": { "preferenceId": "showGuidance", "default": true },
+      "translation": "ai",
+      "sourceIds": [
+        "rosary-center-howto",
+        "traditional-catholic-prayers-howto",
+        "usccb-howto",
+        "holy-see-howto",
+        "rosarium-virginis-mariae"
+      ],
+      "silentSteps": [
+        "opening-sign-of-the-cross",
+        "apostles-creed",
+        "opening-our-father",
+        "opening-glory-be",
+        "closing-sign-of-the-cross"
+      ],
+      "openingHailMarys": [
+        {
+          "text": "Reza esta Avemaría por la fe.",
+          "sourceId": "rosary-center-howto",
+          "sourceRefs": [
+            {
+              "sourceId": "rosary-center-howto",
+              "locator": "Three Hail Marys for faith, hope, and charity"
+            }
+          ],
+          "repetition": 1
+        },
+        {
+          "text": "Reza esta Avemaría por la esperanza.",
+          "sourceId": "rosary-center-howto",
+          "sourceRefs": [
+            {
+              "sourceId": "rosary-center-howto",
+              "locator": "Three Hail Marys for faith, hope, and charity"
+            }
+          ],
+          "repetition": 2
+        },
+        {
+          "text": "Reza esta Avemaría por la caridad.",
+          "sourceId": "rosary-center-howto",
+          "sourceRefs": [
+            {
+              "sourceId": "rosary-center-howto",
+              "locator": "Three Hail Marys for faith, hope, and charity"
+            }
+          ],
+          "repetition": 3
+        }
+      ],
+      "mysteryAnnouncement": {
+        "text": "Mira la escena, escucha la palabra y haz una pausa en silencio antes de comenzar la decena.",
+        "sourceId": "rosarium-virginis-mariae",
+        "sourceRefs": [
+          {
+            "sourceId": "rosarium-virginis-mariae",
+            "locator": "Announcing the mystery, using an icon, hearing Scripture, and silence",
+            "sections": ["29", "30", "31"]
+          },
+          {
+            "sourceId": "holy-see-howto",
+            "locator": "Per-decade instruction; announce the mystery, pause for reflection, then pray"
+          }
+        ]
+      },
+      "decadeOurFather": {
+        "text": "Eleva tu mente al Padre al comenzar la decena.",
+        "sourceId": "rosarium-virginis-mariae",
+        "sourceRefs": [
+          {
+            "sourceId": "rosarium-virginis-mariae",
+            "locator": "The Our Father after focusing on the mystery",
+            "sections": ["32"]
+          }
+        ]
+      },
+      "decadeHailMarys": {
+        "text": "Medita en {mystery} mientras rezas estas diez Avemarías.",
+        "sourceId": "usccb-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "usccb-howto",
+            "locator": "Step 7; ten Hail Marys while meditating on the mystery"
+          }
+        ]
+      },
+      "decadeGloryBe": {
+        "text": "Corona la decena con la alabanza a la Trinidad.",
+        "sourceId": "rosarium-virginis-mariae",
+        "sourceRefs": [
+          {
+            "sourceId": "rosarium-virginis-mariae",
+            "locator": "The Gloria as the high point of contemplation",
+            "sections": ["34"]
+          }
+        ]
+      },
+      "fatimaPrayer": {
+        "text": "Se suele añadir después de cada decena, como pidió Nuestra Señora en Fátima.",
+        "sourceId": "usccb-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "usccb-howto",
+            "locator": "Step 7 note; Fatima Prayer after the Glory Be"
+          }
+        ]
+      },
+      "hailHolyQueen": {
+        "text": "Terminadas las cinco decenas, el Rosario se dirige a María.",
+        "sourceId": "usccb-howto",
+        "sourceRefs": [
+          {
+            "sourceId": "usccb-howto",
+            "locator": "Step 8; after the five decades, say the Hail Holy Queen"
+          }
+        ]
+      },
+      "finalPrayer": {
+        "text": "Pide imitar lo que contienen los misterios y alcanzar lo que prometen.",
+        "sourceId": "rosary-center-prayers",
+        "sourceRefs": [
+          {
+            "sourceId": "rosary-center-prayers",
+            "locator": "Final Prayer; imitate what they contain and obtain what they promise"
+          },
+          { "sourceId": "usccb-howto", "locator": "Concluding prayer sequence" }
+        ]
+      },
+      "fruitLine": {
+        "note": "Per-mystery fruit text stays on each mystery as fruit and fruitSourceId.",
+        "sourceId": "rosarium-virginis-mariae",
+        "sourceRefs": [
+          {
+            "sourceId": "rosarium-virginis-mariae",
+            "locator": "Concluding each mystery with a prayer for its spiritual fruit",
+            "sections": ["35"]
+          }
+        ]
+      }
+    }
+  },
+  "aiTranslation": {
+    "notice": "Estas traducciones son una ayuda de Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Informa de cualquier error a lucerna@wedefendit.com.",
+    "toolSourceIds": ["claude-opus-5-5", "gpt-6-astra"]
+  }
+}

@@ -1,3 +1,4 @@
+import type { BibleEditionId } from '../../content/language.ts';
 import { BibleTestament } from '../../content/schema.ts';
 import { isRecord } from '../../shared/guards.ts';
 import { readStoredValue, writeStoredValue } from '../preferences/storage.ts';
@@ -44,14 +45,17 @@ export const saveReadingPosition = async (workId: string, blockIndex: number): P
   await writeStoredValue(READING_POSITIONS_KEY, { ...positions, [workId]: blockIndex });
 };
 
-export const loadLastBibleBook = async (): Promise<string | null> => {
-  const stored = await readStoredValue(LAST_BIBLE_BOOK_KEY);
+const lastBibleBookKeyOf = (edition: BibleEditionId): string => `${LAST_BIBLE_BOOK_KEY}-${edition}`;
 
-  return typeof stored === 'string' && stored.length > 0 ? stored : null;
-};
+const bookIdFrom = (stored: unknown): string | null =>
+  typeof stored === 'string' && stored.length > 0 ? stored : null;
 
-export const saveLastBibleBook = async (bookId: string): Promise<void> => {
-  await writeStoredValue(LAST_BIBLE_BOOK_KEY, bookId);
+export const loadLastBibleBook = async (edition: BibleEditionId): Promise<string | null> =>
+  bookIdFrom(await readStoredValue(lastBibleBookKeyOf(edition))) ??
+  bookIdFrom(await readStoredValue(LAST_BIBLE_BOOK_KEY));
+
+export const saveLastBibleBook = async (edition: BibleEditionId, bookId: string): Promise<void> => {
+  await writeStoredValue(lastBibleBookKeyOf(edition), bookId);
 };
 
 export const loadOpenTestaments = async (): Promise<OpenTestaments> => {

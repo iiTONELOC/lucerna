@@ -1,14 +1,16 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
+import type { MarkToggle } from '../../components/marks/Marks.tsx';
 import {
   CatalogLookupError,
   CatalogLookupErrorCode,
-  contentCatalog,
   type ResolvedArtwork,
   type ResolvedMystery,
 } from '../../content/catalog.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import type { MysteryReflection } from '../../content/schema.ts';
-import { ORDINAL_WORDS } from '../../shared/ordinals.ts';
+import { isShortcutEvent, KeyName, keyNameFrom } from '../../shared/keyboard.ts';
+import type { SetPreference } from '../../state/preferences/context.ts';
 import {
   READING_SPEED_MAXIMUM,
   READING_SPEED_MINIMUM,
@@ -16,7 +18,6 @@ import {
   type Preferences,
   type RosaryDisplay,
 } from '../../state/preferences/model.ts';
-import type { SetPreference } from '../../state/preferences/context.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import type { BibleVerseLocation } from '../library/model.ts';
 import type { ReferenceTarget } from '../references/referenceCatalog.ts';
@@ -26,7 +27,6 @@ import {
   advance,
   createProgression,
   currentStep,
-  FRUIT_LABEL,
   isAtEnd,
   isAtStart,
   jumpTo,
@@ -42,6 +42,7 @@ import {
   type Progression,
   type StepAnchorPoint,
 } from './progression.ts';
+import { useGuidedPlayback, type GuidedPlayback } from './useGuidedPlayback.ts';
 import {
   useNotesCollision,
   type NotesCollision,
@@ -53,8 +54,6 @@ import {
   type PendantOverhangRefs,
 } from './usePendantOverhang.ts';
 import { usePrayerFit, type FitRefs, type FitResult } from './usePrayerFit.ts';
-import { useGuidedPlayback, type GuidedPlayback } from './useGuidedPlayback.ts';
-import { isShortcutEvent } from '../../shared/keyboard.ts';
 
 export type HeadingProps = {
   readonly rubric: string;
@@ -93,14 +92,24 @@ export type ControlsBundle = {
 export type MysteryFruit = {
   readonly text: string;
   readonly sourceId: string;
+  readonly translated: boolean;
 };
+
+export const GUIDANCE_TRANSLATED = (reading: ReadingSnapshot) =>
+  reading.catalog.rosary.guidance.translation !== undefined;
 
 const SUMMARY_SUBPOINT_MAPPING_TYPE = 'summary-subpoint';
 
-export const offeringLabelOf = (offering: MysteryReflection): string =>
-  offering.mappingType === SUMMARY_SUBPOINT_MAPPING_TYPE ? 'Meditation' : 'Offering';
+export const offeringLabelOf = (reading: ReadingSnapshot, offering: MysteryReflection): string =>
+  offering.mappingType === SUMMARY_SUBPOINT_MAPPING_TYPE
+    ? reading.wording.prayer.meditation
+    : reading.wording.prayer.offering;
 
-const mysteryForStep = (mysterySetId: string, step: PrayerStep): ResolvedMystery | null => {
+const mysteryForStep = (
+  reading: ReadingSnapshot,
+  mysterySetId: string,
+  step: PrayerStep,
+): ResolvedMystery | null => {
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
     return step.mystery;
   }
@@ -109,7 +118,7 @@ const mysteryForStep = (mysterySetId: string, step: PrayerStep): ResolvedMystery
     return null;
   }
 
-  const mystery = contentCatalog.mysterySetById(mysterySetId).mysteries[step.decade - 1];
+  const mystery = reading.catalog.mysterySetById(mysterySetId).mysteries[step.decade - 1];
 
   if (mystery === undefined) {
     throw new CatalogLookupError(
@@ -122,39 +131,42 @@ const mysteryForStep = (mysterySetId: string, step: PrayerStep): ResolvedMystery
   return mystery;
 };
 
-const setShortName = (mysterySetId: string): string =>
-  contentCatalog.mysterySetById(mysterySetId).name.replace('The ', '').replace(' Mysteries', '');
-
-const rubricFor = (mysterySetId: string, step: PrayerStep, opening: boolean): string => {
+const rubricFor = (
+  reading: ReadingSnapshot,
+  mysterySetId: string,
+  step: PrayerStep,
+  opening: boolean,
+): string => {
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
-    return `${ORDINAL_WORDS[step.mystery.ordinal - 1] ?? ''} ${setShortName(mysterySetId)} Mystery`;
+    return reading.wording.prayer.mysteryHeading(step.mystery.ordinal, mysterySetId);
   }
 
   if (step.decade !== undefined) {
-    return 'Decade in progress';
+    return reading.wording.prayer.decadeInProgress;
   }
 
-  return opening ? 'Opening prayer' : 'Closing prayer';
+  return opening ? reading.wording.prayer.openingPrayer : reading.wording.prayer.closingPrayer;
 };
 
-const titleFor = (step: PrayerStep): string => {
+const titleFor = (reading: ReadingSnapshot, step: PrayerStep): string => {
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
     return step.mystery.title;
   }
 
   if (step.prayerId === PrayerId.FatimaPrayer) {
-    return 'O My Jesus';
+    return reading.wording.prayer.fatimaTitle;
   }
 
-  return contentCatalog.prayerById(step.prayerId).title;
+  return reading.catalog.prayerById(step.prayerId).title;
 };
 
-export const bodyFor = (step: PrayerStep): string =>
+export const bodyFor = (reading: ReadingSnapshot, step: PrayerStep): string =>
   step.archetype === StepArchetype.MysteryAnnouncement
     ? step.mystery.scripture.text
-    : contentCatalog.prayerById(step.prayerId).text;
+    : reading.catalog.prayerById(step.prayerId).text;
 
 type ViewModelRequest = {
+  readonly onComplete: () => void;
   readonly mysterySetId: string;
   readonly progression: Progression;
   readonly setIndex: (stepIndex: number) => void;
@@ -162,20 +174,33 @@ type ViewModelRequest = {
   readonly onOpenSettings: () => void;
 };
 
-const progressionFor = (mysterySetId: string, includeFatimaPrayer: boolean): Progression =>
-  createProgression(contentCatalog.mysterySetById(mysterySetId), contentCatalog.rosary.guidance, {
-    includeFatimaPrayer,
-  });
+const progressionFor = (
+  reading: ReadingSnapshot,
+  mysterySetId: string,
+  includeFatimaPrayer: boolean,
+): Progression =>
+  createProgression(
+    reading,
+    reading.catalog.mysterySetById(mysterySetId),
+    reading.catalog.rosary.guidance,
+    {
+      includeFatimaPrayer,
+    },
+  );
 
-const headingOf = (mysterySetId: string, progression: Progression): HeadingProps => {
+const headingOf = (
+  reading: ReadingSnapshot,
+  mysterySetId: string,
+  progression: Progression,
+): HeadingProps => {
   const step = currentStep(progression);
   const announced = progression.steps.findIndex(
     (candidate) => candidate.archetype === StepArchetype.MysteryAnnouncement,
   );
 
   return {
-    rubric: rubricFor(mysterySetId, step, progression.index < announced),
-    title: titleFor(step),
+    rubric: rubricFor(reading, mysterySetId, step, progression.index < announced),
+    title: titleFor(reading, step),
   };
 };
 
@@ -203,7 +228,7 @@ const controlsOf = (
   request: ViewModelRequest,
   playback: Pick<GuidedPlayback, 'playing' | 'toggle'>,
 ): ControlsBundle => {
-  const { progression, setIndex, onExit, onOpenSettings } = request;
+  const { progression, setIndex, onExit, onComplete, onOpenSettings } = request;
 
   return {
     actions: {
@@ -211,7 +236,7 @@ const controlsOf = (
       onExit,
       onForward: () => {
         if (isAtEnd(progression)) {
-          onExit();
+          onComplete();
           return;
         }
 
@@ -229,6 +254,7 @@ const controlsOf = (
 };
 
 export type PrayerFocusProps = {
+  readonly onComplete: () => void;
   readonly mysterySetId: string;
   readonly start?: PrayerStart;
   readonly onExit: () => void;
@@ -261,18 +287,34 @@ type PrayerPlan = {
   readonly progression: Progression;
 };
 
+const sessionArtworkPlan = (
+  reading: ReadingSnapshot,
+  mysterySetId: string,
+  includeFatimaPrayer: boolean,
+  start: PrayerStart | undefined,
+): readonly ResolvedArtwork[] => {
+  const progression = progressionFor(reading, mysterySetId, includeFatimaPrayer);
+  return featuring(reading, artworkPlanFor(reading, progression), progression, start);
+};
+
 const usePrayerPlan = (
   mysterySetId: string,
   includeFatimaPrayer: boolean,
   index: number,
   start: PrayerStart | undefined,
 ): PrayerPlan => {
+  const reading = useReading();
+  const [sessionReading] = useState(reading);
   const base = useMemo(
-    () => progressionFor(mysterySetId, includeFatimaPrayer),
-    [includeFatimaPrayer, mysterySetId],
+    () => progressionFor(reading, mysterySetId, includeFatimaPrayer),
+    [includeFatimaPrayer, mysterySetId, reading],
   );
   const geometry = useMemo(() => createDrapeGeometry(beadSlotsOf(base)), [base]);
-  const artworkPlan = useMemo(() => featuring(artworkPlanFor(base), base, start), [base, start]);
+  const artPlan = useMemo(
+    () => sessionArtworkPlan(sessionReading, mysterySetId, includeFatimaPrayer, start),
+    [includeFatimaPrayer, mysterySetId, sessionReading, start],
+  );
+  const artworkPlan = artPlan.map((artwork) => reading.catalog.artworkById(artwork.id));
 
   return { artworkPlan, geometry, progression: jumpTo(base, index) };
 };
@@ -290,6 +332,7 @@ const fitKeyOf = (
     String(preferences.showGuidance),
     String(preferences.showDecadeOfferings),
     String(preferences.showMysteryFruits),
+    String(preferences.aiTranslations),
     String(preferences.showScriptureReadings),
   ].join(':');
 
@@ -324,30 +367,30 @@ const offeringFor = (
 ): MysteryReflection | null =>
   step.archetype === StepArchetype.MysteryAnnouncement &&
   preferences.showDecadeOfferings &&
+  (mystery?.reflection.translation === undefined || preferences.aiTranslations) &&
   mystery?.reflection.text !== undefined
     ? mystery.reflection
     : null;
 
-const prayerDisplayOf = ({
-  artworkPlan,
-  mysterySetId,
-  preferences,
-  progression,
-}: PrayerDisplayRequest): PrayerDisplay => {
+const prayerDisplayOf = (
+  reading: ReadingSnapshot,
+  { artworkPlan, mysterySetId, preferences, progression }: PrayerDisplayRequest,
+): PrayerDisplay => {
   const step = currentStep(progression);
   const artwork = plannedArtworkAt(artworkPlan, progression);
-  const mystery = mysteryForStep(mysterySetId, step);
+  const mystery = mysteryForStep(reading, mysterySetId, step);
   const showScriptureReading =
     step.archetype !== StepArchetype.MysteryAnnouncement || preferences.showScriptureReadings;
   const showGuidance =
     preferences.showGuidance &&
+    (!GUIDANCE_TRANSLATED(reading) || preferences.aiTranslations) &&
     !repeatsDecadeGuidance(step) &&
     (step.archetype !== StepArchetype.MysteryAnnouncement || showScriptureReading);
 
   return {
     artwork,
     fitKey: fitKeyOf(mysterySetId, progression.index, preferences),
-    heading: headingOf(mysterySetId, progression),
+    heading: headingOf(reading, mysterySetId, progression),
     mystery,
     offering: offeringFor(step, mystery, preferences),
     showGuidance,
@@ -382,26 +425,37 @@ const usePrayerPlayback = ({
   readingSpeed,
   setIndex,
   setPlaying,
-}: PrayerPlaybackRequest): GuidedPlayback =>
-  useGuidedPlayback({
+}: PrayerPlaybackRequest): GuidedPlayback => {
+  const reading = useReading();
+  return useGuidedPlayback({
     announcement: display.step.archetype === StepArchetype.MysteryAnnouncement,
-    fruitText: fruit === null || !read.readMysteryFruits ? '' : `${FRUIT_LABEL}. ${fruit.text}.`,
+    fruitText:
+      fruit === null || !read.readMysteryFruits
+        ? ''
+        : reading.wording.prayer.spokenFruit(fruit.text),
     guidanceText:
       fit.showGuidance && read.readGuidance && display.step.guidance !== undefined
-        ? `Guidance. ${display.step.guidance.text} ${contentCatalog.sourceById(display.step.guidance.sourceId).work}.`
+        ? reading.wording.prayer.spokenGuidance(
+            display.step.guidance.text,
+            reading.catalog.sourceById(display.step.guidance.sourceId).work,
+          )
         : '',
     offeringText:
       display.offering?.text === undefined || !read.readDecadeOfferings
         ? ''
-        : `${offeringLabelOf(display.offering)}. ${display.offering.text}`,
+        : reading.wording.prayer.spokenOffering(
+            offeringLabelOf(reading, display.offering),
+            display.offering.text,
+          ),
     isLastStep: isAtEnd(progression),
     onAdvance: () => setIndex(advance(progression).index),
     onPlayingChange: setPlaying,
     playing,
     readingSpeed,
     stepKey: `${display.fitKey}:${String(fit.showGuidance)}:${readKeyOf(read)}`,
-    text: display.showScriptureReading ? bodyFor(display.step) : '',
+    text: display.showScriptureReading ? bodyFor(reading, display.step) : '',
   });
+};
 
 const viewModelRequestOf = (
   props: PrayerFocusProps,
@@ -411,6 +465,10 @@ const viewModelRequestOf = (
 ): ViewModelRequest => ({
   mysterySetId: props.mysterySetId,
   onExit: props.onExit,
+  onComplete: () => {
+    playback.pause();
+    props.onComplete();
+  },
   onOpenSettings: () => {
     playback.pause();
     props.onOpenSettings();
@@ -442,15 +500,6 @@ export type PrayerFocusSession = {
   readonly refs: PrayerFocusRefs;
 };
 
-enum PrayerKey {
-  Space = ' ',
-  Enter = 'Enter',
-  Plus = '+',
-  Equals = '=',
-  Minus = '-',
-  Underscore = '_',
-}
-
 const CURRENT_WORD_SELECTOR = '[data-playback-word="current"]';
 const ACTIVE_NOTE_SELECTOR = '[data-playback-active="true"]';
 
@@ -472,33 +521,32 @@ const keyActionsOf = ({
   controls,
   readingSpeed,
   setPreference,
-}: KeyboardRequest): Readonly<Record<PrayerKey, () => void>> => {
+}: KeyboardRequest): Readonly<Partial<Record<KeyName, () => void>>> => {
   const stepSpeed = (direction: 1 | -1): void =>
     setPreference('readingSpeed', steppedReadingSpeed(readingSpeed, direction));
 
   return {
-    [PrayerKey.Space]: controls.actions.onTogglePlayback,
-    [PrayerKey.Enter]: controls.actions.onForward,
-    [PrayerKey.Plus]: () => stepSpeed(1),
-    [PrayerKey.Equals]: () => stepSpeed(1),
-    [PrayerKey.Minus]: () => stepSpeed(-1),
-    [PrayerKey.Underscore]: () => stepSpeed(-1),
+    [KeyName.Space]: controls.actions.onTogglePlayback,
+    [KeyName.Enter]: controls.actions.onForward,
+    [KeyName.Plus]: () => stepSpeed(1),
+    [KeyName.Equals]: () => stepSpeed(1),
+    [KeyName.Minus]: () => stepSpeed(-1),
+    [KeyName.Underscore]: () => stepSpeed(-1),
   };
 };
-
-const isPrayerKey = (key: string): key is PrayerKey =>
-  Object.values<string>(PrayerKey).includes(key);
 
 const usePrayerKeyboard = (request: KeyboardRequest): void => {
   useEffect(() => {
     const actions = keyActionsOf(request);
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (!isShortcutEvent(event) || !isPrayerKey(event.key)) {
+      const keyName = keyNameFrom(event.key);
+      const action = keyName === undefined ? undefined : actions[keyName];
+      if (!isShortcutEvent(event) || action === undefined) {
         return;
       }
 
       event.preventDefault();
-      actions[event.key]();
+      action();
     };
 
     globalThis.addEventListener('keydown', onKeyDown);
@@ -563,12 +611,13 @@ const useDrapeLayout = (
 });
 
 export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSession => {
+  const reading = useReading();
   const { preferences, setPreference } = usePreferences();
   const [index, setIndex] = useState(() =>
     props.start === undefined
       ? 0
       : stepIndexForStart(
-          progressionFor(props.mysterySetId, preferences.includeFatimaPrayer),
+          progressionFor(reading, props.mysterySetId, preferences.includeFatimaPrayer),
           props.start,
         ),
   );
@@ -582,17 +631,24 @@ export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSessi
     index,
     props.start,
   );
-  const display = prayerDisplayOf({
+  const display = prayerDisplayOf(reading, {
     artworkPlan: plan.artworkPlan,
     mysterySetId: props.mysterySetId,
     preferences,
     progression: plan.progression,
   });
   const fit = usePrayerFit(display.fitKey, display.showGuidance, refs);
+  const translatedFruit = display.mystery?.fruitTranslation !== undefined;
   const fruit =
-    display.mystery === null || !preferences.showMysteryFruits
+    display.mystery === null ||
+    !preferences.showMysteryFruits ||
+    (translatedFruit && !preferences.aiTranslations)
       ? null
-      : { text: display.mystery.fruit, sourceId: display.mystery.fruitSourceId };
+      : {
+          text: display.mystery.fruit,
+          sourceId: display.mystery.fruitSourceId,
+          translated: translatedFruit,
+        };
   const playback = usePrayerPlayback({
     display,
     fit,
@@ -622,5 +678,14 @@ export const usePrayerFocusSession = (props: PrayerFocusProps): PrayerFocusSessi
     playback,
     preferences,
     refs,
+  };
+};
+
+export const useStepNotice = (step: PrayerStep): MarkToggle => {
+  const [openStep, setOpenStep] = useState<PrayerStep | null>(null);
+
+  return {
+    open: openStep === step,
+    onToggle: () => setOpenStep((current) => (current === step ? null : step)),
   };
 };

@@ -2,7 +2,6 @@ import {
   BIBLE_SCHEMA_VERSION,
   BibleBlockKind,
   BibleRunKind,
-  BibleTestament,
   bibleBookFrom,
   bibleIndexFrom,
   type BibleBlock,
@@ -14,12 +13,10 @@ import {
   type ScriptureRedSpan,
 } from '../../src/content/schema.ts';
 import { recordFrom } from '../../src/content/shape.ts';
-import { isRecord } from '../../src/shared/guards.ts';
+import { isRecord, type UnknownRecord } from '../../src/shared/guards.ts';
 import { SOURCE_DATABASE } from './devotional.ts';
 import { buildFailure, ContentBuildError, ContentBuildErrorCode, readJsonFile } from './records.ts';
 import {
-  BIBLE_SOURCE_ID,
-  RED_LETTER_DATABASE,
   bibleBookIdentifierFrom,
   redLetterBooksFrom,
   redLetterError,
@@ -27,111 +24,25 @@ import {
   redSpansOf,
   type RedLetterEntry,
 } from './redLetter.ts';
+import { BIBLE_DEFINITIONS, type TestamentDefinition } from './bibleBooks.ts';
+import type { ContentReading } from './editions.ts';
 import {
   CHAPTER_MARKER,
   FOOTNOTE_END,
   FOOTNOTE_START,
-  SCRIPTURE_SOURCE_DIRECTORY,
+  editionFileNamesOf,
+  editionFileOf,
+  ITALIC_END,
+  ITALIC_START,
+  NOTE_PATTERN,
   VERSE_MARKER,
 } from './scripture.ts';
-
-type BibleBookDefinition = {
-  readonly code: string;
-  readonly name: string;
-};
-
-const OLD_TESTAMENT: readonly BibleBookDefinition[] = [
-  { code: 'GEN', name: 'Genesis' },
-  { code: 'EXO', name: 'Exodus' },
-  { code: 'LEV', name: 'Leviticus' },
-  { code: 'NUM', name: 'Numbers' },
-  { code: 'DEU', name: 'Deuteronomy' },
-  { code: 'JOS', name: 'Josue' },
-  { code: 'JDG', name: 'Judges' },
-  { code: 'RUT', name: 'Ruth' },
-  { code: '1SA', name: '1 Kings' },
-  { code: '2SA', name: '2 Kings' },
-  { code: '1KI', name: '3 Kings' },
-  { code: '2KI', name: '4 Kings' },
-  { code: '1CH', name: '1 Paralipomenon' },
-  { code: '2CH', name: '2 Paralipomenon' },
-  { code: 'EZR', name: '1 Esdras' },
-  { code: 'NEH', name: '2 Esdras' },
-  { code: 'TOB', name: 'Tobias' },
-  { code: 'JDT', name: 'Judith' },
-  { code: 'EST', name: 'Esther' },
-  { code: 'JOB', name: 'Job' },
-  { code: 'PSA', name: 'Psalms' },
-  { code: 'PRO', name: 'Proverbs' },
-  { code: 'ECC', name: 'Ecclesiastes' },
-  { code: 'SNG', name: 'Canticle of Canticles' },
-  { code: 'WIS', name: 'Wisdom' },
-  { code: 'SIR', name: 'Ecclesiasticus' },
-  { code: 'ISA', name: 'Isaias' },
-  { code: 'JER', name: 'Jeremias' },
-  { code: 'LAM', name: 'Lamentations' },
-  { code: 'BAR', name: 'Baruch' },
-  { code: 'EZK', name: 'Ezechiel' },
-  { code: 'DAN', name: 'Daniel' },
-  { code: 'HOS', name: 'Osee' },
-  { code: 'JOL', name: 'Joel' },
-  { code: 'AMO', name: 'Amos' },
-  { code: 'OBA', name: 'Abdias' },
-  { code: 'JON', name: 'Jonas' },
-  { code: 'MIC', name: 'Micheas' },
-  { code: 'NAM', name: 'Nahum' },
-  { code: 'HAB', name: 'Habacuc' },
-  { code: 'ZEP', name: 'Sophonias' },
-  { code: 'HAG', name: 'Aggeus' },
-  { code: 'ZEC', name: 'Zacharias' },
-  { code: 'MAL', name: 'Malachias' },
-  { code: '1MA', name: '1 Machabees' },
-  { code: '2MA', name: '2 Machabees' },
-];
-
-const NEW_TESTAMENT: readonly BibleBookDefinition[] = [
-  { code: 'MAT', name: 'Matthew' },
-  { code: 'MRK', name: 'Mark' },
-  { code: 'LUK', name: 'Luke' },
-  { code: 'JHN', name: 'John' },
-  { code: 'ACT', name: 'Acts of the Apostles' },
-  { code: 'ROM', name: 'Romans' },
-  { code: '1CO', name: '1 Corinthians' },
-  { code: '2CO', name: '2 Corinthians' },
-  { code: 'GAL', name: 'Galatians' },
-  { code: 'EPH', name: 'Ephesians' },
-  { code: 'PHP', name: 'Philippians' },
-  { code: 'COL', name: 'Colossians' },
-  { code: '1TH', name: '1 Thessalonians' },
-  { code: '2TH', name: '2 Thessalonians' },
-  { code: '1TI', name: '1 Timothy' },
-  { code: '2TI', name: '2 Timothy' },
-  { code: 'TIT', name: 'Titus' },
-  { code: 'PHM', name: 'Philemon' },
-  { code: 'HEB', name: 'Hebrews' },
-  { code: 'JAM', name: 'James' },
-  { code: '1PE', name: '1 Peter' },
-  { code: '2PE', name: '2 Peter' },
-  { code: '1JN', name: '1 John' },
-  { code: '2JN', name: '2 John' },
-  { code: '3JN', name: '3 John' },
-  { code: 'JUD', name: 'Jude' },
-  { code: 'REV', name: 'Apocalypse' },
-];
-
-type TestamentDefinition = BibleBookDefinition & {
-  readonly testament: BibleTestament;
-};
-
-const BIBLE_DEFINITIONS: readonly TestamentDefinition[] = [
-  ...OLD_TESTAMENT.map((definition) => ({ ...definition, testament: BibleTestament.Old })),
-  ...NEW_TESTAMENT.map((definition) => ({ ...definition, testament: BibleTestament.New })),
-];
 
 const PREFACE_CHAPTER_MARKER = String.raw`\c0`;
 const CHAPTER_LABEL_MARKER = String.raw`\cl `;
 const CHAPTER_SUMMARY_MARKER = String.raw`\cd `;
 const PARAGRAPH_MARKER = String.raw`\p`;
+const POETRY_MARKER = String.raw`\q1`;
 const SECTION_MARKERS: readonly string[] = [String.raw`\s1 `, String.raw`\s `];
 const PSALM_TITLE_MARKER = String.raw`\d`;
 const ACROSTIC_MARKER = String.raw`\qa `;
@@ -144,6 +55,7 @@ const SKIPPED_MARKERS: readonly string[] = [
   String.raw`\h `,
   String.raw`\toc`,
   String.raw`\mte9 `,
+  String.raw`\mt2 `,
 ];
 const REFERENCE_START = String.raw`\rq `;
 const REFERENCE_END = String.raw`\rq*`;
@@ -206,6 +118,10 @@ const noteRunFrom = (content: string, context: string): BibleRun => {
 };
 
 const consumeMarker = (runs: BibleRun[], marker: string, context: string): string => {
+  if (marker.startsWith(ITALIC_START) || marker.startsWith(ITALIC_END)) {
+    return marker.slice(ITALIC_START.length);
+  }
+
   if (marker.startsWith(FOOTNOTE_START)) {
     const end = marker.indexOf(FOOTNOTE_END);
 
@@ -293,6 +209,8 @@ type ChapterBuilder = {
 };
 
 type BookBuilder = {
+  readonly name: string;
+  readonly versePerParagraph: boolean;
   title: string | null;
   fallbackTitle: string | null;
   introduction: readonly BibleRun[] | null;
@@ -317,13 +235,13 @@ const closeChapter = (book: BookBuilder, context: string): void => {
 
   closeParagraph(chapter);
 
-  if (chapter.label === null || chapter.blocks.length === 0) {
+  if (chapter.blocks.length === 0) {
     return structureError(context);
   }
 
   book.chapters.push({
     number: chapter.number,
-    label: chapter.label,
+    label: chapter.label ?? `${book.name} ${String(chapter.number)}`,
     blocks: chapter.blocks,
     ...(chapter.summary === null ? {} : { summary: chapter.summary }),
   });
@@ -430,13 +348,17 @@ type BibleLineBlockStart = {
 const handleContentLine = (book: BookBuilder, line: string, context: string): void => {
   const chapter = requireChapter(book, context);
 
-  if (line === PARAGRAPH_MARKER || line === PSALM_TITLE_MARKER) {
+  if (line === PARAGRAPH_MARKER || line === POETRY_MARKER || line === PSALM_TITLE_MARKER) {
     closeParagraph(chapter);
-    chapter.paragraph = line === PARAGRAPH_MARKER ? [] : null;
+    chapter.paragraph = line === PSALM_TITLE_MARKER ? null : [];
     return;
   }
 
   if (line.startsWith(VERSE_MARKER)) {
+    if (book.versePerParagraph) {
+      closeParagraph(chapter);
+    }
+
     chapter.paragraph ??= [];
     chapter.paragraph.push(verseFrom(line.slice(VERSE_MARKER.length), context));
     return;
@@ -578,8 +500,12 @@ const redBookFrom = (book: BibleBook, entries: ReadonlyMap<string, RedLetterEntr
   return { ...book, chapters };
 };
 
-const applyRedLetter = (books: readonly BibleBook[], database: unknown): readonly BibleBook[] => {
-  const redLetter = redLetterBooksFrom(database);
+const applyRedLetter = (
+  books: readonly BibleBook[],
+  database: unknown,
+  sourceId: string,
+): readonly BibleBook[] => {
+  const redLetter = redLetterBooksFrom(database, sourceId);
 
   for (const bookId of redLetter.keys()) {
     if (!books.some((book) => book.id === bookId)) {
@@ -594,12 +520,34 @@ const applyRedLetter = (books: readonly BibleBook[], database: unknown): readonl
   });
 };
 
+const ROMAN_NUMERAL = /^[IVX]+$/u;
+const TITLE_LINKING_WORDS: ReadonlySet<string> = new Set(['AD', 'EST', 'ET', 'ID', 'SECUNDUM']);
+
+const titleWordOf = (word: string, index: number): string => {
+  if (ROMAN_NUMERAL.test(word)) {
+    return word;
+  }
+
+  const lower = word.toLowerCase();
+
+  return index > 0 && TITLE_LINKING_WORDS.has(word)
+    ? lower
+    : `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`;
+};
+
+const displayTitleOf = (title: string): string =>
+  title === title.toUpperCase() ? title.split(' ').map(titleWordOf).join(' ') : title;
+
 const parseBibleBook = (
   definition: TestamentDefinition,
+  { bookNameOf, edition }: ContentReading,
   source: string,
   fileName: string,
 ): BibleBook => {
+  const name = bookNameOf(definition);
   const book: BookBuilder = {
+    name,
+    versePerParagraph: edition.versePerParagraph,
     title: null,
     fallbackTitle: null,
     introduction: null,
@@ -625,22 +573,11 @@ const parseBibleBook = (
   return bibleBookFrom({
     schemaVersion: BIBLE_SCHEMA_VERSION,
     id: bibleBookIdentifierFrom(definition.name),
-    name: definition.name,
-    title,
+    name,
+    title: displayTitleOf(title),
     chapters: book.chapters,
     ...(book.introduction === null ? {} : { introduction: book.introduction }),
   });
-};
-
-const bibleFileFor = (code: string, fileNames: readonly string[]): string => {
-  const matches = fileNames.filter((fileName) => fileName.includes(`-${code}-`));
-  const fileName = matches[0];
-
-  if (matches.length !== 1 || fileName === undefined) {
-    throw new ContentBuildError(ContentBuildErrorCode.InvalidSourceBook, code);
-  }
-
-  return fileName;
 };
 
 export type BibleContent = {
@@ -648,40 +585,51 @@ export type BibleContent = {
   readonly books: readonly BibleBook[];
 };
 
-export const buildBibleContent = async (repositoryRoot: URL): Promise<BibleContent> => {
-  const sources = recordFrom(await readJsonFile(SOURCE_DATABASE, repositoryRoot), 'sources');
-
-  if (!isRecord(sources[BIBLE_SOURCE_ID])) {
-    throw new ContentBuildError(ContentBuildErrorCode.MissingSource, BIBLE_SOURCE_ID);
-  }
-
-  const directory = new URL(SCRIPTURE_SOURCE_DIRECTORY, repositoryRoot);
-  const fileNames = await Array.fromAsync(new Bun.Glob('*.sfm').scan({ cwd: directory.pathname }));
-  const parsed = await Promise.all(
-    BIBLE_DEFINITIONS.map(async (definition) => {
-      const fileName = bibleFileFor(definition.code, fileNames);
-      const source = await Bun.file(new URL(fileName, directory)).text();
-
-      return parseBibleBook(definition, source, fileName);
-    }),
-  );
-  const database = await readJsonFile(RED_LETTER_DATABASE, repositoryRoot);
-  const books = applyRedLetter(parsed, database);
-  const redLetter = redLetterMarkingFrom(database);
-
-  for (const sourceId of [...redLetter.witnessSourceIds, ...redLetter.toolSourceIds]) {
+const requireSources = (sources: UnknownRecord, sourceIds: readonly string[]): void => {
+  for (const sourceId of sourceIds) {
     if (!isRecord(sources[sourceId])) {
       throw new ContentBuildError(ContentBuildErrorCode.MissingSource, sourceId);
     }
   }
+};
+
+export const buildBibleContent = async (
+  repositoryRoot: URL,
+  reading: ContentReading,
+): Promise<BibleContent> => {
+  const { edition } = reading;
+  const sources = recordFrom(await readJsonFile(SOURCE_DATABASE, repositoryRoot), 'sources');
+
+  requireSources(sources, [edition.sourceId]);
+  const directory = new URL(edition.directory, repositoryRoot);
+  const fileNames = await editionFileNamesOf(edition, repositoryRoot);
+  const parsed = await Promise.all(
+    BIBLE_DEFINITIONS.map(async (definition) => {
+      const fileName = editionFileOf(edition, definition.code, fileNames);
+      const source = await Bun.file(new URL(fileName, directory)).text();
+
+      return parseBibleBook(
+        definition,
+        reading,
+        edition.keepsNotes ? source : source.replaceAll(NOTE_PATTERN, ''),
+        fileName,
+      );
+    }),
+  );
+  const database = await readJsonFile(edition.redLetterDatabase, repositoryRoot);
+  const books = applyRedLetter(parsed, database, edition.sourceId);
+  const redLetter = redLetterMarkingFrom(database, reading.language);
+
+  requireSources(sources, [...redLetter.witnessSourceIds, ...redLetter.toolSourceIds]);
 
   const index = bibleIndexFrom({
     schemaVersion: BIBLE_SCHEMA_VERSION,
-    sourceId: BIBLE_SOURCE_ID,
+    sourceId: edition.sourceId,
+    edition: edition.id,
     redLetter,
     books: BIBLE_DEFINITIONS.map((definition, position) => ({
       id: bibleBookIdentifierFrom(definition.name),
-      name: definition.name,
+      name: reading.bookNameOf(definition),
       testament: definition.testament,
       chapterCount: books[position]?.chapters.filter((chapter) => chapter.number > 0).length,
     })),

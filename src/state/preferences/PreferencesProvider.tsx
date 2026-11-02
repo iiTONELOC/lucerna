@@ -1,22 +1,40 @@
+import { prepareLoadedContent } from '../../content/loaders.ts';
 import {
   useEffect,
   useLayoutEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
   useSyncExternalStore,
   type Dispatch,
   type PropsWithChildren,
 } from 'react';
+import {
+  BIBLE_CHOICES,
+  deviceLanguageTags,
+  editionOf,
+  LANGUAGE_CHOICES,
+  languageOf,
+  type BibleEditionId,
+  type Language,
+} from '../../content/language.ts';
+import {
+  INITIAL_READING,
+  loadReading,
+  ReadingContext,
+  type ReadingSnapshot,
+} from '../../content/reading.ts';
+import { cacheEdition } from '../../features/pwa/registration.ts';
 import { PreferencesContext, type PreferencesContextValue } from './context.ts';
 import { applyPreferencesToDocument } from './dom.ts';
 import {
   DEFAULT_PREFERENCES,
-  type Preferences,
-  type PreferencesAction,
   PreferencesActionType,
   preferencesReducer,
   resolvedThemeOf,
+  type Preferences,
+  type PreferencesAction,
   type ResolvedTheme,
 } from './model.ts';
 import { loadPreferences, savePreferences } from './storage.ts';
@@ -61,6 +79,76 @@ const useHydratedPreferences = (): [Preferences, PreferencesDispatch, boolean] =
   return [preferences, dispatch, hydrated];
 };
 
+type Reading = {
+  readonly language: Language;
+  readonly edition: BibleEditionId;
+};
+
+const readingOf = (preferences: Preferences): Reading => {
+  const language = languageOf(preferences.language, deviceLanguageTags());
+
+  return { language, edition: editionOf(language, preferences.bibleChoice) };
+};
+
+const sameReading = (left: Reading, right: Reading): boolean =>
+  left.language === right.language && left.edition === right.edition;
+
+const restoreReading = (reading: ReadingSnapshot, dispatch: PreferencesDispatch): void => {
+  const language = LANGUAGE_CHOICES.find(
+    (choice) => languageOf(choice, deviceLanguageTags()) === reading.language,
+  );
+  const bibleChoice = BIBLE_CHOICES.find(
+    (choice) => editionOf(reading.language, choice) === reading.edition,
+  );
+  if (language !== undefined) {
+    dispatch({ type: PreferencesActionType.Set, key: 'language', value: language });
+  }
+  if (bibleChoice !== undefined) {
+    dispatch({ type: PreferencesActionType.Set, key: 'bibleChoice', value: bibleChoice });
+  }
+};
+
+const useActiveReading = (
+  preferences: Preferences,
+  dispatch: PreferencesDispatch,
+  hydrated: boolean,
+): ReadingSnapshot => {
+  const [reading, setReading] = useState(INITIAL_READING);
+  const snapshots = useRef(new Map<string, ReadingSnapshot>());
+  useEffect(() => {
+    const wanted = readingOf(preferences);
+    if (!hydrated || sameReading(wanted, reading)) return;
+    let active = true;
+    const key = wanted.language + '/' + wanted.edition;
+    const prepare = async (): Promise<void> => {
+      try {
+        const next =
+          snapshots.current.get(key) ?? (await loadReading(wanted.language, wanted.edition));
+        if (!(await cacheEdition(wanted.language, wanted.edition))) {
+          if (active) restoreReading(reading, dispatch);
+          return;
+        }
+        if (!(await prepareLoadedContent(reading, next, cacheEdition))) {
+          if (active) restoreReading(reading, dispatch);
+          return;
+        }
+        snapshots.current.set(key, next);
+        if (active) setReading(next);
+      } catch {
+        if (active) restoreReading(reading, dispatch);
+      }
+    };
+    void prepare();
+    return () => {
+      active = false;
+    };
+  }, [dispatch, hydrated, preferences, reading]);
+  useLayoutEffect(() => {
+    document.documentElement.lang = reading.language;
+  }, [reading.language]);
+  return reading;
+};
+
 const usePersistedPreferences = (
   preferences: Preferences,
   theme: ResolvedTheme,
@@ -68,9 +156,7 @@ const usePersistedPreferences = (
 ): void => {
   useLayoutEffect(() => applyPreferencesToDocument(preferences, theme), [preferences, theme]);
   useEffect(() => {
-    if (hydrated) {
-      void savePreferences(preferences);
-    }
+    if (hydrated) void savePreferences(preferences);
   }, [hydrated, preferences]);
 };
 
@@ -89,6 +175,7 @@ export function PreferencesProvider({ children }: Readonly<PropsWithChildren>) {
   const light = useSyncExternalStore(subscribeToLight, prefersLight, () => false);
   const resolvedTheme = resolvedThemeOf(preferences.theme, light);
   usePersistedPreferences(preferences, resolvedTheme, hydrated);
+  const reading = useActiveReading(preferences, dispatch, hydrated);
   const value = useMemo(
     () => contextValueFrom(preferences, resolvedTheme, dispatch),
     [dispatch, preferences, resolvedTheme],
@@ -98,5 +185,9 @@ export function PreferencesProvider({ children }: Readonly<PropsWithChildren>) {
     return null;
   }
 
-  return <PreferencesContext value={value}>{children}</PreferencesContext>;
+  return (
+    <ReadingContext value={reading}>
+      <PreferencesContext value={value}>{children}</PreferencesContext>
+    </ReadingContext>
+  );
 }

@@ -1,23 +1,24 @@
 import { useState, type CSSProperties, type RefObject } from 'react';
-import { contentCatalog } from '../../content/catalog.ts';
+import { CitationLink } from '../../components/links/CitationLink.tsx';
+import { AiTranslationNotice, type MarkToggle } from '../../components/marks/Marks.tsx';
+import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
+import { useReading } from '../../content/reading.ts';
 import type { ScriptureRedSpan } from '../../content/schema.ts';
 import { classNames } from '../../shared/classNames.ts';
+import { useLandscape } from '../../shared/useLandscape.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { CITATION_CLASS_NAME, EYEBROW_CLASS_NAME, SCRIPTURE_CLASS_NAME } from '../../styles.ts';
-import { CitationLink } from '../../components/links/CitationLink.tsx';
-import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
 import { scriptureLocationOf, type BibleVerseLocation } from '../library/model.ts';
 import {
   apparatusReferenceTarget,
   rosaryTextReferenceTarget,
 } from '../references/referenceCatalog.ts';
 import { guidedText, redMarkOf, scriptureRedOf, type RedMark } from './guidedText.tsx';
+import { GuidedPlaybackPhase } from './playbackSequence.ts';
+import { FruitLine, ReadingNotes, type AuxiliaryPlaybackNotesProps } from './PrayerNotes.tsx';
 import { bodyFor, type MysteryFruit, type PrayerFocusSession } from './prayerSession.ts';
 import { StepArchetype, type PrayerStep } from './progression.ts';
-import { GuidedPlaybackPhase } from './playbackSequence.ts';
 import type { PendantOverhang } from './usePendantOverhang.ts';
-import { FruitLine, ReadingNotes, type AuxiliaryPlaybackNotesProps } from './PrayerNotes.tsx';
-import { useLandscape } from '../../shared/useLandscape.ts';
 
 const DROP_CAP_CLASS_NAME =
   'first-letter:float-left first-letter:mt-1 first-letter:mr-2 first-letter:font-display first-letter:text-[3.5em] first-letter:leading-[0.78] first-letter:font-medium first-letter:text-accent spread:first-letter:text-[3.75em] spread:first-letter:leading-[0.76]';
@@ -33,19 +34,18 @@ const overhangStyleOf = (overhang: PendantOverhang): OverhangStyle => ({
 export const TAIL_CLEARANCE_CLASS_NAME =
   'landscape:pr-(--tail-clearance) spread:pr-(--tail-clearance)';
 
-const HAIL_MARY_LABEL = 'Hail Mary';
-
 function RepetitionFeedback({ step }: { readonly step: PrayerStep }) {
+  const { wording } = useReading();
   if (step.archetype !== StepArchetype.CountedRepetition) {
     return null;
   }
 
-  const label = `${HAIL_MARY_LABEL} ${String(step.repetition)} of ${String(step.repetitionTotal)}`;
+  const label = wording.prayer.hailMaryCount(step.repetition, step.repetitionTotal);
 
   return (
     <section aria-label={label} className="flex flex-col gap-2">
       <p className={EYEBROW_CLASS_NAME}>{label}</p>
-      <ol aria-label="Hail Mary repetition progress" className="flex flex-wrap gap-2">
+      <ol aria-label={wording.prayer.repetitionProgress} className="flex flex-wrap gap-2">
         {Array.from({ length: step.repetitionTotal }, (_, index) => {
           const repetition = index + 1;
           const complete = repetition <= step.repetition;
@@ -61,9 +61,7 @@ function RepetitionFeedback({ step }: { readonly step: PrayerStep }) {
               )}
               key={repetition}
             >
-              <span className="sr-only">
-                {`${HAIL_MARY_LABEL} ${String(repetition)}${complete ? ' complete' : ' upcoming'}`}
-              </span>
+              <span className="sr-only">{wording.prayer.hailMaryState(repetition, complete)}</span>
             </li>
           );
         })}
@@ -101,9 +99,10 @@ function SourceCitation({
   onOpenReference,
   step,
 }: Pick<PrayerBodyProps, 'onOpenBibleVerse' | 'onOpenReference' | 'step'>) {
+  const reading = useReading();
   if (step.archetype === StepArchetype.MysteryAnnouncement) {
     const scripture = step.mystery.scripture;
-    const location = scriptureLocationOf(scripture);
+    const location = scriptureLocationOf(reading, scripture);
 
     if (location === null) {
       return scripture.reference;
@@ -118,7 +117,7 @@ function SourceCitation({
     );
   }
 
-  const prayer = contentCatalog.prayerById(step.prayerId);
+  const prayer = reading.catalog.prayerById(step.prayerId);
 
   return (
     <CitationLink
@@ -146,6 +145,7 @@ function ScriptureText({
   readonly mark: RedMark;
   readonly red: readonly ScriptureRedSpan[];
 }) {
+  const reading = useReading();
   return (
     <p
       ref={scriptureRef}
@@ -154,7 +154,7 @@ function ScriptureText({
         showDropCaps && !dense && DROP_CAP_CLASS_NAME,
       )}
     >
-      {guidedText(bodyFor(step), guidedPlayback, red, mark)}
+      {guidedText(bodyFor(reading, step), guidedPlayback, red, mark)}
     </p>
   );
 }
@@ -191,6 +191,7 @@ function PrayerBody({
   showScriptureReading,
   step,
 }: PrayerBodyProps) {
+  const reading = useReading();
   const { preferences } = usePreferences();
   const [noticeOpen, setNoticeOpen] = useState(false);
 
@@ -213,8 +214,9 @@ function PrayerBody({
       />
       {noticeOpen && red.length > 0 ? (
         <RedLetterNotice
+          onClose={() => setNoticeOpen(false)}
           onOpenSource={(sourceId) => onOpenReference(apparatusReferenceTarget(sourceId))}
-          redLetter={contentCatalog.bible.redLetter}
+          redLetter={reading.catalog.bible.redLetter}
         />
       ) : null}
       <SourceLine
@@ -228,11 +230,15 @@ function PrayerBody({
 }
 
 function ReadingFruit({
+  aiNotice,
   fruit,
   guidedPlayback,
   onOpenReference,
   showArtwork,
-}: Pick<ReadingPageProps, 'fruit' | 'guidedPlayback' | 'onOpenReference' | 'showArtwork'>) {
+}: Pick<
+  ReadingPageProps,
+  'aiNotice' | 'fruit' | 'guidedPlayback' | 'onOpenReference' | 'showArtwork'
+>) {
   const landscape = useLandscape();
 
   if (fruit === null) {
@@ -249,6 +255,7 @@ function ReadingFruit({
       )}
     >
       <FruitLine
+        aiNotice={aiNotice}
         fruit={fruit}
         illuminated={guidedPlayback.activePhase === GuidedPlaybackPhase.Fruit}
         onArt={false}
@@ -259,10 +266,11 @@ function ReadingFruit({
 }
 
 function ReadingPage(props: ReadingPageProps) {
+  const { wording } = useReading();
   return (
     <article
       ref={props.readingRef}
-      aria-label="Prayer text"
+      aria-label={wording.prayer.prayerText}
       className={classNames(
         'scroll-region relative z-10 col-start-1 row-start-3 flex max-h-full min-h-0 min-w-0 flex-col overflow-y-auto',
         TAIL_CLEARANCE_CLASS_NAME,
@@ -275,6 +283,7 @@ function ReadingPage(props: ReadingPageProps) {
       style={overhangStyleOf(props.pendantOverhang)}
     >
       <ReadingNotes
+        aiNotice={props.aiNotice}
         guidedPlayback={props.guidedPlayback}
         offering={props.offering}
         onOpenReference={props.onOpenReference}
@@ -284,11 +293,18 @@ function ReadingPage(props: ReadingPageProps) {
       />
       <RepetitionFeedback step={props.step} />
       <ReadingFruit
+        aiNotice={props.aiNotice}
         fruit={props.fruit}
         guidedPlayback={props.guidedPlayback}
         onOpenReference={props.onOpenReference}
         showArtwork={props.showArtwork}
       />
+      {props.aiNotice.open ? (
+        <AiTranslationNotice
+          onClose={props.aiNotice.onToggle}
+          onOpenSource={(sourceId) => props.onOpenReference(apparatusReferenceTarget(sourceId))}
+        />
+      ) : null}
       <PrayerBody
         dense={props.dense}
         guidedPlayback={props.guidedPlayback}
@@ -304,12 +320,19 @@ function ReadingPage(props: ReadingPageProps) {
   );
 }
 
-export function PrayerReadingPage({ session }: { readonly session: PrayerFocusSession }) {
+export function PrayerReadingPage({
+  aiNotice,
+  session,
+}: {
+  readonly aiNotice: MarkToggle;
+  readonly session: PrayerFocusSession;
+}) {
   const { display, fit, fruit, onOpenBibleVerse, onOpenReference, playback, preferences, refs } =
     session;
 
   return (
     <ReadingPage
+      aiNotice={aiNotice}
       dense={fit.dense}
       fruit={fruit}
       guidedPlayback={playback}

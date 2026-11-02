@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
+import { KeyName } from './keyboard.ts';
 
 export const useEscape = (onEscape: (event: KeyboardEvent) => void, capture = false): void => {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
+      if (event.key === KeyName.Escape) {
         onEscape(event);
       }
     };

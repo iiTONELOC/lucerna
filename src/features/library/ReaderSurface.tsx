@@ -1,11 +1,12 @@
 import type { ReactNode, RefObject } from 'react';
+import { BackButton } from '../../components/buttons/BackButton.tsx';
+import { SettingsButton } from '../../components/buttons/SettingsButton.tsx';
+import { useReading } from '../../content/reading.ts';
+import type { DevotionalSource } from '../../content/schema.ts';
 import { useEscape } from '../../shared/useEscape.ts';
 import { ReaderGround, Theme, type Preferences } from '../../state/preferences/model.ts';
 import { usePreferences } from '../../state/preferences/usePreferences.ts';
 import { CITATION_CLASS_NAME, READING_CLASS_NAME } from '../../styles.ts';
-import type { DevotionalSource } from '../../content/schema.ts';
-import { BackButton } from '../../components/buttons/BackButton.tsx';
-import { SettingsButton } from '../../components/buttons/SettingsButton.tsx';
 
 const readerSurfacePropsOf = (preferences: Preferences) => ({
   'data-reader-face': preferences.readerFace,
@@ -55,12 +56,15 @@ function ReaderTopBar({
 }
 
 export function ReaderColophon({ source }: { readonly source: DevotionalSource }) {
+  const { wording } = useReading();
   const publication = [source.publisher, source.published].filter((part) => part !== undefined);
 
   return (
     <footer className="flex flex-col gap-1 border-t border-hairline pt-6">
       {source.translator === undefined ? null : (
-        <p className={`${CITATION_CLASS_NAME} text-muted`}>Translated by {source.translator}.</p>
+        <p className={`${CITATION_CLASS_NAME} text-muted`}>
+          {wording.library.translatedBy(source.translator)}
+        </p>
       )}
       {publication.length === 0 ? null : (
         <p className={`${CITATION_CLASS_NAME} text-muted`}>{publication.join(', ')}.</p>
@@ -83,12 +87,13 @@ export function ReaderSurface({
   readonly onBack: () => void;
   readonly onOpenSettings: () => void;
 }) {
+  const { wording } = useReading();
   const { preferences } = usePreferences();
   useReaderEscape(onBack);
 
   return (
     <div
-      aria-label="Reader"
+      aria-label={wording.library.reader}
       className="flex h-full min-h-0 flex-col bg-background pt-safe-top text-foreground"
       {...readerSurfacePropsOf(preferences)}
     >

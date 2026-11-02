@@ -1,3 +1,4 @@
+import type { BibleEditionId } from '../../content/language.ts';
 import type { BibleVerseLocation } from '../library/model.ts';
 import type { PrayerStart } from '../prayer/progression.ts';
 import { ReferenceGroup, type ReferenceTarget } from '../references/referenceCatalog.ts';
@@ -25,9 +26,10 @@ export type Destination =
       readonly workId: string;
       readonly blockIndex: number | null;
     }
-  | { readonly kind: DestinationKind.BibleContents }
+  | { readonly kind: DestinationKind.BibleContents; readonly edition: BibleEditionId }
   | {
       readonly kind: DestinationKind.BibleBook;
+      readonly edition: BibleEditionId;
       readonly bookId: string;
       readonly blockIndex: number | null;
       readonly verse?: BibleVerseLocation;
@@ -41,7 +43,10 @@ export type Navigation = {
 
 export const INITIAL_NAVIGATION: Navigation = { area: ApplicationView.Rosary, paths: {} };
 
-const BIBLE_CONTENTS: Destination = { kind: DestinationKind.BibleContents };
+const bibleContentsOf = (edition: BibleEditionId): Destination => ({
+  edition,
+  kind: DestinationKind.BibleContents,
+});
 
 export const pathIn = (navigation: Navigation, area: ApplicationView): readonly Destination[] =>
   navigation.paths[area] ?? [];
@@ -75,22 +80,40 @@ export const replaceDestination = (navigation: Navigation, destination: Destinat
 export const showArea = (navigation: Navigation, area: ApplicationView): Navigation =>
   selectArea(withPath(navigation, area, []), area);
 
-export const openBible = (navigation: Navigation, bookId: string | null): Navigation => {
-  const contents = openDestination(navigation, BIBLE_CONTENTS);
+export const openBible = (
+  navigation: Navigation,
+  edition: BibleEditionId,
+  bookId: string | null,
+): Navigation => {
+  const contents = openDestination(navigation, bibleContentsOf(edition));
 
   return bookId === null
     ? contents
-    : openDestination(contents, { blockIndex: null, bookId, kind: DestinationKind.BibleBook });
+    : openDestination(contents, {
+        blockIndex: null,
+        bookId,
+        edition,
+        kind: DestinationKind.BibleBook,
+      });
 };
 
-export const turnToBook = (navigation: Navigation, bookId: string): Navigation => {
+export const turnToBook = (
+  navigation: Navigation,
+  edition: BibleEditionId,
+  bookId: string,
+): Navigation => {
   const previous = goBack(navigation);
   const contents =
     destinationOf(previous)?.kind === DestinationKind.BibleContents
       ? previous
-      : openDestination(previous, BIBLE_CONTENTS);
+      : openDestination(previous, bibleContentsOf(edition));
 
-  return openDestination(contents, { blockIndex: 0, bookId, kind: DestinationKind.BibleBook });
+  return openDestination(contents, {
+    blockIndex: 0,
+    bookId,
+    edition,
+    kind: DestinationKind.BibleBook,
+  });
 };
 
 export const destinationOfRecord = (target: ReferenceTarget): Destination =>

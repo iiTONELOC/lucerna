@@ -1,3 +1,4 @@
+import { useReading } from '../../content/reading.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { SettingsGlyph } from '../icons/SettingsGlyph.tsx';
 
@@ -11,12 +12,13 @@ export function SettingsButton({
   readonly className?: string;
   readonly onOpen: () => void;
 }) {
+  const { wording } = useReading();
   return (
     <button
-      aria-label="Settings"
+      aria-label={wording.navigation.settings}
       className={classNames(SETTINGS_BUTTON_CLASS_NAME, className)}
       onClick={onOpen}
-      title="Settings"
+      title={wording.navigation.settings}
       type="button"
     >
       <SettingsGlyph className="size-5" />

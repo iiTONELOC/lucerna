@@ -1,4 +1,6 @@
 import { useId, useRef, type KeyboardEvent, type MouseEvent } from 'react';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
+import type { StrandGeometry } from './decadeStrand.ts';
 import {
   activeTargetOf,
   BeadKind,
@@ -12,8 +14,8 @@ import {
   type Marker,
   type PlacedBead,
 } from './drape.ts';
-import type { StrandGeometry } from './decadeStrand.ts';
 import { StepAnchor, type NonBeadAnchor, type StepAnchorPoint } from './progression.ts';
+import { KeyName } from '../../shared/keyboard.ts';
 
 const CONTACT_BLUR = 1.5;
 const GLOW_BLUR = 4;
@@ -51,17 +53,19 @@ const TOUCH_TARGET_MINIMUM_PIXELS = 44;
 
 const CRUCIFIX_RING_RADIUS = CRUCIFIX_STROKE_WIDTH / CRUCIFIX_RING_DIVISOR;
 
-const BEAD_LABEL: Readonly<Record<BeadKind, string>> = {
-  [BeadKind.OurFather]: 'Our Father',
-  [BeadKind.HailMary]: 'Hail Mary',
-};
+const BEAD_LABEL = (reading: ReadingSnapshot): Readonly<Record<BeadKind, string>> => ({
+  [BeadKind.OurFather]: reading.wording.prayer.ourFather,
+  [BeadKind.HailMary]: reading.wording.prayer.hailMary,
+});
 
-const TARGET_LABEL: Readonly<Record<NonBeadAnchor['kind'], string>> = {
-  [StepAnchor.Crucifix]: 'Crucifix',
-  [StepAnchor.Centerpiece]: 'Centerpiece',
-  [StepAnchor.ChainLeading]: 'Chain before the next bead',
-  [StepAnchor.ChainTrailing]: 'Chain after the previous bead',
-};
+const TARGET_LABEL = (
+  reading: ReadingSnapshot,
+): Readonly<Record<NonBeadAnchor['kind'], string>> => ({
+  [StepAnchor.Crucifix]: reading.wording.prayer.crucifix,
+  [StepAnchor.Centerpiece]: reading.wording.prayer.centerpiece,
+  [StepAnchor.ChainLeading]: reading.wording.prayer.chainLeading,
+  [StepAnchor.ChainTrailing]: reading.wording.prayer.chainTrailing,
+});
 
 const HIT_CLASS_NAME =
   'pointer-events-auto cursor-pointer outline-none [-webkit-tap-highlight-color:transparent] focus-visible:outline-2 focus-visible:outline-accent';
@@ -72,7 +76,7 @@ const BEAD_CLASS_NAME =
 const selectOnKey =
   (select: () => void) =>
   (event: KeyboardEvent<SVGElement>): void => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === KeyName.Enter || event.key === KeyName.Space) {
       event.preventDefault();
       select();
     }
@@ -274,6 +278,7 @@ type BeadLayerProps = {
 };
 
 function BeadLayer(props: BeadLayerProps) {
+  const reading = useReading();
   return (
     <>
       {props.beads.map((bead) => {
@@ -285,7 +290,10 @@ function BeadLayer(props: BeadLayerProps) {
         return (
           <circle
             aria-current={active ? 'step' : undefined}
-            aria-label={`${BEAD_LABEL[bead.kind]} bead ${bead.beadIndex + 1}`}
+            aria-label={reading.wording.prayer.bead(
+              BEAD_LABEL(reading)[bead.kind],
+              bead.beadIndex + 1,
+            )}
             className={BEAD_CLASS_NAME}
             cx={bead.center.x}
             cy={bead.center.y}
@@ -451,11 +459,12 @@ type HitAttributes = {
 };
 
 function TargetHit(props: TargetHitProps) {
+  const reading = useReading();
   const { anchor, target } = props;
   const select = () => props.onSelect(anchor);
   const shared: HitAttributes = {
     'aria-current': props.active ? 'step' : undefined,
-    'aria-label': TARGET_LABEL[anchor.kind],
+    'aria-label': TARGET_LABEL(reading)[anchor.kind],
     className: BEAD_CLASS_NAME,
     onKeyDown: selectOnKey(select),
     role: 'button',
@@ -557,15 +566,15 @@ const useNearestAnchorSelect = (
 };
 
 export function RosaryDrape(props: RosaryDrapeProps) {
+  const { wording } = useReading();
   const { geometry, target, anchors, prayedThroughBeadIndex, onSelect, alignment } = props;
   const ids = drapeIdsFrom(useId());
   const { viewBox } = geometry;
   const activeBeadIndex = target.kind === StepAnchor.Bead ? target.beadIndex : null;
   const { bandRef, selectNearestAnchor } = useNearestAnchorSelect(geometry, anchors, onSelect);
-
   return (
     <svg
-      aria-label="Rosary progress"
+      aria-label={wording.prayer.rosaryProgress}
       className="pointer-events-none block h-full w-full overflow-visible"
       preserveAspectRatio={alignment}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
@@ -629,6 +638,7 @@ export function DecadeStrand({
   prayedThroughBeadIndex,
   onSelect,
 }: DecadeStrandProps) {
+  const { wording } = useReading();
   const ids = drapeIdsFrom(useId());
   const bandRef = useRef<SVGPathElement>(null);
   const { viewBox } = strand;
@@ -650,7 +660,7 @@ export function DecadeStrand({
 
   return (
     <svg
-      aria-label="Current decade"
+      aria-label={wording.prayer.currentDecade}
       className="pointer-events-none block h-auto w-full overflow-visible"
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
     >

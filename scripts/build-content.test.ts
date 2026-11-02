@@ -1,8 +1,10 @@
 import { expect, test } from 'bun:test';
 import { buildBibleContent } from './content/bible.ts';
 import { buildDevotionalContent } from './content/devotional.ts';
+import { CONTENT_LANGUAGES, LATIN_EDITION } from './content/editions.ts';
 import { buildLibraryContent } from './content/library.ts';
 import { buildSplashContent } from './build-content.ts';
+import { Language } from '../src/content/language.ts';
 import {
   CatalogLookupError,
   createContentCatalog,
@@ -19,12 +21,36 @@ import {
   LibraryCategory,
   LibraryHeadingLevel,
   libraryContentFrom,
+  ReflectionStatus,
+  Translation,
+  type BibleBook,
 } from '../src/content/schema.ts';
 
+const REPOSITORY_ROOT = new URL('../', import.meta.url);
+const MISSING_CONTENT = 'Expected built content is missing';
+
+const defined = <Value>(value: Value | undefined): Value => {
+  if (value === undefined) {
+    throw new TypeError(MISSING_CONTENT);
+  }
+
+  return value;
+};
+const ENGLISH_LANGUAGE = CONTENT_LANGUAGES[Language.English];
+const ENGLISH = { ...ENGLISH_LANGUAGE, edition: ENGLISH_LANGUAGE.ownEdition };
+const SPANISH = { ...CONTENT_LANGUAGES[Language.Spanish], edition: LATIN_EDITION };
+
+const verseIn = (books: readonly BibleBook[], bookId: string, chapter: number, verse: number) =>
+  books
+    .find((book) => book.id === bookId)
+    ?.chapters.find((candidate) => candidate.number === chapter)
+    ?.blocks.flatMap((block) => (block.kind === BibleBlockKind.Paragraph ? block.verses : []))
+    .find((candidate) => candidate.number === verse);
+
 test('builds the nine approved splash verses from canonical sources', async () => {
-  const verses = await buildSplashContent(new URL('../', import.meta.url));
+  const verses = await buildSplashContent(REPOSITORY_ROOT, ENGLISH);
   const generated = await Bun.file(
-    new URL('../src/generated/splash-verses.json', import.meta.url),
+    new URL('../src/generated/en/douay-rheims/splash-verses.json', import.meta.url),
   ).json();
 
   expect(verses).toHaveLength(9);
@@ -41,20 +67,21 @@ test('builds the nine approved splash verses from canonical sources', async () =
 });
 
 test('compiles the complete devotional catalog from canonical records', async () => {
-  const repositoryRoot = new URL('../', import.meta.url);
-  const library = await buildLibraryContent(repositoryRoot);
-  const content = await buildDevotionalContent(repositoryRoot, library);
+  const library = await buildLibraryContent(REPOSITORY_ROOT, ENGLISH);
+  const content = await buildDevotionalContent(REPOSITORY_ROOT, library, ENGLISH);
   const generated = devotionalContentFrom(
-    await Bun.file(new URL('../src/generated/devotional-content.json', import.meta.url)).json(),
+    await Bun.file(
+      new URL('../src/generated/en/douay-rheims/devotional-content.json', import.meta.url),
+    ).json(),
   );
-  const bible = await buildBibleContent(repositoryRoot);
+  const bible = await buildBibleContent(REPOSITORY_ROOT, ENGLISH);
   const catalog = createContentCatalog(content, bible.index);
   const resolvedLibrary = resolveLibrary(library, catalog.sourceById);
   const mysteries = catalog.rosary.mysterySets.flatMap((mysterySet) => mysterySet.mysteries);
   const annunciation = catalog.mysterySetById('joyful').mysteries[0];
 
   expect(content).toEqual(generated);
-  expect(catalog.sources).toHaveLength(23);
+  expect(catalog.sources).toHaveLength(34);
   expect(catalog.prayers).toHaveLength(8);
   expect(catalog.artworks).toHaveLength(120);
   expect(catalog.rosary.mysterySets).toHaveLength(4);
@@ -81,9 +108,9 @@ test('compiles the complete devotional catalog from canonical records', async ()
 });
 
 test('compiles The Secret of the Rosary into the library reading model', async () => {
-  const content = await buildLibraryContent(new URL('../', import.meta.url));
+  const content = await buildLibraryContent(REPOSITORY_ROOT, ENGLISH);
   const generated = libraryContentFrom(
-    await Bun.file(new URL('../src/generated/library-content.json', import.meta.url)).json(),
+    await Bun.file(new URL('../src/generated/en/library-content.json', import.meta.url)).json(),
   );
   const work = content.works[0];
   const blocks = work?.blocks ?? [];
@@ -114,19 +141,19 @@ test('compiles The Secret of the Rosary into the library reading model', async (
   );
   expect(headings.map((heading) => heading.text)).toContain('Third Method (Book of Sermons)');
   expect(blocks.filter((block) => block.kind === LibraryBlockKind.Verse)).toHaveLength(3);
-  expect(numbered).toHaveLength(534);
+  expect(numbered).toHaveLength(536);
 });
 
 test('compiles the full Douay-Rheims canon under traditional names', async () => {
-  const bible = await buildBibleContent(new URL('../', import.meta.url));
+  const bible = await buildBibleContent(REPOSITORY_ROOT, ENGLISH);
   const generatedIndex = bibleIndexFrom(
     await Bun.file(
-      new URL('../src/generated/bible/douay-rheims/index.json', import.meta.url),
+      new URL('../src/generated/en/douay-rheims/bible/index.json', import.meta.url),
     ).json(),
   );
   const generatedMatthew = bibleBookFrom(
     await Bun.file(
-      new URL('../src/generated/bible/douay-rheims/books/matthew.json', import.meta.url),
+      new URL('../src/generated/en/douay-rheims/bible/books/matthew.json', import.meta.url),
     ).json(),
   );
   const names = bible.index.books.map((book) => book.name);
@@ -134,7 +161,7 @@ test('compiles the full Douay-Rheims canon under traditional names', async () =>
   expect(bible.index).toEqual(generatedIndex);
   expect(bible.index.redLetter).toEqual({
     notice:
-      'These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant using public-domain tagged Bible editions and have not been fully reviewed; errors are possible. Report any to lucerna@wedefendit.com.',
+      'These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com.',
     witnessSourceIds: ['world-english-bible', 'king-james-version'],
     toolSourceIds: ['claude-fable-5'],
   });
@@ -153,31 +180,32 @@ test('compiles the full Douay-Rheims canon under traditional names', async () =>
 });
 
 test('parses chapters, verses, and Challoner notes faithfully', async () => {
-  const bible = await buildBibleContent(new URL('../', import.meta.url));
-  const bookById = new Map(bible.books.map((book) => [book.id, book]));
-  const matthew = bookById.get('matthew');
-  const chapter = matthew?.chapters[0];
-  const verses = (chapter?.blocks ?? []).flatMap((block) =>
+  const bible = await buildBibleContent(REPOSITORY_ROOT, ENGLISH);
+  const bookOf = (id: string) => defined(bible.books.find((book) => book.id === id));
+  const firstChapterOf = (id: string) => defined(bookOf(id).chapters[0]);
+  const matthew = bookOf('matthew');
+  const chapter = firstChapterOf('matthew');
+  const verses = chapter.blocks.flatMap((block) =>
     block.kind === BibleBlockKind.Paragraph ? block.verses : [],
   );
-  const note = verses
-    .find((verse) => verse.number === 16)
-    ?.runs.find((run) => run.kind === BibleRunKind.Note);
+  const note = defined(verses.find((verse) => verse.number === 16)).runs.find(
+    (run) => run.kind === BibleRunKind.Note,
+  );
 
-  expect(matthew?.title).toBe('The Holy Gospel of Jesus Christ According to Saint Matthew');
-  expect(matthew?.chapters).toHaveLength(28);
-  expect(chapter?.label).toBe('Matthew 1');
-  expect(chapter?.summary?.[0]?.text).toContain('The genealogy of Christ');
+  expect(matthew.title).toBe('The Holy Gospel of Jesus Christ According to Saint Matthew');
+  expect(matthew.chapters).toHaveLength(28);
+  expect(chapter.label).toBe('Matthew 1');
+  expect(chapter.summary?.[0]?.text).toContain('The genealogy of Christ');
   expect(verses).toHaveLength(25);
   expect(note?.keyword).toBe('The husband of Mary:');
-  expect(bookById.get('lamentations')?.chapters[0]?.number).toBe(0);
-  expect(bookById.get('lamentations')?.chapters[0]?.label).toBe('Preface');
-  expect(bookById.get('ecclesiasticus')?.chapters[0]?.label).toBe('The Prologue.');
-  expect(bookById.get('psalms')?.chapters).toHaveLength(150);
+  expect(firstChapterOf('lamentations').number).toBe(0);
+  expect(firstChapterOf('lamentations').label).toBe('Preface');
+  expect(firstChapterOf('ecclesiasticus').label).toBe('The Prologue.');
+  expect(bookOf('psalms').chapters).toHaveLength(150);
 });
 
 test('applies the red letter marking to the words of Christ', async () => {
-  const bible = await buildBibleContent(new URL('../', import.meta.url));
+  const bible = await buildBibleContent(REPOSITORY_ROOT, ENGLISH);
   const bookById = new Map(bible.books.map((book) => [book.id, book]));
   const verseAt = (bookId: string, chapterNumber: number, verseNumber: number) =>
     bookById
@@ -214,4 +242,167 @@ test('applies the red letter marking to the words of Christ', async () => {
       ),
     ),
   ).toBe(true);
+});
+
+test('builds the opening verses from the Latin Vulgate under Spanish references', async () => {
+  const verses = await buildSplashContent(REPOSITORY_ROOT, SPANISH);
+  const generated = await Bun.file(
+    new URL('../src/generated/es/clementine-vulgate/splash-verses.json', import.meta.url),
+  ).json();
+
+  expect(verses).toHaveLength(9);
+  expect(verses).toEqual(generated);
+  expect(verses[0]?.reference).toBe('2 Reyes 22,29');
+  expect(verses[0]?.text).toBe(
+    'Quia tu lucerna mea, Domine, et tu, Domine, illuminabis tenebras meas.',
+  );
+  expect(verses[0]?.sourceId).toBe('clementine-vulgate');
+});
+
+test('starts every quoted passage with a capital letter in both languages', async () => {
+  for (const language of [ENGLISH, SPANISH]) {
+    const library = await buildLibraryContent(REPOSITORY_ROOT, language);
+    const content = await buildDevotionalContent(REPOSITORY_ROOT, library, language);
+    const passages = [
+      ...(await buildSplashContent(REPOSITORY_ROOT, language)).map(({ text }) => text),
+      ...content.rosary.mysterySets.flatMap(({ mysteries }) =>
+        mysteries.map(({ scripture }) => scripture.text),
+      ),
+    ];
+
+    for (const passage of passages) {
+      expect(passage.charAt(0)).toBe(passage.charAt(0).toUpperCase());
+    }
+  }
+});
+
+test('compiles the Spanish Rosary over the English structure', async () => {
+  const library = await buildLibraryContent(REPOSITORY_ROOT, SPANISH);
+  const content = await buildDevotionalContent(REPOSITORY_ROOT, library, SPANISH);
+  const english = await buildDevotionalContent(
+    REPOSITORY_ROOT,
+    await buildLibraryContent(REPOSITORY_ROOT, ENGLISH),
+    ENGLISH,
+  );
+  const generated = devotionalContentFrom(
+    await Bun.file(
+      new URL('../src/generated/es/clementine-vulgate/devotional-content.json', import.meta.url),
+    ).json(),
+  );
+  const annunciation = defined(content.rosary.mysterySets[0]?.mysteries[0]);
+
+  expect(content).toEqual(generated);
+  expect(content.prayers.map((prayer) => prayer.id)).toEqual(
+    english.prayers.map((prayer) => prayer.id),
+  );
+  expect(content.prayers.find((prayer) => prayer.id === 'our-father')?.text).toStartWith(
+    'Padre nuestro que estás en el cielo',
+  );
+  expect(content.rosary.mysterySets[0]?.name).toBe('Misterios Gozosos');
+  expect(annunciation.title).toBe('La Encarnación del Hijo de Dios');
+  expect(annunciation.fruit).toBe('Humildad');
+  expect(annunciation.fruitTranslation).toBe(Translation.Ai);
+  expect(annunciation.scripture.reference).toBe('Lucas 1,26-27');
+  expect(annunciation.scripture.sourceId).toBe('clementine-vulgate');
+  expect(annunciation.scripture.text).toStartWith('In mense autem sexto');
+  expect(annunciation.reflection.status).toBe(ReflectionStatus.Mapped);
+  expect(annunciation.reflection.translation).toBe(Translation.Ai);
+  expect(annunciation.reflection.text).toStartWith(
+    'Te ofrecemos, Señor Jesús, esta primera decena',
+  );
+  expect(annunciation.artIds).toEqual(defined(english.rosary.mysterySets[0]?.mysteries[0]).artIds);
+  expect(content.rosary.guidance.translation).toBe(Translation.Ai);
+  expect(content.rosary.guidance.decadeHailMarys.text).toContain('{mystery}');
+  expect(content.rosary.schedule).toEqual(english.rosary.schedule);
+});
+
+test('gives every Latin verse its own block as the English does', async () => {
+  const bible = await buildBibleContent(REPOSITORY_ROOT, SPANISH);
+  const genesis = bible.books.find((book) => book.id === 'genesis');
+  const paragraphs = genesis?.chapters.flatMap((chapter) =>
+    chapter.blocks.filter((block) => block.kind === BibleBlockKind.Paragraph),
+  );
+
+  expect(paragraphs?.length).toBeGreaterThan(1000);
+  for (const paragraph of paragraphs ?? []) {
+    expect(paragraph.kind === BibleBlockKind.Paragraph ? paragraph.verses : []).toHaveLength(1);
+  }
+});
+
+test('titles the Latin books in mixed case as the English does', async () => {
+  const bible = await buildBibleContent(REPOSITORY_ROOT, SPANISH);
+  const titleOf = (id: string): string | undefined =>
+    bible.books.find((book) => book.id === id)?.title;
+
+  expect(titleOf('genesis')).toBe('Incipit Liber Beresit id est Genesis');
+  expect(titleOf('1-corinthians')).toBe('Incipit ad Corinthios I');
+  expect(titleOf('matthew')).toBe('Incipit Evangelium secundum Mattheum');
+  expect(bible.books.filter((book) => book.title === book.title.toUpperCase())).toEqual([]);
+});
+
+test('gives every source record in the reader language', async () => {
+  const englishLatin = { ...ENGLISH_LANGUAGE, edition: LATIN_EDITION };
+  const sourceOf = async (language: typeof SPANISH, sourceId: string) => {
+    const library = await buildLibraryContent(REPOSITORY_ROOT, language);
+    const content = await buildDevotionalContent(REPOSITORY_ROOT, library, language);
+
+    return content.sources.find(({ id }) => id === sourceId);
+  };
+
+  expect((await sourceOf(englishLatin, 'clementine-vulgate'))?.approval).toBe('public domain');
+  expect((await sourceOf(englishLatin, 'holy-see-compendium-es'))?.work).toBe(
+    'Compendium of the Catechism of the Catholic Church (Spanish edition)',
+  );
+  expect((await sourceOf(SPANISH, 'douay-rheims-challoner'))?.approval).toBe('dominio público');
+  expect((await buildSplashContent(REPOSITORY_ROOT, englishLatin))[0]?.sourceLabel).toBe(
+    'Clementine Vulgate (1598), with the Glossa Ordinaria (Migne edition, 1880)',
+  );
+  expect((await buildSplashContent(REPOSITORY_ROOT, SPANISH))[0]?.sourceLabel).toBe(
+    'Biblia Vulgata Clementina (1598), con la Glosa ordinaria (edición Migne, 1880)',
+  );
+});
+
+test('compiles the Spanish Secret of the Rosary over the English structure', async () => {
+  const english = (await buildLibraryContent(REPOSITORY_ROOT, ENGLISH)).works[0];
+  const spanish = (await buildLibraryContent(REPOSITORY_ROOT, SPANISH)).works[0];
+
+  expect(spanish?.title).toBe('El secreto admirable del Santísimo Rosario');
+  expect(spanish?.translation).toBe(Translation.Ai);
+  expect(spanish?.sourceId).toBe(english?.sourceId);
+  expect(spanish?.blocks.map((block) => block.kind)).toEqual(
+    english?.blocks.map((block) => block.kind),
+  );
+  expect(spanish?.blocks[0]).toEqual({
+    kind: LibraryBlockKind.Heading,
+    level: LibraryHeadingLevel.Part,
+    text: 'Rosa blanca',
+  });
+});
+
+test('compiles the Clementine Vulgate under Spanish names without the Glossa', async () => {
+  const bible = await buildBibleContent(REPOSITORY_ROOT, SPANISH);
+  const english = await buildBibleContent(REPOSITORY_ROOT, ENGLISH);
+  const names = bible.index.books.map((book) => book.name);
+  const runs = bible.books.flatMap((book) =>
+    book.chapters.flatMap((chapter) =>
+      chapter.blocks.flatMap((block) =>
+        block.kind === BibleBlockKind.Paragraph ? block.verses.flatMap((verse) => verse.runs) : [],
+      ),
+    ),
+  );
+
+  expect(bible.index.sourceId).toBe('clementine-vulgate');
+  expect(bible.index.books.map((book) => book.id)).toEqual(
+    english.index.books.map((book) => book.id),
+  );
+  expect(names).toContain('Apocalipsis');
+  expect(names).toContain('Santiago');
+  expect(runs.some((run) => run.kind === BibleRunKind.Note)).toBe(false);
+  expect(verseIn(bible.books, 'matthew', 5, 3)?.runs.map((run) => run.kind)).toEqual([
+    BibleRunKind.Christ,
+  ]);
+  expect(
+    verseIn(bible.books, 'matthew', 3, 15)?.runs.every((run) => run.kind !== BibleRunKind.Christ),
+  ).toBe(true);
+  expect(bible.index.redLetter.notice).toStartWith('Estas marcas son una ayuda de Lucerna');
 });

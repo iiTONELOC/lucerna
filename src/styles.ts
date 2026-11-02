@@ -49,6 +49,9 @@ export const APPARATUS_CLASS_NAME = 'font-reading text-citation leading-citation
 export const TOUCH_LINK_CLASS_NAME =
   "focus-ring relative underline decoration-hairline underline-offset-4 transition-colors after:absolute after:-inset-y-3.5 after:inset-x-0 after:content-['']";
 
+export const CLOSE_BUTTON_CLASS_NAME =
+  'flex size-11 items-center justify-center text-2xl leading-none text-muted transition-colors hover:text-foreground focus-ring';
+
 export const SUPERSCRIPT_CLASS_NAME = 'align-super text-[0.7em] leading-none';
 
 export const SUPERSCRIPT_BUTTON_CLASS_NAME = `${SUPERSCRIPT_CLASS_NAME} pr-1 pl-0.5 text-accent-current transition-colors hover:text-accent-strong focus-ring`;

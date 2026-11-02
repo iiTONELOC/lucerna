@@ -1,3 +1,8 @@
+import {
+  editionAssetPrefixOf,
+  type BibleEditionId,
+  type Language,
+} from '../../content/language.ts';
 import { UpdateChecks } from '../../state/preferences/model.ts';
 import { isInstalled } from './installed.ts';
 import { ServiceWorkerContract } from './model.ts';
@@ -134,6 +139,34 @@ const acceptRegistration = (registered: ServiceWorkerRegistration): Promise<void
   notifyUpdate();
   installUpdateChecks();
   return checkForUpdate();
+};
+
+const serviceWorkerActive = (): boolean =>
+  import.meta.env.PROD && 'serviceWorker' in navigator && registrationStarted;
+
+const askToCache = (worker: ServiceWorker | null | undefined, prefix: string): Promise<boolean> =>
+  worker === null || worker === undefined
+    ? Promise.resolve(true)
+    : new Promise((resolve) => {
+        const channel = new MessageChannel();
+
+        channel.port1.onmessage = (event: MessageEvent<unknown>) => resolve(event.data === true);
+        worker.postMessage({ type: ServiceWorkerContract.CacheEditionMessage, prefix }, [
+          channel.port2,
+        ]);
+      });
+
+export const cacheEdition = async (
+  language: Language,
+  edition: BibleEditionId,
+): Promise<boolean> => {
+  const registered = serviceWorkerActive()
+    ? await navigator.serviceWorker.getRegistration()
+    : undefined;
+  const prefix = editionAssetPrefixOf(language, edition);
+
+  void askToCache(registered?.waiting, prefix);
+  return askToCache(registered?.active, prefix);
 };
 
 export const registerServiceWorker = (config: ServiceWorkerRegistrationConfig): void => {

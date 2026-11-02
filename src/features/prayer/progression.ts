@@ -1,4 +1,5 @@
 import type { ResolvedMystery, ResolvedMysterySet } from '../../content/catalog.ts';
+import { type ReadingSnapshot } from '../../content/reading.ts';
 import type { GuidanceStatement, RosaryGuidance } from '../../content/schema.ts';
 import { CodedError } from '../../shared/codedError.ts';
 
@@ -114,7 +115,7 @@ export type FramedPrayerStep = StepBase & {
 export type PrayerStep =
   SilentStep | CountedRepetitionStep | MysteryAnnouncementStep | FramedPrayerStep;
 
-export const FRUIT_LABEL = 'Fruit of the Mystery';
+export const FRUIT_LABEL = (reading: ReadingSnapshot) => reading.wording.prayer.fruitLabel;
 
 export enum PrayerStartKind {
   Mystery = 'mystery',
@@ -147,18 +148,12 @@ export type Progression = {
 
 const DECADE_HAIL_MARY_COUNT = 10;
 const MYSTERY_PLACEHOLDER = '{mystery}';
-const LEADING_ARTICLE = 'The ';
-const LOWERCASED_LEADING_ARTICLE = 'the ';
 
 const CRUCIFIX_ANCHOR: CrucifixAnchor = Object.freeze({ kind: StepAnchor.Crucifix });
 const CENTERPIECE_ANCHOR: CenterpieceAnchor = Object.freeze({ kind: StepAnchor.Centerpiece });
 
-const mysteryPhrase = (title: string): string =>
-  title.startsWith(LEADING_ARTICLE)
-    ? `${LOWERCASED_LEADING_ARTICLE}${title.slice(LEADING_ARTICLE.length)}`
-    : title;
-
 const decadeHailMaryGuidance = (
+  reading: ReadingSnapshot,
   template: GuidanceStatement,
   mystery: ResolvedMystery,
 ): GuidanceStatement => {
@@ -168,7 +163,10 @@ const decadeHailMaryGuidance = (
 
   return {
     ...template,
-    text: template.text.replace(MYSTERY_PLACEHOLDER, mysteryPhrase(mystery.title)),
+    text: template.text.replace(
+      MYSTERY_PLACEHOLDER,
+      reading.wording.prayer.mysteryPhrase(mystery.title),
+    ),
   };
 };
 
@@ -191,13 +189,15 @@ type ChainAnchorDraft = Omit<ChainAnchor, 'toBeadIndex'> & {
 };
 
 type Sequence = {
+  readonly reading: ReadingSnapshot;
   readonly steps: PrayerStep[];
   readonly pendingChains: ChainAnchorDraft[];
   lastBeadIndex: number | undefined;
   beadCount: number;
 };
 
-const createSequence = (): Sequence => ({
+const createSequence = (reading: ReadingSnapshot): Sequence => ({
+  reading,
   steps: [],
   pendingChains: [],
   lastBeadIndex: undefined,
@@ -321,8 +321,9 @@ const appendDecade = (
   mystery: ResolvedMystery,
   options: RosaryOptions,
 ): void => {
+  const { reading } = sequence;
   const decade = mystery.ordinal;
-  const hailMaryGuidance = decadeHailMaryGuidance(guidance.decadeHailMarys, mystery);
+  const hailMaryGuidance = decadeHailMaryGuidance(reading, guidance.decadeHailMarys, mystery);
   const ourFatherAnchor = beadAnchor(sequence);
 
   sequence.steps.push(
@@ -384,6 +385,7 @@ const appendClosing = (sequence: Sequence, guidance: RosaryGuidance): void => {
 };
 
 export const createProgression = (
+  reading: ReadingSnapshot,
   mysterySet: ResolvedMysterySet,
   guidance: RosaryGuidance,
   options: RosaryOptions,
@@ -394,7 +396,7 @@ export const createProgression = (
     throw new ProgressionError(ProgressionErrorCode.EmptyMysterySet);
   }
 
-  const sequence = createSequence();
+  const sequence = createSequence(reading);
 
   appendOpening(sequence, guidance);
 

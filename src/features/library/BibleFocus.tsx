@@ -1,8 +1,20 @@
-import { Fragment, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
-import { loadBibleBook, useLoaded } from '../../content/loaders.ts';
-import { contentCatalog } from '../../content/catalog.ts';
-import { saveLastBibleBook } from '../../state/reading/readingPositions.ts';
-import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
+import { GluedTail } from '../../components/marks/MarkGlue.tsx';
+import { NoteMark, RedLetterMark } from '../../components/marks/Marks.tsx';
+import { runText } from '../../components/marks/runText.tsx';
+import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
+import type { BibleEditionId } from '../../content/language.ts';
+import { verseLocatorOf } from '../../content/language.ts';
+import { loadBible, loadBibleBook, useLoaded } from '../../content/loaders.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import {
   BibleBlockKind,
   BibleRunKind,
@@ -13,6 +25,9 @@ import {
   type BibleRun,
   type BibleVerse,
 } from '../../content/schema.ts';
+import { usePreferences } from '../../state/preferences/usePreferences.ts';
+import { ChapterCompletion } from '../support/Support.tsx';
+import { saveLastBibleBook } from '../../state/reading/readingPositions.ts';
 import {
   APPARATUS_CLASS_NAME,
   CHAPTER_CLASS_NAME,
@@ -21,17 +36,25 @@ import {
   SUBTITLE_CLASS_NAME,
   SUPERSCRIPT_CLASS_NAME,
 } from '../../styles.ts';
-import { GluedTail } from '../../components/marks/MarkGlue.tsx';
-import { NoteMark, RedLetterMark } from '../../components/marks/Marks.tsx';
-import { runText } from '../../components/marks/runText.tsx';
-import { RedLetterNotice } from '../../components/RedLetterNotice.tsx';
 import { apparatusReferenceTarget, type ReferenceTarget } from '../references/referenceCatalog.ts';
-import { BIBLE_TITLE, type BibleVerseLocation, type ReaderJump } from './model.ts';
+import {
+  BIBLE_TITLE,
+  OpenBibleContext,
+  useOpenBible,
+  type BibleVerseLocation,
+  type ReaderJump,
+} from './model.ts';
 import { ReaderHeader } from './ReaderHeader.tsx';
 import { JumpButtons, ReaderLocationControl } from './ReaderLocation.tsx';
 import { ReaderSurface } from './ReaderSurface.tsx';
 import { useHeadingFocus } from './useHeadingFocus.ts';
-import { blockIndexPropsOf, useReadingPosition, useTopmostTracker } from './useReadingPosition.ts';
+import {
+  blockIndexPropsOf,
+  scrollToBlock,
+  useReadingPosition,
+  useTopmostTracker,
+  type TopmostTracker,
+} from './useReadingPosition.ts';
 type NoteEntry = {
   readonly key: string;
   readonly note: BibleNoteRun;
@@ -292,6 +315,7 @@ function VerseParagraph({
   const { openNotes, toggleNote } = useNoteToggles();
   const [noticeOpen, setNoticeOpen] = useState(false);
   const groups = verses.map((verse, index) => ({ baseKey: String(index), runs: verse.runs }));
+  const bible = useOpenBible();
 
   return (
     <div className="flex flex-col gap-2">
@@ -318,7 +342,11 @@ function VerseParagraph({
       </p>
       <OpenNotes entries={noteEntriesFrom(groups, openNotes)} />
       {noticeOpen ? (
-        <RedLetterNotice onOpenSource={onOpenSource} redLetter={contentCatalog.bible.redLetter} />
+        <RedLetterNotice
+          onClose={() => setNoticeOpen(false)}
+          onOpenSource={onOpenSource}
+          redLetter={bible.redLetter}
+        />
       ) : null}
     </div>
   );
@@ -374,12 +402,16 @@ enum BookUnitKind {
 
 type BookUnit =
   | { readonly kind: BookUnitKind.Chapter; readonly chapter: BibleChapter }
-  | { readonly kind: BookUnitKind.Block; readonly block: BibleBlock };
+  | { readonly kind: BookUnitKind.Block; readonly block: BibleBlock; readonly chapter: number };
 
 const bookUnitsFrom = (book: BibleBook): readonly BookUnit[] =>
   book.chapters.flatMap((chapter): readonly BookUnit[] => [
     { kind: BookUnitKind.Chapter, chapter },
-    ...chapter.blocks.map((block): BookUnit => ({ kind: BookUnitKind.Block, block })),
+    ...chapter.blocks.map((block): BookUnit => ({
+      kind: BookUnitKind.Block,
+      block,
+      chapter: chapter.number,
+    })),
   ]);
 
 const blockHoldsVerse = (block: BibleBlock, verse: number): boolean =>
@@ -443,6 +475,7 @@ const chapterJumpsFrom = (units: readonly BookUnit[]): readonly ReaderJump[] =>
   );
 
 const bibleLocationOf = (
+  reading: ReadingSnapshot,
   units: readonly BookUnit[],
   bookName: string,
   blockIndex: number,
@@ -471,7 +504,7 @@ const bibleLocationOf = (
 
   return verse === undefined
     ? `${bookName} ${String(chapter)}`
-    : `${bookName} ${String(chapter)}:${String(verse)}`;
+    : `${bookName} ${verseLocatorOf(reading.language, chapter, String(verse))}`;
 };
 
 function ChapterNav({
@@ -481,14 +514,18 @@ function ChapterNav({
   readonly articleRef: RefObject<HTMLElement | null>;
   readonly jumps: readonly ReaderJump[];
 }) {
+  const { wording } = useReading();
   if (jumps.length < 2) {
     return null;
   }
 
   return (
-    <nav aria-label="Chapters" className="flex flex-wrap justify-center gap-x-1 pb-8">
+    <nav
+      aria-label={wording.library.chapters}
+      className="flex flex-wrap justify-center gap-x-1 pb-8"
+    >
       <JumpButtons
-        ariaLabelOf={(jump) => `Chapter ${jump.label}`}
+        ariaLabelOf={(jump) => wording.library.chapter(jump.label)}
         articleRef={articleRef}
         jumps={jumps}
       />
@@ -497,11 +534,14 @@ function ChapterNav({
 }
 
 const useBibleBook = (bookId: string): BibleBook | null => {
-  useEffect(() => {
-    void saveLastBibleBook(bookId);
-  }, [bookId]);
+  const reading = useReading();
+  const edition = useOpenBible().directory;
 
-  return useLoaded(loadBibleBook(bookId));
+  useEffect(() => {
+    void saveLastBibleBook(edition, bookId);
+  }, [bookId, edition]);
+
+  return useLoaded(loadBibleBook(reading, edition, bookId));
 };
 
 function BookPager({
@@ -511,14 +551,15 @@ function BookPager({
   readonly book: BibleBook;
   readonly onOpenBook: (bookId: string) => void;
 }) {
-  const books = contentCatalog.bible.books;
+  const { wording } = useReading();
+  const { books } = useOpenBible();
   const position = books.findIndex((entry) => entry.id === book.id);
   const previous = position > 0 ? books[position - 1] : undefined;
   const next = position < 0 ? undefined : books[position + 1];
 
   return (
     <nav
-      aria-label="Neighboring books"
+      aria-label={wording.library.neighboringBooks}
       className="flex items-baseline justify-between gap-4 border-t border-hairline pt-6"
     >
       {previous === undefined ? (
@@ -529,7 +570,7 @@ function BookPager({
           onClick={() => onOpenBook(previous.id)}
           type="button"
         >
-          Previous: {previous.name}
+          {wording.library.previousBook(previous.name)}
         </button>
       )}
       {next === undefined ? null : (
@@ -538,7 +579,7 @@ function BookPager({
           onClick={() => onOpenBook(next.id)}
           type="button"
         >
-          Next: {next.name}
+          {wording.library.nextBook(next.name)}
         </button>
       )}
     </nav>
@@ -546,9 +587,11 @@ function BookPager({
 }
 
 function BookUnitList({
+  bookId,
   onOpenSource,
   units,
 }: {
+  readonly bookId: string;
   readonly onOpenSource: (sourceId: string) => void;
   readonly units: readonly BookUnit[];
 }) {
@@ -556,19 +599,31 @@ function BookUnitList({
 
   return (
     <>
-      {units.map((unit, index) => (
-        <div key={`unit-${String(index)}`} {...blockIndexPropsOf(index)}>
-          {unit.kind === BookUnitKind.Chapter ? (
-            <ChapterHead chapter={unit.chapter} />
-          ) : (
-            <BibleBlockView
-              block={unit.block}
-              markedRuns={markEnds.get(index)}
-              onOpenSource={onOpenSource}
+      {units.flatMap((unit, index) => {
+        const next = units[index + 1];
+        const chapter = unit.kind === BookUnitKind.Block ? unit.chapter : 0;
+        const ended = next === undefined || next.kind === BookUnitKind.Chapter;
+        return [
+          <div key={`unit-${String(index)}`} {...blockIndexPropsOf(index)}>
+            {unit.kind === BookUnitKind.Chapter ? (
+              <ChapterHead chapter={unit.chapter} />
+            ) : (
+              <BibleBlockView
+                block={unit.block}
+                markedRuns={markEnds.get(index)}
+                onOpenSource={onOpenSource}
+              />
+            )}
+          </div>,
+          ended && chapter > 0 ? (
+            <ChapterCompletion
+              key={bookId + '/chapter/' + String(chapter)}
+              bookId={bookId}
+              chapter={chapter}
             />
-          )}
-        </div>
-      ))}
+          ) : null,
+        ];
+      })}
     </>
   );
 }
@@ -587,9 +642,10 @@ function BookBody({
   readonly onOpenSource: (sourceId: string) => void;
 }) {
   const { articleRef, tracker, units } = model;
+  const bible = useOpenBible();
 
   useReadingPosition(
-    `${contentCatalog.bible.source.id}/${book.id}`,
+    { contentKey: book.id, storageKey: `${bible.source.id}/${book.id}` },
     articleRef,
     initialBlockIndex,
     tracker,
@@ -603,7 +659,7 @@ function BookBody({
           runs={book.introduction}
         />
       )}
-      <BookUnitList onOpenSource={onOpenSource} units={units} />
+      <BookUnitList bookId={book.id} onOpenSource={onOpenSource} units={units} />
       <BookPager book={book} onOpenBook={onOpenBook} />
     </>
   );
@@ -619,6 +675,48 @@ type BibleFocusProps = {
   readonly onOpenSettings: () => void;
 };
 
+const verseLocationAt = (units: readonly BookUnit[], index: number): BibleVerseLocation => {
+  const chapter = units.slice(0, index + 1).findLast((unit) => unit.kind === BookUnitKind.Chapter);
+  const unit = units[index];
+  const verse =
+    unit?.kind === BookUnitKind.Block && unit.block.kind === BibleBlockKind.Paragraph
+      ? unit.block.verses.find((entry) => entry.number !== undefined)?.number
+      : undefined;
+  return {
+    chapter: chapter?.kind === BookUnitKind.Chapter ? chapter.chapter.number : 1,
+    verse: verse ?? 1,
+  };
+};
+
+const useBibleLanguageAnchor = (
+  bookId: string,
+  units: readonly BookUnit[],
+  articleRef: RefObject<HTMLElement | null>,
+  tracker: TopmostTracker,
+): void => {
+  const previous = useRef({ bookId, units, index: 0 });
+  useEffect(
+    () =>
+      tracker.subscribe((index) => {
+        previous.current.index = index;
+      }),
+    [tracker],
+  );
+  useLayoutEffect(() => {
+    const current = previous.current;
+    if (
+      current.bookId === bookId &&
+      current.units !== units &&
+      current.units.length > 0 &&
+      units.length > 0
+    ) {
+      const index = blockIndexForVerse(units, verseLocationAt(current.units, current.index));
+      if (index !== null) scrollToBlock(articleRef, index);
+    }
+    previous.current = { bookId, units, index: current.index };
+  }, [articleRef, bookId, units]);
+};
+
 const useBibleBookModel = (bookId: string) => {
   const book = useBibleBook(bookId);
   const headingRef = useHeadingFocus(bookId);
@@ -626,7 +724,8 @@ const useBibleBookModel = (bookId: string) => {
   const units = useMemo(() => (book === null ? [] : bookUnitsFrom(book)), [book]);
   const jumps = useMemo(() => chapterJumpsFrom(units), [units]);
   const tracker = useTopmostTracker(articleRef, book);
-  const bookSummary = contentCatalog.bible.books.find((entry) => entry.id === bookId);
+  useBibleLanguageAnchor(bookId, units, articleRef, tracker);
+  const bookSummary = useOpenBible().books.find((entry) => entry.id === bookId);
 
   return {
     articleRef,
@@ -642,18 +741,19 @@ const useBibleBookModel = (bookId: string) => {
 type BibleBookModel = ReturnType<typeof useBibleBookModel>;
 
 function BibleLocation({ model }: { readonly model: BibleBookModel }) {
+  const reading = useReading();
   return (
     <ReaderLocationControl
       articleRef={model.articleRef}
       headingRef={model.headingRef}
       jumps={model.jumps}
-      labelOf={(blockIndex) => bibleLocationOf(model.units, model.bookName, blockIndex)}
+      labelOf={(blockIndex) => bibleLocationOf(reading, model.units, model.bookName, blockIndex)}
       tracker={model.tracker}
     />
   );
 }
 
-export function BibleFocus({
+function BibleBookPage({
   bookId,
   initialBlockIndex,
   initialVerse,
@@ -662,6 +762,7 @@ export function BibleFocus({
   onOpenReference,
   onOpenSettings,
 }: BibleFocusProps) {
+  const reading = useReading();
   const model = useBibleBookModel(bookId);
   const { articleRef, book, bookName, headingRef, jumps } = model;
   const onOpenSource = (sourceId: string): void =>
@@ -678,7 +779,7 @@ export function BibleFocus({
       onOpenSettings={onOpenSettings}
     >
       <ReaderHeader
-        eyebrow={BIBLE_TITLE}
+        eyebrow={BIBLE_TITLE(reading)}
         headingRef={headingRef}
         subtitle={book?.title}
         title={bookName}
@@ -694,5 +795,19 @@ export function BibleFocus({
         />
       )}
     </ReaderSurface>
+  );
+}
+
+export function BibleFocus({
+  edition,
+  ...props
+}: BibleFocusProps & { readonly edition: BibleEditionId }) {
+  const reading = useReading();
+  const bible = useLoaded(loadBible(reading, edition));
+
+  return bible === null ? null : (
+    <OpenBibleContext value={bible}>
+      <BibleBookPage {...props} />
+    </OpenBibleContext>
   );
 }

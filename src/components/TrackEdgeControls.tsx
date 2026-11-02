@@ -1,3 +1,4 @@
+import { useReading } from '../content/reading.ts';
 import type { TrackEdges } from '../shared/useHorizontalTrack.ts';
 import { Chevron } from './icons/Chevron.tsx';
 import { ChevronDirection } from './icons/model.ts';
@@ -19,8 +20,9 @@ type EdgeControlProps = {
 };
 
 function EdgeControl({ direction, onStep }: EdgeControlProps) {
+  const { wording } = useReading();
   const back = direction === ChevronDirection.Left;
-  const label = back ? 'Previous works' : 'More works';
+  const label = back ? wording.common.previousWorks : wording.common.moreWorks;
 
   return (
     <button

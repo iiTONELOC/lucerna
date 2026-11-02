@@ -1,5 +1,6 @@
-import { ACTION_TEXT_CLASS_NAME, QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 import { SettingsButton } from '../../components/buttons/SettingsButton.tsx';
+import { useReading } from '../../content/reading.ts';
+import { ACTION_TEXT_CLASS_NAME, QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 import type { ControlsBundle } from './prayerSession.ts';
 
 function PlaybackIcon({ playing }: { readonly playing: boolean }) {
@@ -22,7 +23,8 @@ function PlaybackButton({
   readonly onToggle: () => void;
   readonly playing: boolean;
 }) {
-  const label = playing ? 'Pause guided prayer' : 'Begin guided prayer';
+  const { wording } = useReading();
+  const label = playing ? wording.prayer.pauseGuided : wording.prayer.beginGuided;
 
   return (
     <button
@@ -40,13 +42,14 @@ function PlaybackButton({
 }
 
 export function PrayerControls({ actions, state }: ControlsBundle) {
+  const { wording } = useReading();
   return (
     <footer
       className="relative z-20 flex min-h-11 shrink-0 items-center gap-1 px-2 sm:min-h-12 sm:px-0 sm:pt-2"
       data-layout-region="controls"
     >
       <button className={`${QUIET_BUTTON_CLASS_NAME} px-2`} onClick={actions.onExit} type="button">
-        Exit
+        {wording.prayer.exit}
       </button>
 
       <PlaybackButton onToggle={actions.onTogglePlayback} playing={state.playing} />
@@ -60,14 +63,14 @@ export function PrayerControls({ actions, state }: ControlsBundle) {
         onClick={actions.onBack}
         type="button"
       >
-        Back
+        {wording.common.back}
       </button>
       <button
         className={`${ACTION_TEXT_CLASS_NAME} px-2 text-accent-current underline decoration-accent-current underline-offset-8 hover:text-accent-strong`}
         onClick={actions.onForward}
         type="button"
       >
-        {state.atEnd ? 'Finish' : 'Continue'}
+        {state.atEnd ? wording.prayer.finish : wording.prayer.continue}
       </button>
     </footer>
   );

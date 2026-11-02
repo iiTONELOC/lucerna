@@ -10,9 +10,10 @@ import {
 } from 'react';
 import { resolveArtAsset } from '../../assets/art.ts';
 import type { ResolvedArtwork } from '../../content/catalog.ts';
+import { useReading, type ReadingSnapshot } from '../../content/reading.ts';
 import { classNames } from '../../shared/classNames.ts';
 import { useDialogOpen } from '../../shared/focus.ts';
-import { isShortcutEvent } from '../../shared/keyboard.ts';
+import { isShortcutEvent, KeyName } from '../../shared/keyboard.ts';
 import { QUIET_BUTTON_CLASS_NAME } from '../../styles.ts';
 import type { Point } from '../prayer/drape.ts';
 import {
@@ -46,7 +47,8 @@ type ZoomStyle = CSSProperties & {
   readonly '--zoom': string;
 };
 
-const altOf = (artwork: Artwork): string => `${artwork.title} by ${artwork.artist}`;
+const altOf = (reading: ReadingSnapshot, artwork: Artwork): string =>
+  reading.wording.artworkAlt(artwork.title, artwork.artist);
 
 const artworkStyleOf = (artwork: Artwork): ArtworkStyle => ({
   '--artwork-aspect': `${String(artwork.width)} / ${String(artwork.height)}`,
@@ -81,7 +83,7 @@ type FramedArtworkProps = {
 const useSpaceToExpand = (onExpand: () => void): void => {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === ' ' && isShortcutEvent(event)) {
+      if (event.key === KeyName.Space && isShortcutEvent(event)) {
         event.preventDefault();
         onExpand();
       }
@@ -93,11 +95,12 @@ const useSpaceToExpand = (onExpand: () => void): void => {
 };
 
 export function FramedArtwork({ artwork, className, onExpand }: FramedArtworkProps) {
+  const reading = useReading();
   useSpaceToExpand(onExpand);
 
   return (
     <button
-      aria-label="View full size"
+      aria-label={reading.wording.gallery.viewFullSize}
       className={classNames(
         'group focus-ring relative flex cursor-zoom-in border border-outline bg-surface p-2',
         className,
@@ -107,7 +110,7 @@ export function FramedArtwork({ artwork, className, onExpand }: FramedArtworkPro
       type="button"
     >
       <img
-        alt={altOf(artwork)}
+        alt={altOf(reading, artwork)}
         className="size-full object-cover"
         decoding="async"
         height={artwork.height}
@@ -361,6 +364,7 @@ function ZoomStage({
   readonly artwork: Artwork;
   readonly onClose: () => void;
 }) {
+  const reading = useReading();
   const { dragging, handlers, imageRef, stageRef, zoom } = useZoomGestures(onClose);
 
   return (
@@ -370,7 +374,7 @@ function ZoomStage({
       ref={stageRef}
     >
       <img
-        alt={altOf(artwork)}
+        alt={altOf(reading, artwork)}
         className={classNames(
           'translate-x-(--pan-x) translate-y-(--pan-y) scale-(--zoom)',
           FITTED_ARTWORK_CLASS_NAME,
@@ -397,6 +401,7 @@ type ArtworkViewerProps = {
 };
 
 export function ArtworkViewer({ artwork, onClose, open }: ArtworkViewerProps) {
+  const reading = useReading();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const focusDialog = useCallback(() => dialogRef.current?.focus(), []);
 
@@ -404,7 +409,7 @@ export function ArtworkViewer({ artwork, onClose, open }: ArtworkViewerProps) {
 
   return (
     <dialog
-      aria-label={altOf(artwork)}
+      aria-label={altOf(reading, artwork)}
       className="m-0 size-full max-h-none max-w-none flex-col bg-background p-0 pt-safe-top pb-safe-bottom text-foreground backdrop:bg-background open:flex focus:outline-none"
       onCancel={(event) => {
         event.preventDefault();
@@ -416,7 +421,7 @@ export function ArtworkViewer({ artwork, onClose, open }: ArtworkViewerProps) {
     >
       <div className="flex shrink-0 px-4">
         <button className={QUIET_BUTTON_CLASS_NAME} onClick={onClose} type="button">
-          Close
+          {reading.wording.common.close}
         </button>
       </div>
       {open ? <ZoomStage artwork={artwork} onClose={onClose} /> : null}

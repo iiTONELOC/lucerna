@@ -3,6 +3,7 @@ import {
   devotionalContentFrom,
   guidanceStatementsOf,
   ReflectionStatus,
+  Translation,
   type Artwork,
   type DevotionalContent,
   type DevotionalSource,
@@ -14,23 +15,35 @@ import {
   type SourceReference,
 } from '../../src/content/schema.ts';
 import { arrayFrom, positiveIntegerFrom, recordFrom, stringFrom } from '../../src/content/shape.ts';
+import { BIBLE_DEFINITIONS } from './bibleBooks.ts';
+import {
+  BIBLE_EDITIONS,
+  CONTENT_LANGUAGES,
+  type ContentLanguage,
+  type ContentReading,
+} from './editions.ts';
+import { buildLibraryContent } from './library.ts';
+import { BibleEditionId, Language } from '../../src/content/language.ts';
+import { contentInLanguage, sourcesInLanguage } from './overlay.ts';
 import { buildFailure, ContentBuildErrorCode, readJsonFile, sourceRecordOf } from './records.ts';
 import {
-  RED_LETTER_DATABASE,
   bibleBookIdentifierFrom,
   redLetterBooksFrom,
+  toolMarkingFrom,
   type RedLetterBooks,
 } from './redLetter.ts';
 import { reflectionBlockIndexOf, reflectionTextFrom } from './reflections.ts';
 import {
   extractPassageContent,
-  SCRIPTURE_SOURCE_DIRECTORY,
+  editionRangeOf,
+  sourceCodeOf,
   sourceBookOf,
   type ScriptureRange,
   validateScriptureRange,
 } from './scripture.ts';
 
 export const SOURCE_DATABASE = 'data/db/sources.json';
+const DOUAY_RHEIMS = BIBLE_EDITIONS[BibleEditionId.DouayRheims];
 const PRAYER_DATABASE = 'data/db/prayers.json';
 const ART_DATABASE = 'data/db/art.json';
 const ROSARY_DATABASE = 'data/db/rosary.json';
@@ -80,10 +93,10 @@ const sourceFilesForBooks = async (
   books: ReadonlySet<string>,
   repositoryRoot: URL,
 ): Promise<ReadonlyMap<string, string>> => {
-  const sourceDirectory = new URL(SCRIPTURE_SOURCE_DIRECTORY, repositoryRoot);
+  const sourceDirectory = new URL(DOUAY_RHEIMS.directory, repositoryRoot);
   const filenames: string[] = [];
 
-  for await (const filename of new Bun.Glob('*.sfm').scan({
+  for await (const filename of new Bun.Glob(`*${DOUAY_RHEIMS.extension}`).scan({
     cwd: sourceDirectory.pathname,
     onlyFiles: true,
   })) {
@@ -105,7 +118,7 @@ const sourceFilesForBooks = async (
       fail(`duplicate scripture book ${book}`);
     }
 
-    sourceFiles.set(book, `${SCRIPTURE_SOURCE_DIRECTORY}${filename}`);
+    sourceFiles.set(book, `${DOUAY_RHEIMS.directory}${filename}`);
   }
 
   for (const book of books) {
@@ -154,10 +167,55 @@ const reflectionSourceLoaderFrom = (
   };
 };
 
+type ReflectionLibraries = {
+  readonly source: LibraryContent;
+  readonly display: LibraryContent;
+};
+
+const SENTENCE_BREAK = '. ';
+
+const isHeadingSentence = (heading: string): boolean =>
+  heading.endsWith('.') && !heading.includes(SENTENCE_BREAK);
+
+const blockTextOf = (
+  work: LibraryContent['works'][number] | undefined,
+  blockIndex: number,
+): string | undefined => {
+  const block = work?.blocks[blockIndex];
+
+  return block !== undefined && 'text' in block ? block.text : undefined;
+};
+
+const displayedReflectionOf = (
+  { source, display }: ReflectionLibraries,
+  workId: string,
+  blockIndex: number,
+  text: string,
+): string | null => {
+  const work = display.works.find(({ id }) => id === workId);
+  const displayed = blockTextOf(work, blockIndex);
+  const original = blockTextOf(
+    source.works.find(({ id }) => id === workId),
+    blockIndex,
+  );
+
+  if (work?.translation === undefined || displayed === undefined || original === undefined) {
+    return null;
+  }
+
+  if (original === text) {
+    return displayed;
+  }
+
+  return isHeadingSentence(original.slice(0, -text.length).trimEnd())
+    ? displayed.slice(displayed.indexOf(SENTENCE_BREAK) + SENTENCE_BREAK.length)
+    : fail(`${workId} reflection heading ${String(blockIndex)}`);
+};
+
 const enrichReflection = async (
   mystery: JsonRecord,
   loadReflectionSource: ReflectionSourceLoader,
-  library: LibraryContent,
+  libraries: ReflectionLibraries,
 ): Promise<JsonRecord> => {
   const reflection = recordFrom(mystery['reflection'], 'reflection');
 
@@ -171,19 +229,24 @@ const enrichReflection = async (
     await loadReflectionSource(sourceId),
   );
 
+  const blockIndex = reflectionBlockIndexOf(libraries.source, sourceId, text);
+  const displayed = displayedReflectionOf(libraries, sourceId, blockIndex, text);
+
   return {
     ...reflection,
-    text,
-    blockIndex: reflectionBlockIndexOf(library, sourceId, text),
+    text: displayed ?? text,
+    blockIndex,
+    ...(displayed === null ? {} : { translation: Translation.Ai }),
   };
 };
 
 type MysteryEnrichmentContext = {
   readonly sourceFiles: ReadonlyMap<string, string>;
   readonly loadReflectionSource: ReflectionSourceLoader;
-  readonly library: LibraryContent;
+  readonly libraries: ReflectionLibraries;
   readonly repositoryRoot: URL;
   readonly redLetter: RedLetterBooks;
+  readonly contentLanguage: ContentReading;
 };
 
 const enrichMystery = async (
@@ -191,9 +254,10 @@ const enrichMystery = async (
   {
     sourceFiles,
     loadReflectionSource,
-    library,
+    libraries,
     repositoryRoot,
     redLetter,
+    contentLanguage,
   }: MysteryEnrichmentContext,
 ): Promise<JsonRecord> => {
   const scripture = recordFrom(mystery['scripture'], 'scripture');
@@ -208,9 +272,12 @@ const enrichMystery = async (
   };
 
   validateScriptureRange(range);
+  const passageRange = await editionRangeOf(range, contentLanguage, repositoryRoot);
+  const code = sourceCodeOf(await Bun.file(new URL(range.sourceFile, repositoryRoot)).text());
+  const definition = BIBLE_DEFINITIONS.find((candidate) => candidate.code === code);
   const { text, red } = extractPassageContent(
-    await Bun.file(new URL(range.sourceFile, repositoryRoot)).text(),
-    range,
+    await Bun.file(new URL(passageRange.sourceFile, repositoryRoot)).text(),
+    passageRange,
     redLetter.get(bibleBookIdentifierFrom(book)),
   );
 
@@ -218,18 +285,26 @@ const enrichMystery = async (
     ...mystery,
     scripture: {
       ...scripture,
+      reference: passageRange.reference,
+      bookId: bibleBookIdentifierFrom(definition?.name ?? fail(`scripture book ${book}`)),
+      sourceId: contentLanguage.edition.sourceId,
       text,
       ...(red.length === 0 ? {} : { red }),
     },
-    reflection: await enrichReflection(mystery, loadReflectionSource, library),
+    reflection: await enrichReflection(mystery, loadReflectionSource, libraries),
   };
+};
+
+type RosaryInputs = {
+  readonly sources: unknown;
+  readonly libraries: ReflectionLibraries;
 };
 
 const enrichRosary = async (
   value: unknown,
-  sources: unknown,
-  library: LibraryContent,
+  { sources, libraries }: RosaryInputs,
   repositoryRoot: URL,
+  contentLanguage: ContentReading,
 ): Promise<JsonRecord> => {
   const rosary = recordFrom(value, 'rosary');
   const mysteries = mysteryRecordsFrom(rosary);
@@ -238,7 +313,11 @@ const enrichRosary = async (
   );
   const sourceFiles = await sourceFilesForBooks(books, repositoryRoot);
   const loadReflectionSource = reflectionSourceLoaderFrom(sources, repositoryRoot);
-  const redLetter = redLetterBooksFrom(await readJsonFile(RED_LETTER_DATABASE, repositoryRoot));
+  const { edition } = contentLanguage;
+  const redLetter = redLetterBooksFrom(
+    await readJsonFile(edition.redLetterDatabase, repositoryRoot),
+    edition.sourceId,
+  );
   const mysterySets = await Promise.all(
     arrayFrom(rosary.mysterySets, 'rosary.mysterySets').map(async (value, setIndex) => {
       const mysterySet = recordFrom(value, mysterySetPath(setIndex));
@@ -248,9 +327,10 @@ const enrichRosary = async (
             enrichMystery(recordFrom(mystery, mysteryPath(setIndex, index)), {
               sourceFiles,
               loadReflectionSource,
-              library,
+              libraries,
               repositoryRoot,
               redLetter,
+              contentLanguage,
             }),
         ),
       );
@@ -330,6 +410,9 @@ const validateRosaryOwners = (content: DevotionalContent, context: RelationshipC
   });
   content.rosary.prayerIds.forEach((prayerId) => requireId(context.prayers, prayerId, 'prayer'));
   requireSource(context.sources, content.rosary.schedule.sourceId);
+  content.aiTranslation?.toolSourceIds.forEach((sourceId) =>
+    requireSource(context.sources, sourceId),
+  );
 
   if (
     content.rosary.devotion !== 'rosary' ||
@@ -430,22 +513,62 @@ const validateRelationships = async (
   await validateFiles(content, repositoryRoot);
 };
 
+const aiTranslationOf = async (
+  { aiTranslationDatabase }: ContentLanguage,
+  repositoryRoot: URL,
+): Promise<JsonRecord> =>
+  aiTranslationDatabase === null
+    ? {}
+    : {
+        aiTranslation: toolMarkingFrom(
+          recordFrom(
+            await readJsonFile(aiTranslationDatabase, repositoryRoot),
+            aiTranslationDatabase,
+          ),
+          fail,
+        ),
+      };
+
+const sourceLibraryOf = async (
+  library: LibraryContent,
+  repositoryRoot: URL,
+): Promise<LibraryContent> =>
+  library.works.some(({ translation }) => translation !== undefined)
+    ? buildLibraryContent(repositoryRoot, CONTENT_LANGUAGES[Language.English])
+    : library;
+
 export const buildDevotionalContent = async (
   repositoryRoot: URL,
   library: LibraryContent,
+  contentLanguage: ContentReading,
 ): Promise<DevotionalContent> => {
-  const [sources, prayers, artworks, rosary] = await Promise.all([
+  const [englishSources, englishPrayers, artworks, englishRosary] = await Promise.all([
     readJsonFile(SOURCE_DATABASE, repositoryRoot),
     readJsonFile(PRAYER_DATABASE, repositoryRoot),
     readJsonFile(ART_DATABASE, repositoryRoot),
     readJsonFile(ROSARY_DATABASE, repositoryRoot),
   ]);
+  const sources = await sourcesInLanguage(contentLanguage, englishSources, repositoryRoot);
+  const { prayers, rosary } = await contentInLanguage(
+    contentLanguage,
+    { prayers: englishPrayers, rosary: englishRosary },
+    repositoryRoot,
+  );
   const content = devotionalContentFrom({
     schemaVersion: DEVOTIONAL_SCHEMA_VERSION,
     sources: sourceEntriesFrom(sources),
     prayers,
     artworks,
-    rosary: await enrichRosary(rosary, sources, library, repositoryRoot),
+    rosary: await enrichRosary(
+      rosary,
+      {
+        sources,
+        libraries: { source: await sourceLibraryOf(library, repositoryRoot), display: library },
+      },
+      repositoryRoot,
+      contentLanguage,
+    ),
+    ...(await aiTranslationOf(contentLanguage, repositoryRoot)),
   });
 
   await validateRelationships(content, repositoryRoot);

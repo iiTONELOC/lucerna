@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "sourceId": "scio-de-san-miguel",
+  "edition": "scio",
+  "redLetter": {
+    "notice": "Estas marcas son una ayuda de Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Por ahora solo se marcan los versículos completos. Informa de cualquier error a lucerna@wedefendit.com.",
+    "toolSourceIds": ["claude-fable-5"],
+    "witnessSourceIds": ["world-english-bible", "king-james-version"]
+  },
+  "books": [
+    {
+      "id": "genesis",
+      "name": "Génesis",
+      "testament": "old",
+      "chapterCount": 50
+    },
+    { "id": "exodus", "name": "Éxodo", "testament": "old", "chapterCount": 40 },
+    {
+      "id": "leviticus",
+      "name": "Levítico",
+      "testament": "old",
+      "chapterCount": 27
+    },
+    {
+      "id": "numbers",
+      "name": "Números",
+      "testament": "old",
+      "chapterCount": 36
+    },
+    {
+      "id": "deuteronomy",
+      "name": "Deuteronomio",
+      "testament": "old",
+      "chapterCount": 34
+    },
+    { "id": "josue", "name": "Josué", "testament": "old", "chapterCount": 24 },
+    {
+      "id": "judges",
+      "name": "Jueces",
+      "testament": "old",
+      "chapterCount": 21
+    },
+    { "id": "ruth", "name": "Rut", "testament": "old", "chapterCount": 4 },
+    {
+      "id": "1-kings",
+      "name": "1 Reyes",
+      "testament": "old",
+      "chapterCount": 31
+    },
+    {
+      "id": "2-kings",
+      "name": "2 Reyes",
+      "testament": "old",
+      "chapterCount": 24
+    },
+    {
+      "id": "3-kings",
+      "name": "3 Reyes",
+      "testament": "old",
+      "chapterCount": 22
+    },
+    {
+      "id": "4-kings",
+      "name": "4 Reyes",
+      "testament": "old",
+      "chapterCount": 25
+    },
+    {
+      "id": "1-paralipomenon",
+      "name": "1 Paralipómenos",
+      "testament": "old",
+      "chapterCount": 29
+    },
+    {
+      "id": "2-paralipomenon",
+      "name": "2 Paralipómenos",
+      "testament": "old",
+      "chapterCount": 36
+    },
+    {
+      "id": "1-esdras",
+      "name": "1 Esdras",
+      "testament": "old",
+      "chapterCount": 10
+    },
+    {
+      "id": "2-esdras",
+      "name": "2 Esdras",
+      "testament": "old",
+      "chapterCount": 13
+    },
+    {
+      "id": "tobias",
+      "name": "Tobías",
+      "testament": "old",
+      "chapterCount": 14
+    },
+    { "id": "judith", "name": "Judit", "testament": "old", "chapterCount": 16 },
+    { "id": "esther", "name": "Ester", "testament": "old", "chapterCount": 16 },
+    { "id": "job", "name": "Job", "testament": "old", "chapterCount": 42 },
+    {
+      "id": "psalms",
+      "name": "Salmos",
+      "testament": "old",
+      "chapterCount": 150
+    },
+    {
+      "id": "proverbs",
+      "name": "Proverbios",
+      "testament": "old",
+      "chapterCount": 31
+    },
+    {
+      "id": "ecclesiastes",
+      "name": "Eclesiastés",
+      "testament": "old",
+      "chapterCount": 12
+    },
+    {
+      "id": "canticle-of-canticles",
+      "name": "Cantar de los Cantares",
+      "testament": "old",
+      "chapterCount": 8
+    },
+    {
+      "id": "wisdom",
+      "name": "Sabiduría",
+      "testament": "old",
+      "chapterCount": 19
+    },
+    {
+      "id": "ecclesiasticus",
+      "name": "Eclesiástico",
+      "testament": "old",
+      "chapterCount": 51
+    },
+    {
+      "id": "isaias",
+      "name": "Isaías",
+      "testament": "old",
+      "chapterCount": 66
+    },
+    {
+      "id": "jeremias",
+      "name": "Jeremías",
+      "testament": "old",
+      "chapterCount": 52
+    },
+    {
+      "id": "lamentations",
+      "name": "Lamentaciones",
+      "testament": "old",
+      "chapterCount": 5
+    },
+    { "id": "baruch", "name": "Baruc", "testament": "old", "chapterCount": 6 },
+    {
+      "id": "ezechiel",
+      "name": "Ezequiel",
+      "testament": "old",
+      "chapterCount": 48
+    },
+    {
+      "id": "daniel",
+      "name": "Daniel",
+      "testament": "old",
+      "chapterCount": 14
+    },
+    { "id": "osee", "name": "Oseas", "testament": "old", "chapterCount": 14 },
+    { "id": "joel", "name": "Joel", "testament": "old", "chapterCount": 3 },
+    { "id": "amos", "name": "Amós", "testament": "old", "chapterCount": 9 },
+    { "id": "abdias", "name": "Abdías", "testament": "old", "chapterCount": 1 },
+    { "id": "jonas", "name": "Jonás", "testament": "old", "chapterCount": 4 },
+    {
+      "id": "micheas",
+      "name": "Miqueas",
+      "testament": "old",
+      "chapterCount": 7
+    },
+    { "id": "nahum", "name": "Nahúm", "testament": "old", "chapterCount": 3 },
+    {
+      "id": "habacuc",
+      "name": "Habacuc",
+      "testament": "old",
+      "chapterCount": 3
+    },
+    {
+      "id": "sophonias",
+      "name": "Sofonías",
+      "testament": "old",
+      "chapterCount": 3
+    },
+    { "id": "aggeus", "name": "Ageo", "testament": "old", "chapterCount": 2 },
+    {
+      "id": "zacharias",
+      "name": "Zacarías",
+      "testament": "old",
+      "chapterCount": 14
+    },
+    {
+      "id": "malachias",
+      "name": "Malaquías",
+      "testament": "old",
+      "chapterCount": 3
+    },
+    {
+      "id": "1-machabees",
+      "name": "1 Macabeos",
+      "testament": "old",
+      "chapterCount": 16
+    },
+    {
+      "id": "2-machabees",
+      "name": "2 Macabeos",
+      "testament": "old",
+      "chapterCount": 15
+    },
+    {
+      "id": "matthew",
+      "name": "Mateo",
+      "testament": "new",
+      "chapterCount": 28
+    },
+    { "id": "mark", "name": "Marcos", "testament": "new", "chapterCount": 16 },
+    { "id": "luke", "name": "Lucas", "testament": "new", "chapterCount": 24 },
+    { "id": "john", "name": "Juan", "testament": "new", "chapterCount": 21 },
+    {
+      "id": "acts-of-the-apostles",
+      "name": "Hechos de los Apóstoles",
+      "testament": "new",
+      "chapterCount": 28
+    },
+    {
+      "id": "romans",
+      "name": "Romanos",
+      "testament": "new",
+      "chapterCount": 16
+    },
+    {
+      "id": "1-corinthians",
+      "name": "1 Corintios",
+      "testament": "new",
+      "chapterCount": 16
+    },
+    {
+      "id": "2-corinthians",
+      "name": "2 Corintios",
+      "testament": "new",
+      "chapterCount": 13
+    },
+    {
+      "id": "galatians",
+      "name": "Gálatas",
+      "testament": "new",
+      "chapterCount": 6
+    },
+    {
+      "id": "ephesians",
+      "name": "Efesios",
+      "testament": "new",
+      "chapterCount": 6
+    },
+    {
+      "id": "philippians",
+      "name": "Filipenses",
+      "testament": "new",
+      "chapterCount": 4
+    },
+    {
+      "id": "colossians",
+      "name": "Colosenses",
+      "testament": "new",
+      "chapterCount": 4
+    },
+    {
+      "id": "1-thessalonians",
+      "name": "1 Tesalonicenses",
+      "testament": "new",
+      "chapterCount": 5
+    },
+    {
+      "id": "2-thessalonians",
+      "name": "2 Tesalonicenses",
+      "testament": "new",
+      "chapterCount": 3
+    },
+    {
+      "id": "1-timothy",
+      "name": "1 Timoteo",
+      "testament": "new",
+      "chapterCount": 6
+    },
+    {
+      "id": "2-timothy",
+      "name": "2 Timoteo",
+      "testament": "new",
+      "chapterCount": 4
+    },
+    { "id": "titus", "name": "Tito", "testament": "new", "chapterCount": 3 },
+    {
+      "id": "philemon",
+      "name": "Filemón",
+      "testament": "new",
+      "chapterCount": 1
+    },
+    {
+      "id": "hebrews",
+      "name": "Hebreos",
+      "testament": "new",
+      "chapterCount": 13
+    },
+    {
+      "id": "james",
+      "name": "Santiago",
+      "testament": "new",
+      "chapterCount": 5
+    },
+    {
+      "id": "1-peter",
+      "name": "1 Pedro",
+      "testament": "new",
+      "chapterCount": 5
+    },
+    {
+      "id": "2-peter",
+      "name": "2 Pedro",
+      "testament": "new",
+      "chapterCount": 3
+    },
+    { "id": "1-john", "name": "1 Juan", "testament": "new", "chapterCount": 5 },
+    { "id": "2-john", "name": "2 Juan", "testament": "new", "chapterCount": 1 },
+    { "id": "3-john", "name": "3 Juan", "testament": "new", "chapterCount": 1 },
+    { "id": "jude", "name": "Judas", "testament": "new", "chapterCount": 1 },
+    {
+      "id": "apocalypse",
+      "name": "Apocalipsis",
+      "testament": "new",
+      "chapterCount": 22
+    }
+  ]
+}

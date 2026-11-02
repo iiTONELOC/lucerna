@@ -1,3 +1,9 @@
+import {
+  BIBLE_CHOICES,
+  BibleChoice,
+  LANGUAGE_CHOICES,
+  LanguageChoice,
+} from '../../content/language.ts';
 import { isRecord, type UnknownRecord } from '../../shared/guards.ts';
 
 export enum Theme {
@@ -76,6 +82,8 @@ export enum BeadMaterial {
 }
 
 export type Preferences = {
+  readonly language: LanguageChoice;
+  readonly bibleChoice: BibleChoice;
   readonly theme: Theme;
   readonly textScale: TextScale;
   readonly readerFace: ReaderFace;
@@ -93,6 +101,7 @@ export type Preferences = {
   readonly readDecadeOfferings: boolean;
   readonly showDropCaps: boolean;
   readonly showMysteryFruits: boolean;
+  readonly aiTranslations: boolean;
   readonly readMysteryFruits: boolean;
   readonly showScriptureReadings: boolean;
   readonly includeFatimaPrayer: boolean;
@@ -103,6 +112,8 @@ export type Preferences = {
 export type PreferenceKey = keyof Preferences;
 
 export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
+  language: LanguageChoice.System,
+  bibleChoice: BibleChoice.Own,
   theme: Theme.EternalLight,
   textScale: TextScale.Standard,
   readerFace: ReaderFace.Garamond,
@@ -120,6 +131,7 @@ export const DEFAULT_PREFERENCES: Preferences = Object.freeze({
   readDecadeOfferings: true,
   showDropCaps: true,
   showMysteryFruits: true,
+  aiTranslations: true,
   readMysteryFruits: true,
   showScriptureReadings: true,
   includeFatimaPrayer: true,
@@ -208,6 +220,8 @@ type ParsedPreferences = {
 const textScaleFrom = memberOf(Object.values(TextScale));
 
 const parsedPreferencesFrom = (raw: UnknownRecord): ParsedPreferences => ({
+  language: optional('language', memberOf(LANGUAGE_CHOICES))(raw['language']),
+  bibleChoice: optional('bibleChoice', memberOf(BIBLE_CHOICES))(raw['bibleChoice']),
   theme: memberOf(Object.values(Theme))(raw['theme']),
   textScale: textScaleFrom(raw['textScale']),
   readerFace: optional('readerFace', memberOf(Object.values(ReaderFace)))(raw['readerFace']),
@@ -240,6 +254,7 @@ const parsedPreferencesFrom = (raw: UnknownRecord): ParsedPreferences => ({
   readDecadeOfferings: optional('readDecadeOfferings', booleanFrom)(raw['readDecadeOfferings']),
   showDropCaps: optional('showDropCaps', booleanFrom)(raw['showDropCaps']),
   showMysteryFruits: optional('showMysteryFruits', booleanFrom)(raw['showMysteryFruits']),
+  aiTranslations: optional('aiTranslations', booleanFrom)(raw['aiTranslations']),
   readMysteryFruits: optional('readMysteryFruits', booleanFrom)(raw['readMysteryFruits']),
   showScriptureReadings: optional(
     'showScriptureReadings',

@@ -1,4 +1,5 @@
 import { ViewHeader } from '../../components/layout.tsx';
+import { useReading } from '../../content/reading.ts';
 import {
   BODY_CLASS_NAME,
   CITATION_CLASS_NAME,
@@ -44,6 +45,7 @@ function ReferenceSectionView({
   readonly section: ReferenceSection;
   readonly onOpen: (target: ReferenceTarget) => void;
 }) {
+  const { wording } = useReading();
   return (
     <section
       aria-labelledby={`references-${section.group}`}
@@ -54,9 +56,7 @@ function ReferenceSectionView({
         className={`pt-1 ${SUBTITLE_CLASS_NAME} font-semibold text-foreground`}
         id={`references-${section.group}`}
       >
-        {section.records.length === 1
-          ? '1 reference'
-          : `${String(section.records.length)} references`}
+        {wording.references.count(section.records.length)}
       </h2>
       <p className={`max-w-prose pt-2 ${BODY_CLASS_NAME} text-secondary`}>{section.description}</p>
       <ul className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -69,6 +69,7 @@ function ReferenceSectionView({
 }
 
 export function ReferencesView({ onOpenReference }: ReferencesViewProps) {
+  const reading = useReading();
   return (
     <section
       className="scroll-region h-full overflow-x-hidden overflow-y-auto"
@@ -76,14 +77,14 @@ export function ReferencesView({ onOpenReference }: ReferencesViewProps) {
     >
       <div className="flex w-full flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <ViewHeader
-          eyebrow="Sources and provenance"
+          eyebrow={reading.wording.references.eyebrow}
           id="references-title"
-          lede="These records identify the texts, guidance, Scripture, and artwork used in Lucerna. Every record is available offline."
+          lede={reading.wording.references.lede}
           ledeClassName={`${BODY_CLASS_NAME} text-secondary`}
-          title="References"
+          title={reading.wording.references.title}
         />
 
-        {referenceSections.map((section) => (
+        {referenceSections(reading).map((section) => (
           <ReferenceSectionView key={section.group} onOpen={onOpenReference} section={section} />
         ))}
       </div>

@@ -1,0 +1,187 @@
+{
+  "mysterySets": [
+    {
+      "id": "joyful",
+      "name": "Misterios Gozosos",
+      "nameSourceId": "holy-see-mysteries-es",
+      "mysteries": [
+        {
+          "ordinal": 1,
+          "title": "La Encarnación del Hijo de Dios",
+          "titleSourceId": "holy-see-joyful-es",
+          "fruit": "Humildad",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 2,
+          "title": "La Visitación de Nuestra Señora a su prima Santa Isabel",
+          "titleSourceId": "holy-see-joyful-es",
+          "fruit": "Amor al prójimo",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 3,
+          "title": "El Nacimiento del Hijo de Dios en el portal de Belén",
+          "titleSourceId": "holy-see-joyful-es",
+          "fruit": "Pobreza",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 4,
+          "title": "La presentación de Jesús en el Templo",
+          "titleSourceId": "holy-see-joyful-es",
+          "fruit": "Pureza de corazón y de cuerpo",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 5,
+          "title": "El Niño Jesús perdido y hallado en el Templo",
+          "titleSourceId": "holy-see-joyful-es",
+          "fruit": "Devoción a Jesús",
+          "fruitTranslation": "ai"
+        }
+      ]
+    },
+    {
+      "id": "luminous",
+      "name": "Misterios Luminosos",
+      "nameSourceId": "holy-see-mysteries-es",
+      "mysteries": [
+        {
+          "ordinal": 1,
+          "title": "El Bautismo en el Jordán",
+          "titleSourceId": "holy-see-luminous-es",
+          "fruit": "Apertura al Espíritu Santo",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 2,
+          "title": "Las bodas de Caná",
+          "titleSourceId": "holy-see-luminous-es",
+          "fruit": "A Jesús por María",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 3,
+          "title": "El anuncio del Reino de Dios",
+          "titleSourceId": "holy-see-luminous-es",
+          "fruit": "Conversión",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 4,
+          "title": "La Transfiguración",
+          "titleSourceId": "holy-see-luminous-es",
+          "fruit": "Deseo de santidad",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 5,
+          "title": "La institución de la Eucaristía",
+          "titleSourceId": "holy-see-luminous-es",
+          "fruit": "Adoración",
+          "fruitTranslation": "ai"
+        }
+      ]
+    },
+    {
+      "id": "sorrowful",
+      "name": "Misterios Dolorosos",
+      "nameSourceId": "holy-see-mysteries-es",
+      "mysteries": [
+        {
+          "ordinal": 1,
+          "title": "La oración en el Huerto",
+          "titleSourceId": "holy-see-sorrowful-es",
+          "fruit": "Obediencia a la voluntad de Dios",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 2,
+          "title": "La flagelación de Jesús atado a la columna",
+          "titleSourceId": "holy-see-sorrowful-es",
+          "fruit": "Mortificación",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 3,
+          "title": "La coronación de espinas",
+          "titleSourceId": "holy-see-sorrowful-es",
+          "fruit": "Valentía",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 4,
+          "title": "Jesús con la Cruz a cuestas camino del Calvario",
+          "titleSourceId": "holy-see-sorrowful-es",
+          "fruit": "Paciencia",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 5,
+          "title": "La crucifixión y muerte de Jesús",
+          "titleSourceId": "holy-see-sorrowful-es",
+          "fruit": "Dolor por nuestros pecados",
+          "fruitTranslation": "ai"
+        }
+      ]
+    },
+    {
+      "id": "glorious",
+      "name": "Misterios Gloriosos",
+      "nameSourceId": "holy-see-mysteries-es",
+      "mysteries": [
+        {
+          "ordinal": 1,
+          "title": "La resurrección del Hijo de Dios",
+          "titleSourceId": "holy-see-glorious-es",
+          "fruit": "Fe",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 2,
+          "title": "La Ascensión del Señor al cielo",
+          "titleSourceId": "holy-see-glorious-es",
+          "fruit": "Esperanza",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 3,
+          "title": "La venida del Espíritu Santo",
+          "titleSourceId": "holy-see-glorious-es",
+          "fruit": "Sabiduría",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 4,
+          "title": "La Asunción de María al cielo",
+          "titleSourceId": "holy-see-glorious-es",
+          "fruit": "Devoción a María",
+          "fruitTranslation": "ai"
+        },
+        {
+          "ordinal": 5,
+          "title": "La coronación de María como Reina y Señora de todo lo creado",
+          "titleSourceId": "holy-see-glorious-es",
+          "fruit": "Gracia de una buena muerte",
+          "fruitTranslation": "ai"
+        }
+      ]
+    }
+  ],
+  "guidance": {
+    "translation": "ai",
+    "openingHailMarys": [
+      "Reza esta Avemaría por la fe.",
+      "Reza esta Avemaría por la esperanza.",
+      "Reza esta Avemaría por la caridad."
+    ],
+    "mysteryAnnouncement": "Mira la escena, escucha la palabra y haz una pausa en silencio antes de comenzar la decena.",
+    "decadeOurFather": "Eleva tu mente al Padre al comenzar la decena.",
+    "decadeHailMarys": "Medita en {mystery} mientras rezas estas diez Avemarías.",
+    "decadeGloryBe": "Corona la decena con la alabanza a la Trinidad.",
+    "fatimaPrayer": "Se suele añadir después de cada decena, como pidió Nuestra Señora en Fátima.",
+    "hailHolyQueen": "Terminadas las cinco decenas, el Rosario se dirige a María.",
+    "finalPrayer": "Pide imitar lo que contienen los misterios y alcanzar lo que prometen."
+  }
+}
