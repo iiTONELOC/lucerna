@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { SUPPORT_PAYMENT_URL } from '../../appMetadata.ts';
 import { updateStoredValue } from '../../state/preferences/storage.ts';
 import {
   createSupportState,
@@ -29,6 +30,18 @@ type SupportController = {
 };
 
 const SUPPORT_CONTEXT_ERROR = 'Support activity requires SupportProvider';
+const CHECKOUT_ORIGINS = new Set([
+  new URL(SUPPORT_PAYMENT_URL).origin,
+  'https://checkout.stripe.com',
+]);
+
+export const isCheckoutReferrer = (referrer: string): boolean => {
+  try {
+    return CHECKOUT_ORIGINS.has(new URL(referrer).origin);
+  } catch {
+    return false;
+  }
+};
 export const SupportContext = createContext<SupportController | null>(null);
 
 const transactSupport = (events: readonly SupportEvent[]): Promise<SupportState | null> => {
@@ -43,7 +56,7 @@ const transactSupport = (events: readonly SupportEvent[]): Promise<SupportState 
 
 const startupEvent = (): SupportEvent =>
   window.location.hash === SUPPORT_RETURN_HASH
-    ? { type: SupportEventType.GiftReturn, referrer: document.referrer }
+    ? { type: SupportEventType.GiftReturn, fromCheckout: isCheckoutReferrer(document.referrer) }
     : { type: SupportEventType.Opened };
 
 export const useSupportController = (): SupportController => {

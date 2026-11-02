@@ -10,9 +10,7 @@ enum PlaywrightTimeMilliseconds {
   Test = 45_000,
 }
 
-enum PlaywrightWorkerCount {
-  Single = 1,
-}
+const PLAYWRIGHT_WORKERS = 4;
 
 enum PlaywrightServer {
   Command = 'bun run serve:dist',
@@ -35,7 +33,7 @@ export default defineConfig({
     timeout: PlaywrightTimeMilliseconds.Assertion,
   },
   forbidOnly: process.env['CI'] !== undefined,
-  fullyParallel: false,
+  fullyParallel: true,
   projects: [
     {
       name: PlaywrightProfile.DesktopName,
@@ -70,5 +68,5 @@ export default defineConfig({
     timeout: PlaywrightTimeMilliseconds.Server,
     url: PlaywrightServer.Url,
   },
-  workers: PlaywrightWorkerCount.Single,
+  workers: PLAYWRIGHT_WORKERS,
 });

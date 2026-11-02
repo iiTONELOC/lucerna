@@ -96,7 +96,7 @@ test('Not now escalates to 14, 28, 56 and 90 days without permanently stopping a
   expect(asked(state, day(393)).phase).toBe(SupportPhase.Asking);
 });
 
-test('Giving requires the current ask and an exact Stripe referrer for a single three-month courtesy', () => {
+test('Giving requires the current ask and a checkout return for a single three-month courtesy', () => {
   let state = asked(initial(), day(7));
   state = reduceSupport(state, { type: SupportEventType.Give, id: 'other' }, day(7));
   expect(state.phase).toBe(SupportPhase.Asking);
@@ -105,7 +105,7 @@ test('Giving requires the current ask and an exact Stripe referrer for a single 
     state,
     {
       type: SupportEventType.GiftReturn,
-      referrer: 'https://buy.stripe.com/checkout',
+      fromCheckout: true,
     },
     day(7),
   );
@@ -116,7 +116,7 @@ test('Giving requires the current ask and an exact Stripe referrer for a single 
       returned,
       {
         type: SupportEventType.GiftReturn,
-        referrer: 'https://buy.stripe.com/checkout',
+        fromCheckout: true,
       },
       day(9),
     ).giftUntil,
@@ -124,28 +124,16 @@ test('Giving requires the current ask and an exact Stripe referrer for a single 
   expect(asked(returned, Date.UTC(2026, 3, 8)).phase).toBe(SupportPhase.Asking);
 });
 
-test('direct, missing, insecure, lookalike and non-pending returns cannot grant courtesy', () => {
-  for (const referrer of [
-    '',
-    'http://buy.stripe.com/',
-    'https://buy.stripe.com.evil.test/',
-    'not a URL',
-  ]) {
-    let state = asked(initial(), day(7));
-    state = reduceSupport(state, { type: SupportEventType.Give, id: state.askId ?? '' }, day(7));
-    expect(
-      reduceSupport(state, { type: SupportEventType.GiftReturn, referrer }, day(7)).giftUntil,
-    ).toBeNull();
-  }
+test('a return that did not come from checkout, or arrives without a pending gift, grants no courtesy', () => {
+  let state = asked(initial(), day(7));
+  state = reduceSupport(state, { type: SupportEventType.Give, id: state.askId ?? '' }, day(7));
   expect(
-    reduceSupport(
-      initial(),
-      {
-        type: SupportEventType.GiftReturn,
-        referrer: 'https://checkout.stripe.com/',
-      },
-      day(8),
-    ).giftUntil,
+    reduceSupport(state, { type: SupportEventType.GiftReturn, fromCheckout: false }, day(7))
+      .giftUntil,
+  ).toBeNull();
+  expect(
+    reduceSupport(initial(), { type: SupportEventType.GiftReturn, fromCheckout: true }, day(8))
+      .giftUntil,
   ).toBeNull();
 });
 
@@ -157,7 +145,7 @@ test('calendar courtesy clamps month ends and clock rollback never shortens a pa
     state,
     {
       type: SupportEventType.GiftReturn,
-      referrer: 'https://checkout.stripe.com/',
+      fromCheckout: true,
     },
     january31,
   );

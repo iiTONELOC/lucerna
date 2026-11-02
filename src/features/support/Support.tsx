@@ -38,7 +38,7 @@ const useSupportReturn = (dispatch: ReturnType<typeof useSupportController>['dis
     const changed = (): void => {
       const next = window.location.hash === SUPPORT_RETURN_HASH;
       setReturning(next);
-      if (next) void dispatch([{ type: SupportEventType.GiftReturn, referrer: '' }]);
+      if (next) void dispatch([{ type: SupportEventType.GiftReturn, fromCheckout: false }]);
     };
     window.addEventListener('hashchange', changed);
     return () => window.removeEventListener('hashchange', changed);

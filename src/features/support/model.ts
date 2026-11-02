@@ -1,4 +1,3 @@
-import { SUPPORT_PAYMENT_URL } from '../../appMetadata.ts';
 import { isRecord, type UnknownRecord } from '../../shared/guards.ts';
 import { MILLISECONDS_PER_SECOND } from '../../shared/time.ts';
 
@@ -37,10 +36,6 @@ const SUPPORT_GAP_DAYS = 30;
 const SUPPORT_GIFT_MONTHS = 3;
 const SUPPORT_DISMISSAL_DAYS: readonly number[] = [14, 28, 56, 90];
 const SUPPORT_IDENTIFIER_LIMIT = 128;
-const CHECKOUT_ORIGINS = new Set([
-  new URL(SUPPORT_PAYMENT_URL).origin,
-  'https://checkout.stripe.com',
-]);
 export const ACTIVITY_CREDITS: Readonly<Record<SupportActivity, number>> = {
   [SupportActivity.Rosary]: SUPPORT_COMPLETION_CREDITS,
   [SupportActivity.Artwork]: 1,
@@ -82,7 +77,7 @@ export type SupportEvent =
         | SupportEventType.Leave;
       readonly id: string;
     }
-  | { readonly type: SupportEventType.GiftReturn; readonly referrer: string };
+  | { readonly type: SupportEventType.GiftReturn; readonly fromCheckout: boolean };
 
 export const createSupportState = (now: number): SupportState => ({
   version: SUPPORT_VERSION,
@@ -255,14 +250,6 @@ const deferSupport = (state: SupportState, id: string): SupportState => {
   });
 };
 
-const checkoutReferrer = (referrer: string): boolean => {
-  try {
-    return CHECKOUT_ORIGINS.has(new URL(referrer).origin);
-  } catch {
-    return false;
-  }
-};
-
 const giftDeadline = (now: number): number => {
   const date = new Date(now);
   const day = date.getUTCDate();
@@ -273,9 +260,9 @@ const giftDeadline = (now: number): number => {
   return date.getTime();
 };
 
-const receiveGift = (state: SupportState, referrer: string): SupportState => {
+const receiveGift = (state: SupportState, fromCheckout: boolean): SupportState => {
   if (state.phase !== SupportPhase.Giving) return state;
-  if (!checkoutReferrer(referrer)) return released(state);
+  if (!fromCheckout) return released(state);
   return released({
     ...state,
     giftUntil: giftDeadline(state.clockFloor),
@@ -328,6 +315,6 @@ export const reduceSupport = (
     case SupportEventType.Leave:
       return abandonAsk(state, event.id);
     case SupportEventType.GiftReturn:
-      return receiveGift(state, event.referrer);
+      return receiveGift(state, event.fromCheckout);
   }
 };
