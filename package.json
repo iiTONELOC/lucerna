@@ -31,11 +31,6 @@
         "bun",
         "run",
         "build"
-      ],
-      "e2e": [
-        "bunx",
-        "playwright",
-        "test"
       ]
     }
   },
@@ -48,8 +43,6 @@
     "lint": "oxlint",
     "test": "bun test",
     "serve:dist": "bun scripts/serve-dist.ts",
-    "pretest:e2e": "bun run build",
-    "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "bunx --bun vite preview"

@@ -1,8 +1,8 @@
 import { parsePreferences, type Preferences } from './model.ts';
 
-export const DATABASE_NAME = 'lucerna';
+const DATABASE_NAME = 'lucerna';
 const DATABASE_VERSION = 1;
-export const STORE_NAME = 'preferences';
+const STORE_NAME = 'preferences';
 const PREFERENCES_KEY = 'user';
 const STORAGE_ERROR = 'Preference storage operation failed';
 

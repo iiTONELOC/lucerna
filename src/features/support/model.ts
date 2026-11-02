@@ -28,15 +28,15 @@ export enum SupportEventType {
 export const SUPPORT_STORAGE_KEY = 'support';
 export const SUPPORT_RETURN_HASH = '#support-thanks';
 const SUPPORT_VERSION = 1;
-export const SUPPORT_CREDIT_LIMIT = 21;
+const SUPPORT_CREDIT_LIMIT = 21;
 const SUPPORT_COMPLETION_CREDITS = 3;
-export const SUPPORT_DAY = 24 * 60 * 60 * MILLISECONDS_PER_SECOND;
+const SUPPORT_DAY = 24 * 60 * 60 * MILLISECONDS_PER_SECOND;
 const SUPPORT_GRACE_DAYS = 7;
 const SUPPORT_GAP_DAYS = 30;
 const SUPPORT_GIFT_MONTHS = 3;
 const SUPPORT_DISMISSAL_DAYS: readonly number[] = [14, 28, 56, 90];
 const SUPPORT_IDENTIFIER_LIMIT = 128;
-export const ACTIVITY_CREDITS: Readonly<Record<SupportActivity, number>> = {
+const ACTIVITY_CREDITS: Readonly<Record<SupportActivity, number>> = {
   [SupportActivity.Rosary]: SUPPORT_COMPLETION_CREDITS,
   [SupportActivity.Artwork]: 1,
   [SupportActivity.Chapter]: SUPPORT_COMPLETION_CREDITS,
