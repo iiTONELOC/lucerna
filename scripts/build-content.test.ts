@@ -161,7 +161,7 @@ test('compiles the full Douay-Rheims canon under traditional names', async () =>
   expect(bible.index).toEqual(generatedIndex);
   expect(bible.index.redLetter).toEqual({
     notice:
-      'These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com.',
+      'These markings are a Pray Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com.',
     witnessSourceIds: ['world-english-bible', 'king-james-version'],
     toolSourceIds: ['claude-fable-5'],
   });
@@ -404,5 +404,5 @@ test('compiles the Clementine Vulgate under Spanish names without the Glossa', a
   expect(
     verseIn(bible.books, 'matthew', 3, 15)?.runs.every((run) => run.kind !== BibleRunKind.Christ),
   ).toBe(true);
-  expect(bible.index.redLetter.notice).toStartWith('Estas marcas son una ayuda de Lucerna');
+  expect(bible.index.redLetter.notice).toStartWith('Estas marcas son una ayuda de Pray Lucerna');
 });

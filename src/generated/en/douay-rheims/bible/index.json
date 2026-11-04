@@ -3,7 +3,7 @@
   "sourceId": "douay-rheims-challoner",
   "edition": "douay-rheims",
   "redLetter": {
-    "notice": "These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com.",
+    "notice": "These markings are a Pray Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Report any errors to lucerna@wedefendit.com.",
     "toolSourceIds": ["claude-fable-5"],
     "witnessSourceIds": ["world-english-bible", "king-james-version"]
   },

@@ -49,11 +49,11 @@ export const SPANISH_WORDING: Wording = {
     openGallery: 'Abrir la galería',
   },
   support: {
-    link: 'Apoya Lucerna',
-    body: 'Lucerna es gratis para todos y funciona sin conexión, sin anuncios ni rastreo. Tu apoyo ayuda a cubrir el mantenimiento, el alojamiento y nuevas funciones.',
+    link: 'Apoya Pray Lucerna',
+    body: 'Pray Lucerna es gratis para todos y funciona sin conexión, sin anuncios ni rastreo. Tu apoyo ayuda a cubrir el mantenimiento, el alojamiento y nuevas funciones.',
     give: 'Apoyar',
     notNow: 'Ahora no',
-    thanks: 'Gracias por apoyar a Lucerna.',
+    thanks: 'Gracias por apoyar a Pray Lucerna.',
   },
   common: {
     back: 'Atrás',
@@ -69,7 +69,7 @@ export const SPANISH_WORDING: Wording = {
   errors: {
     tryAgain: 'Intentar de nuevo',
     title: 'Algo salió mal',
-    message: 'Lucerna no pudo mostrar esta pantalla.',
+    message: 'Pray Lucerna no pudo mostrar esta pantalla.',
     eyebrow: 'Error',
     details: 'Detalles del diagnóstico',
     emailDiagnostics: 'Enviar diagnóstico por correo',
@@ -79,13 +79,13 @@ export const SPANISH_WORDING: Wording = {
     lastReport: 'Último informe de error',
     clearReport: 'Borrar este informe',
     diagnostics: 'Diagnóstico',
-    keepsLastError: 'Lucerna guarda el último error en este dispositivo.',
+    keepsLastError: 'Pray Lucerna guarda el último error en este dispositivo.',
     nothingSent: 'No se envía nada si no lo envías tú.',
     noError: 'No se ha registrado ningún error.',
   },
   update: {
     ready: 'Actualización lista',
-    cached: 'Una nueva versión de Lucerna está guardada y lista.',
+    cached: 'Una nueva versión de Pray Lucerna está guardada y lista.',
     now: 'Actualizar ahora',
   },
   prayer: {
@@ -173,7 +173,7 @@ export const SPANISH_WORDING: Wording = {
   references: {
     title: 'Referencias',
     eyebrow: 'Fuentes y procedencia',
-    lede: 'Estos registros identifican los textos, las indicaciones, la Escritura y las obras de arte que usa Lucerna. Todos los registros están disponibles sin conexión.',
+    lede: 'Estos registros identifican los textos, las indicaciones, la Escritura y las obras de arte que usa Pray Lucerna. Todos los registros están disponibles sin conexión.',
     count: (count) => (count === 1 ? '1 referencia' : `${String(count)} referencias`),
     rosaryText: 'Texto del Rosario',
     scripture: 'Sagrada Escritura',
@@ -188,7 +188,7 @@ export const SPANISH_WORDING: Wording = {
     apparatusDescription:
       'Las palabras de Cristo en rojo y las ediciones consultadas para identificarlas.',
     artworkDescription:
-      'El registro de la fuente y la nota de derechos de cada obra incluida en Lucerna.',
+      'El registro de la fuente y la nota de derechos de cada obra incluida en Pray Lucerna.',
     rightsDescription:
       'Las políticas de acceso abierto que rigen los archivos de imagen incluidos.',
     prayers: 'Oraciones',
@@ -206,7 +206,7 @@ export const SPANISH_WORDING: Wording = {
       `${sections.length === 1 ? 'Sección' : 'Secciones'} ${sections.join(', ')}`,
     prayer: 'Oración',
     record: 'Registro',
-    usedIn: 'Dónde lo usa Lucerna',
+    usedIn: 'Dónde lo usa Pray Lucerna',
     citedLocation: 'Ubicación citada',
     reference: 'Referencia',
     viewInLibrary: 'Ver en la Biblioteca',
@@ -227,14 +227,14 @@ export const SPANISH_WORDING: Wording = {
     photograph: 'Fotografía',
   },
   install: {
-    eyebrow: 'Lleva Lucerna en tu dispositivo',
-    lede: 'Lucerna funciona en el navegador. Añádela a tu dispositivo y se abrirá como cualquier otra aplicación.',
-    title: 'Cómo añadir Lucerna a tu dispositivo',
+    eyebrow: 'Lleva Pray Lucerna en tu dispositivo',
+    lede: 'Pray Lucerna funciona en el navegador. Añádela a tu dispositivo y se abrirá como cualquier otra aplicación.',
+    title: 'Cómo añadir Pray Lucerna a tu dispositivo',
     devices: 'Dispositivos',
     iphone: {
       heading: 'iPhone',
       steps: [
-        { instruction: 'Abre Lucerna en Safari.' },
+        { instruction: 'Abre Pray Lucerna en Safari.' },
         {
           instruction: 'Toca el botón Más, abajo a la derecha.',
           alt: 'Safari en el iPhone con el botón Más marcado abajo a la derecha',
@@ -260,7 +260,7 @@ export const SPANISH_WORDING: Wording = {
     ipad: {
       heading: 'iPad',
       steps: [
-        { instruction: 'Abre Lucerna en Safari.' },
+        { instruction: 'Abre Pray Lucerna en Safari.' },
         {
           instruction: 'Toca el botón Compartir, arriba a la derecha.',
           alt: 'Safari en el iPad con el botón Compartir marcado arriba a la derecha',
@@ -282,7 +282,7 @@ export const SPANISH_WORDING: Wording = {
     mac: {
       heading: 'Mac',
       steps: [
-        { instruction: 'Abre Lucerna en Safari.' },
+        { instruction: 'Abre Pray Lucerna en Safari.' },
         {
           instruction: 'Haz clic en el botón Compartir y luego en Añadir al Dock.',
           alt: 'El menú Compartir de Safari en un Mac con Añadir al Dock marcado',
@@ -297,7 +297,7 @@ export const SPANISH_WORDING: Wording = {
     android: {
       heading: 'Android',
       steps: [
-        { instruction: 'Abre Lucerna en Chrome.' },
+        { instruction: 'Abre Pray Lucerna en Chrome.' },
         {
           instruction: 'Toca el botón de menú, arriba a la derecha.',
           alt: 'Chrome en Android con el botón de menú marcado arriba a la derecha',
@@ -320,7 +320,7 @@ export const SPANISH_WORDING: Wording = {
     desktop: {
       heading: 'Windows y Linux',
       steps: [
-        { instruction: 'Abre Lucerna en el navegador.' },
+        { instruction: 'Abre Pray Lucerna en el navegador.' },
         {
           instruction: 'Haz clic en el icono de instalar, a la derecha de la barra de direcciones.',
         },
@@ -331,7 +331,7 @@ export const SPANISH_WORDING: Wording = {
     firefox: {
       heading: 'Firefox',
       steps: [
-        { instruction: 'Abre Lucerna en Firefox en un teléfono o tableta Android.' },
+        { instruction: 'Abre Pray Lucerna en Firefox en un teléfono o tableta Android.' },
         { instruction: 'Toca el botón de menú.' },
         { instruction: 'Toca Instalar.' },
       ],
@@ -340,7 +340,7 @@ export const SPANISH_WORDING: Wording = {
   },
   splash: {
     continue: 'Continuar',
-    preparing: 'Preparando Lucerna',
+    preparing: 'Preparando Pray Lucerna',
   },
   about: {
     title: 'Acerca de',
@@ -359,15 +359,15 @@ export const SPANISH_WORDING: Wording = {
   },
   external: {
     title: '¿Abrir un sitio web externo?',
-    body: 'Esta página no forma parte de Lucerna y puede necesitar conexión a internet.',
+    body: 'Esta página no forma parte de Pray Lucerna y puede necesitar conexión a internet.',
     stay: 'Quedarme aquí',
     continue: 'Continuar',
   },
   settings: {
     whenOpens: 'Al abrirse',
     alsoWhileOpen: 'También mientras está abierta',
-    onLoadNote: 'Lucerna busca una versión nueva una vez, al iniciarse.',
-    whileOpenNote: 'Si Lucerna está instalada, también busca cada veinte minutos.',
+    onLoadNote: 'Pray Lucerna busca una versión nueva una vez, al iniciarse.',
+    whileOpenNote: 'Si Pray Lucerna está instalada, también busca cada veinte minutos.',
     sansSerif: 'Sin serifa',
     general: 'General',
     custom: 'Personalizada',
@@ -424,7 +424,7 @@ export const SPANISH_WORDING: Wording = {
     duringPrayer: 'Durante la oración',
     updates: 'Actualizaciones',
     externalLinks: 'Enlaces externos',
-    askNote: 'Pregunta antes de abrir un sitio web fuera de Lucerna.',
+    askNote: 'Pregunta antes de abrir un sitio web fuera de Pray Lucerna.',
     askLabel: 'Preguntar antes de abrir sitios web',
     sections: 'Secciones de los ajustes',
     seconds: (seconds) => `${seconds} segundos`,

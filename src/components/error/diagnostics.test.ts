@@ -23,7 +23,7 @@ describe('error diagnostics', () => {
     error.stack = 'Error: Rendered prayer failed\n at PrayerFocus';
     const diagnostics = errorDiagnosticsFrom(error, 'at PrayerFocus component', ENVIRONMENT);
 
-    expect(diagnostics).toContain(`Lucerna ${APP_VERSION} error report`);
+    expect(diagnostics).toContain(`Pray Lucerna ${APP_VERSION} error report`);
     expect(diagnostics).toContain('Captured: 2026-08-25T00:00:00.000Z');
     expect(diagnostics).toContain('Online: no');
     expect(diagnostics).toContain('Service worker: controlling');

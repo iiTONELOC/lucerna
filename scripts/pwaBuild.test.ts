@@ -124,8 +124,8 @@ test('web manifest contains installable metadata and distinct maskable artwork',
   ).json();
   const sizes = manifest.icons.map(({ sizes }) => sizes);
 
-  expect(manifest.name).toBe('Lucerna');
-  expect(manifest.short_name).toBe('Lucerna');
+  expect(manifest.name).toBe('Pray Lucerna');
+  expect(manifest.short_name).toBe('Pray Lucerna');
   expect(manifest.lang).toBe('en-US');
   expect(manifest.start_url).toBe('./');
   expect(manifest.scope).toBe('./');

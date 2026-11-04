@@ -4,8 +4,8 @@
   "toolSourceIds": ["claude-fable-5"],
   "provenance": "Words of Christ marks for the Clementine Vulgate and the Scío de San Miguel Spanish Bible, both numbered by the Vulgate, carry over the whole-verse marks of the Douay-Rheims map, whose verse numbering matches in every marked book. Partial-verse marks are not yet transferred.",
   "notice": {
-    "en": "These markings are a Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Only whole verses are marked for now. Report any errors to lucerna@wedefendit.com.",
-    "es": "Estas marcas son una ayuda de Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Por ahora solo se marcan los versículos completos. Informa de cualquier error a lucerna@wedefendit.com."
+    "en": "These markings are a Pray Lucerna aid and do not come directly from the source text. They were prepared with an AI assistant and have not been fully reviewed. Only whole verses are marked for now. Report any errors to lucerna@wedefendit.com.",
+    "es": "Estas marcas son una ayuda de Pray Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Por ahora solo se marcan los versículos completos. Informa de cualquier error a lucerna@wedefendit.com."
   },
   "books": {
     "matthew": {

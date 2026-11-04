@@ -1,6 +1,6 @@
 import packageMetadata from '../package.json';
 
-export const APP_NAME = 'Lucerna';
+export const APP_NAME = 'Pray Lucerna';
 export const APP_VERSION = packageMetadata.version;
 export const SITE_HOST = 'praylucerna.com';
 export const SUPPORT_EMAIL = 'lucerna@wedefendit.com';

@@ -1,13 +1,13 @@
-# Lucerna&trade;
+# Pray Lucerna&trade;
 
-Lucerna is free to use, private by design, and built for offline access. Once installed, it does not need a server during normal use.
+Pray Lucerna is free to use, private by design, and built for offline access. Once installed, it does not need a server during normal use.
 
-## Why Lucerna
+## Why Pray Lucerna
 
-Lucerna is for anyone who wants to learn the Rosary. The guidance walks you through each mystery, and you can switch it off once you no longer need it. What stays is the Scripture, the artwork, and the room to meditate on the mysteries as you pray.
+Pray Lucerna is for anyone who wants to learn the Rosary. The guidance walks you through each mystery, and you can switch it off once you no longer need it. What stays is the Scripture, the artwork, and the room to meditate on the mysteries as you pray.
 
 <p align="center">
-  <img src="docs/screenshots/lucerna-desktop.png" alt="Lucerna on a desktop browser, showing the Sorrowful Mysteries and the Lucerna Collection" height="320" />
+  <img src="docs/screenshots/lucerna-desktop.png" alt="Pray Lucerna on a desktop browser, showing the Sorrowful Mysteries and the Lucerna Collection" height="320" />
 </p>
 
 ## What it does
@@ -21,13 +21,13 @@ Lucerna is for anyone who wants to learn the Rosary. The guidance walks you thro
 
 ## Offline behavior
 
-Installing Lucerna as an app reduces your alliance to a network connection and allows it to function offline.
+Installing Pray Lucerna as an app reduces your alliance to a network connection and allows it to function offline.
 
-[Add Lucerna to your device](docs/INSTALL.md) has the steps for every browser.
+[Add Pray Lucerna to your device](docs/INSTALL.md) has the steps for every browser.
 
 ## Roadmap
 
-These are the directions Lucerna may grow in. None of them are commitments to ship.
+These are the directions Pray Lucerna may grow in. None of them are commitments to ship.
 
 - Scripture reading and browsing
 - Additional prayers and devotions
@@ -48,9 +48,9 @@ Diagnostics are never sent automatically. Nothing leaves the device unless you s
 
 The deployed application is free to use. The source and original design are proprietary, and this repository grants no permission to copy, modify, or redistribute them.
 
-Bundled texts and artworks keep the rights recorded with their credits. [Lucerna References](docs/REFERENCES.md) lists every source.
+Bundled texts and artworks keep the rights recorded with their credits. [Pray Lucerna References](docs/REFERENCES.md) lists every source.
 
-Lucerna™ is a trademark of Anthony Tropeano.
+Pray Lucerna™ is a trademark of Anthony Tropeano.
 
 Copyright &copy; 2026 [Anthony Tropeano](https://github.com/iiTONELOC). All rights reserved.
 

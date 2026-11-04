@@ -106,14 +106,18 @@ function SplashFooter({
           {wording.install.title}
         </button>
       )}
-      <p className="flex flex-wrap items-center justify-center gap-x-2">
+      <p className="flex flex-col items-center gap-x-2 sm:flex-row sm:justify-center">
         <span>{COPYRIGHT_NOTICE}</span>
-        <span aria-hidden="true">·</span>
-        <SupportLink className={FOOTER_LINK_CLASS_NAME} />
-        <span aria-hidden="true">·</span>
-        <button className={FOOTER_LINK_CLASS_NAME} onClick={onOpenPrivacy} type="button">
-          {wording.privacy.link}
-        </button>
+        <span aria-hidden="true" className="hidden sm:inline">
+          ·
+        </span>
+        <span className="flex items-center gap-x-2">
+          <SupportLink className={FOOTER_LINK_CLASS_NAME} />
+          <span aria-hidden="true">·</span>
+          <button className={FOOTER_LINK_CLASS_NAME} onClick={onOpenPrivacy} type="button">
+            {wording.privacy.link}
+          </button>
+        </span>
       </p>
     </footer>
   );
@@ -134,8 +138,14 @@ export function Splash({
         aria-labelledby={SPLASH_TITLE_ID}
         className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.75rem,2.5dvh,2.5rem)] px-6 py-[clamp(1rem,3dvh,2.5rem)] text-center"
       >
-        <h1 className={`shrink-0 ${MARK_CLASS_NAME} text-accent`} id={SPLASH_TITLE_ID}>
-          <span className="mr-[-0.125em]">Lucerna</span>
+        <h1
+          className={`shrink-0 whitespace-nowrap ${MARK_CLASS_NAME} text-accent`}
+          id={SPLASH_TITLE_ID}
+        >
+          <span className="mr-[-0.125em] inline-block">
+            <span className="-mb-[1em] block text-nav leading-none tracking-mark">Pray </span>
+            Lucerna
+          </span>
           <sup aria-hidden="true" className={`align-super ${SUBTITLE_CLASS_NAME}`}>
             ™
           </sup>

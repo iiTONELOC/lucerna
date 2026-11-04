@@ -77,11 +77,11 @@ export const ENGLISH_WORDING = {
     openGallery: 'Open gallery',
   },
   support: {
-    link: 'Support Lucerna',
-    body: 'Lucerna is free for everyone and works offline, with no ads or tracking. Your support helps pay for maintenance, hosting, and new features.',
+    link: 'Support Pray Lucerna',
+    body: 'Pray Lucerna is free for everyone and works offline, with no ads or tracking. Your support helps pay for maintenance, hosting, and new features.',
     give: 'Give',
     notNow: 'Not now',
-    thanks: 'Thank you for supporting Lucerna.',
+    thanks: 'Thank you for supporting Pray Lucerna.',
   },
   common: {
     back: 'Back',
@@ -97,7 +97,7 @@ export const ENGLISH_WORDING = {
   errors: {
     tryAgain: 'Try again',
     title: 'Something went wrong',
-    message: 'Lucerna could not finish this view.',
+    message: 'Pray Lucerna could not finish this view.',
     eyebrow: 'Error',
     details: 'Diagnostic details',
     emailDiagnostics: 'Email diagnostics',
@@ -107,13 +107,13 @@ export const ENGLISH_WORDING = {
     lastReport: 'Last error report',
     clearReport: 'Clear this report',
     diagnostics: 'Diagnostics',
-    keepsLastError: 'Lucerna keeps the last error on this device.',
+    keepsLastError: 'Pray Lucerna keeps the last error on this device.',
     nothingSent: 'Nothing is sent unless you send it.',
     noError: 'No error has been recorded.',
   },
   update: {
     ready: 'Update ready',
-    cached: 'A new version of Lucerna is cached and ready.',
+    cached: 'A new version of Pray Lucerna is cached and ready.',
     now: 'Update now',
   },
   prayer: {
@@ -198,7 +198,7 @@ export const ENGLISH_WORDING = {
   references: {
     title: 'References',
     eyebrow: 'Sources and provenance',
-    lede: 'These records identify the texts, guidance, Scripture, and artwork used in Lucerna. Every record is available offline.',
+    lede: 'These records identify the texts, guidance, Scripture, and artwork used in Pray Lucerna. Every record is available offline.',
     count: (count: number): string => (count === 1 ? '1 reference' : `${String(count)} references`),
     rosaryText: 'Rosary text',
     scripture: 'Scripture',
@@ -212,7 +212,8 @@ export const ENGLISH_WORDING = {
     guidanceDescription: 'The instructions behind the prompts shown during prayer.',
     apparatusDescription:
       'The words of Christ marking and the editions cross-referenced to prepare it.',
-    artworkDescription: 'The source record and rights note for every artwork bundled with Lucerna.',
+    artworkDescription:
+      'The source record and rights note for every artwork bundled with Pray Lucerna.',
     rightsDescription: 'The open-access policies that govern the bundled image files.',
     prayers: 'Prayers',
     schedule: 'Weekly schedule',
@@ -229,7 +230,7 @@ export const ENGLISH_WORDING = {
       `${sections.length === 1 ? 'Section' : 'Sections'} ${sections.join(', ')}`,
     prayer: 'Prayer',
     record: 'Record',
-    usedIn: 'Where Lucerna uses it',
+    usedIn: 'Where Pray Lucerna uses it',
     citedLocation: 'Cited location',
     reference: 'Reference',
     viewInLibrary: 'View in the Library',
@@ -250,14 +251,14 @@ export const ENGLISH_WORDING = {
     photograph: 'Photograph',
   },
   install: {
-    eyebrow: 'Keep Lucerna on your device',
-    lede: 'Lucerna works in a browser. Add it to your device and it opens like any other application.',
-    title: 'How to add Lucerna to your device',
+    eyebrow: 'Keep Pray Lucerna on your device',
+    lede: 'Pray Lucerna works in a browser. Add it to your device and it opens like any other application.',
+    title: 'How to add Pray Lucerna to your device',
     devices: 'Devices',
     iphone: installText({
       heading: 'iPhone',
       steps: [
-        { instruction: 'Open Lucerna in Safari.' },
+        { instruction: 'Open Pray Lucerna in Safari.' },
         {
           instruction: 'Tap the More button at the bottom right.',
           alt: 'Safari on iPhone with the More button marked at the bottom right',
@@ -280,7 +281,7 @@ export const ENGLISH_WORDING = {
     ipad: installText({
       heading: 'iPad',
       steps: [
-        { instruction: 'Open Lucerna in Safari.' },
+        { instruction: 'Open Pray Lucerna in Safari.' },
         {
           instruction: 'Tap the Share button at the top right.',
           alt: 'Safari on iPad with the Share button marked at the top right',
@@ -302,7 +303,7 @@ export const ENGLISH_WORDING = {
     mac: installText({
       heading: 'Mac',
       steps: [
-        { instruction: 'Open Lucerna in Safari.' },
+        { instruction: 'Open Pray Lucerna in Safari.' },
         {
           instruction: 'Click the Share button, then click Add to Dock.',
           alt: 'The Safari share menu on a Mac with Add to Dock marked',
@@ -317,7 +318,7 @@ export const ENGLISH_WORDING = {
     android: installText({
       heading: 'Android',
       steps: [
-        { instruction: 'Open Lucerna in Chrome.' },
+        { instruction: 'Open Pray Lucerna in Chrome.' },
         {
           instruction: 'Tap the menu button at the top right.',
           alt: 'Chrome on Android with the menu button marked at the top right',
@@ -340,7 +341,7 @@ export const ENGLISH_WORDING = {
     desktop: installText({
       heading: 'Windows and Linux',
       steps: [
-        { instruction: 'Open Lucerna in the browser.' },
+        { instruction: 'Open Pray Lucerna in the browser.' },
         { instruction: 'Click the install icon at the right of the address bar.' },
         { instruction: 'Click Install.' },
       ],
@@ -349,7 +350,7 @@ export const ENGLISH_WORDING = {
     firefox: installText({
       heading: 'Firefox',
       steps: [
-        { instruction: 'Open Lucerna in Firefox on an Android phone or tablet.' },
+        { instruction: 'Open Pray Lucerna in Firefox on an Android phone or tablet.' },
         { instruction: 'Tap the menu button.' },
         { instruction: 'Tap Install.' },
       ],
@@ -358,7 +359,7 @@ export const ENGLISH_WORDING = {
   },
   splash: {
     continue: 'Continue',
-    preparing: 'Preparing Lucerna',
+    preparing: 'Preparing Pray Lucerna',
   },
   about: {
     title: 'About',
@@ -377,15 +378,15 @@ export const ENGLISH_WORDING = {
   },
   external: {
     title: 'Open an external website?',
-    body: 'This page is not part of Lucerna and may require an internet connection.',
+    body: 'This page is not part of Pray Lucerna and may require an internet connection.',
     stay: 'Stay here',
     continue: 'Continue',
   },
   settings: {
     whenOpens: 'When it opens',
     alsoWhileOpen: 'Also while open',
-    onLoadNote: 'Lucerna looks for a new version once, as it starts.',
-    whileOpenNote: 'If Lucerna is installed, the app also looks every twenty minutes.',
+    onLoadNote: 'Pray Lucerna looks for a new version once, as it starts.',
+    whileOpenNote: 'If Pray Lucerna is installed, the app also looks every twenty minutes.',
     sansSerif: 'Sans serif',
     general: 'General',
     custom: 'Custom',
@@ -439,7 +440,7 @@ export const ENGLISH_WORDING = {
     duringPrayer: 'During prayer',
     updates: 'Updates',
     externalLinks: 'External links',
-    askNote: 'Ask before opening a website outside Lucerna.',
+    askNote: 'Ask before opening a website outside Pray Lucerna.',
     askLabel: 'Ask before opening websites',
     sections: 'Settings sections',
     seconds: (seconds: string): string => `${seconds} seconds`,

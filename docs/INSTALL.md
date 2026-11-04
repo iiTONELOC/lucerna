@@ -1,6 +1,6 @@
-# Add Lucerna to your device
+# Add Pray Lucerna to your device
 
-Lucerna works in a browser. Add it to your device and it opens like any other application.
+Pray Lucerna works in a browser. Add it to your device and it opens like any other application.
 
 [Back to the README](../README.md)
 
@@ -8,7 +8,7 @@ Lucerna works in a browser. Add it to your device and it opens like any other ap
 
 **Safari**
 
-1. Open Lucerna in Safari.
+1. Open Pray Lucerna in Safari.
 2. Tap the More button at the bottom right.
 
    <img src="../src/assets/install/iphone-1-more.avif" alt="Safari on iPhone with the More button marked at the bottom right" width="320" />
@@ -33,7 +33,7 @@ Lucerna works in a browser. Add it to your device and it opens like any other ap
 
 **Safari**
 
-1. Open Lucerna in Safari.
+1. Open Pray Lucerna in Safari.
 2. Tap the Share button at the top right.
 
    <img src="../src/assets/install/ipad-1-share.avif" alt="Safari on iPad with the Share button marked at the top right" width="320" />
@@ -56,7 +56,7 @@ Lucerna works in a browser. Add it to your device and it opens like any other ap
 
 You can also choose File, then Add to Dock. This needs macOS Sonoma or later.
 
-1. Open Lucerna in Safari.
+1. Open Pray Lucerna in Safari.
 2. Click the Share button, then click Add to Dock.
 
    <img src="../src/assets/install/mac-1-add-to-dock.avif" alt="The Safari share menu on a Mac with Add to Dock marked" width="320" />
@@ -71,7 +71,7 @@ You can also choose File, then Add to Dock. This needs macOS Sonoma or later.
 
 Choose Install, not Create shortcut. A shortcut opens in the browser instead.
 
-1. Open Lucerna in Chrome.
+1. Open Pray Lucerna in Chrome.
 2. Tap the menu button at the top right.
 
    <img src="../src/assets/install/android-1-menu.avif" alt="Chrome on Android with the menu button marked at the top right" width="320" />
@@ -94,7 +94,7 @@ Choose Install, not Create shortcut. A shortcut opens in the browser instead.
 
 Chrome, Brave, Edge, and Opera work the same way on a Mac.
 
-1. Open Lucerna in the browser.
+1. Open Pray Lucerna in the browser.
 2. Click the install icon at the right of the address bar.
 3. Click Install.
 
@@ -104,6 +104,6 @@ Chrome, Brave, Edge, and Opera work the same way on a Mac.
 
 Firefox on the desktop cannot install web applications. Use Chrome, Brave, Edge, Opera, or Safari.
 
-1. Open Lucerna in Firefox on an Android phone or tablet.
+1. Open Pray Lucerna in Firefox on an Android phone or tablet.
 2. Tap the menu button.
 3. Tap Install.

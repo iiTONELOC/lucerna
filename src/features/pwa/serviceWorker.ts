@@ -70,7 +70,7 @@ const pruneEditions = async (): Promise<void> => {
 };
 
 const offlineMiss = (): Response =>
-  new Response('This Lucerna resource is not present in the installed version.', {
+  new Response('This Pray Lucerna resource is not present in the installed version.', {
     status: GATEWAY_TIMEOUT_STATUS,
     statusText: 'Offline resource unavailable',
   });

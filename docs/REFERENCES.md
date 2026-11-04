@@ -2,17 +2,17 @@
 table img { max-height: 250px; width: auto; border-radius: 3px; display: block; }
 </style>
 
-# Lucerna References
+# Pray Lucerna References
 
-This document records the sources used for Lucerna's Rosary prayers, Scripture passages, guidance, fruits, reflections, artwork, and rights.
+This document records the sources used for Pray Lucerna's Rosary prayers, Scripture passages, guidance, fruits, reflections, artwork, and rights.
 
-Quoted text is reproduced as published by the cited source. Lucerna's short guidance lines are original prompts based on the practices listed below.
+Quoted text is reproduced as published by the cited source. Pray Lucerna's short guidance lines are original prompts based on the practices listed below.
 
 The app keeps these reference records offline. Its external links let readers check the original pages when a network connection is available.
 
 ## Primary sources
 
-| Material                            | Source                                                                                                                                                                         | Use in Lucerna                                                                                        |
+| Material                            | Source                                                                                                                                                                         | Use in Pray Lucerna                                                                                   |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
 | Traditional prayer text             | [Rosary Center and Confraternity, Prayers of the Rosary](https://www.rosarycenter.org/how-to-pray-the-rosary-prayers-of-the-rosary)                                            | Our Father, Hail Mary, Glory Be, Fatima Prayer, Hail Holy Queen, and Final Prayer                     |
 | Opening prayers and Rosary sequence | [Rosary Center and Confraternity, How to Pray the Rosary](https://www.rosarycenter.org/how-to-pray-the-rosary/)                                                                | Sign of the Cross, Apostles' Creed, three opening intentions, and closing sequence                    |
@@ -34,7 +34,7 @@ The app keeps these reference records offline. Its external links let readers ch
 
 ## Rosary text
 
-Lucerna uses the traditional English prayer forms published by the Dominican Rosary Center.
+Pray Lucerna uses the traditional English prayer forms published by the Dominican Rosary Center.
 
 | Prayer                           | Source                                |
 | -------------------------------- | ------------------------------------- |
@@ -84,7 +84,7 @@ The Joyful, Sorrowful, and Glorious mappings follow the First Method, paragraphs
 
 ## Guidance
 
-The following lines are Lucerna's own concise prompts. Each line remains tied to the practice that supports it.
+The following lines are Pray Lucerna's own concise prompts. Each line remains tied to the practice that supports it.
 
 | Prayer step              | Guidance                                                                           | Source basis                                                                          |
 | ------------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -102,7 +102,7 @@ The following lines are Lucerna's own concise prompts. Each line remains tied to
 
 ## Artwork
 
-Lucerna includes 120 public-domain or open-access artworks. The Met and the National Gallery of Art supply CC0 files and records for their works.
+Pray Lucerna includes 120 public-domain or open-access artworks. The Met and the National Gallery of Art supply CC0 files and records for their works.
 
 Other images come from Wikimedia Commons file pages marked as public domain or PD-Art. Each record retains its artist, title, date, holder, and accession when available.
 
@@ -235,10 +235,10 @@ Other images come from Wikimedia Commons file pages marked as public domain or P
 
 The Douay-Rheims Bible text is public domain. The traditional prayers are public-domain liturgical text.
 
-The cited Vatican and USCCB pages support the selected mysteries, fruits, prayer order, and guidance. Lucerna does not bundle those web pages.
+The cited Vatican and USCCB pages support the selected mysteries, fruits, prayer order, and guidance. Pray Lucerna does not bundle those web pages.
 
 The bundled edition of `The Secret of the Rosary` is the 1954 United States edition translated by Mary Barbour. No matching renewal appears in the Stanford Copyright Renewal Database.
 
 The Met records identify their bundled images as CC0. Wikimedia Commons records identify most remaining files as public domain or PD-Art. Four files are CC BY or CC BY-SA photographs of public-domain works; each credits its photographer on the artwork record and cites the license.
 
-An artwork's underlying work, digital file, and source record can have separate rights statements. Lucerna retains the source statement attached to each file.
+An artwork's underlying work, digital file, and source record can have separate rights statements. Pray Lucerna retains the source statement attached to each file.

@@ -2868,7 +2868,7 @@
     }
   },
   "aiTranslation": {
-    "notice": "Estas traducciones son una ayuda de Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Informa de cualquier error a lucerna@wedefendit.com.",
+    "notice": "Estas traducciones son una ayuda de Pray Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Informa de cualquier error a lucerna@wedefendit.com.",
     "toolSourceIds": ["claude-opus-5-5", "gpt-6-astra"]
   }
 }

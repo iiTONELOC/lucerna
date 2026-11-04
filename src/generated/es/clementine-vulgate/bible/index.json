@@ -3,7 +3,7 @@
   "sourceId": "clementine-vulgate",
   "edition": "clementine-vulgate",
   "redLetter": {
-    "notice": "Estas marcas son una ayuda de Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Por ahora solo se marcan los versículos completos. Informa de cualquier error a lucerna@wedefendit.com.",
+    "notice": "Estas marcas son una ayuda de Pray Lucerna y no proceden directamente del texto fuente. Se prepararon con un asistente de IA y no se han revisado por completo. Por ahora solo se marcan los versículos completos. Informa de cualquier error a lucerna@wedefendit.com.",
     "toolSourceIds": ["claude-fable-5"],
     "witnessSourceIds": ["world-english-bible", "king-james-version"]
   },

@@ -79,7 +79,7 @@ const watchInstallingWorker = (worker: ServiceWorker): void => {
     }
 
     if (worker.state === ServiceWorkerContract.RedundantState) {
-      reportError(new Error('Lucerna could not store its offline copy.'));
+      reportError(new Error('Pray Lucerna could not store its offline copy.'));
     }
   });
 };
